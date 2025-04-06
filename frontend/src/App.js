@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // Ma
 import { getProducts } from "./services/productService";
 import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection"; // Your Home Page component
+import CartPage from "./components/CartPage"; // Your Home Page component
 import ProductGrid from "./components/ProductGrid"; // Your Products Page component
 import "./App.css"; // Global styles
 
@@ -38,6 +39,11 @@ function App() {
                         <Route 
                             path="/products"                    // When URL is "yourdomain.com/products"
                             element={<ProductGrid products={products} />} // Show the ProductGrid component
+                        />
+                        {/* Route for the Products Page */}
+                        <Route 
+                            path="/cart-page"                    // When URL is "yourdomain.com/products"
+                            element={<CartPage />} // Show the ProductGrid component
                         />
                         
                         {/* You can add more routes here for other pages */}

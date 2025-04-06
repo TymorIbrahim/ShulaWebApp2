@@ -21,6 +21,7 @@ const Navbar = () => {
           <li><Link to="/categories">מוצרים</Link></li>
           <li><Link to="/about">אודות</Link></li>
           <li><Link to="/contact">FAQ</Link></li>
+          <li><Link to="/cart-page">העגלה שלי</Link></li>
         </ul>
 
         {/* Mobile Menu Button */}
