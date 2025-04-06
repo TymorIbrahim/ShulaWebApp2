@@ -6,6 +6,7 @@ import HeroSection from "./components/HeroSection"; // Your Home Page component
 import CartPage from "./components/CartPage"; // Your Home Page component
 import ProductGrid from "./components/ProductGrid"; // Your Products Page component
 import "./App.css"; // Global styles
+import FAQs from "./components/FAQs";
 
 function App() {
     const [products, setProducts] = useState([]);
@@ -45,9 +46,10 @@ function App() {
                             path="/cart-page"                    // When URL is "yourdomain.com/products"
                             element={<CartPage />} // Show the ProductGrid component
                         />
-                        
-                        {/* You can add more routes here for other pages */}
-                        {/* e.g., <Route path="/about" element={<AboutComponent />} /> */}
+                        <Route 
+                            path="/faqs"                    // When URL is "yourdomain.com/products"
+                            element={<FAQs />} // Show the ProductGrid component
+                        />
 
                     </Routes>
                 </div>
