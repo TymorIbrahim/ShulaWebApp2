@@ -7,6 +7,7 @@ import CartPage from "./components/CartPage"; // Your Home Page component
 import ProductGrid from "./components/ProductGrid"; // Your Products Page component
 import "./App.css"; // Global styles
 import FAQs from "./components/FAQs";
+import About from "./components/About";
 
 function App() {
     const [products, setProducts] = useState([]);
@@ -43,12 +44,16 @@ function App() {
                         />
                         {/* Route for the Products Page */}
                         <Route 
-                            path="/cart-page"                    // When URL is "yourdomain.com/products"
-                            element={<CartPage />} // Show the ProductGrid component
+                            path="/cart-page"                   
+                            element={<CartPage />} 
                         />
                         <Route 
-                            path="/faqs"                    // When URL is "yourdomain.com/products"
-                            element={<FAQs />} // Show the ProductGrid component
+                            path="/faqs"                    
+                            element={<FAQs />}
+                        />
+                         <Route 
+                            path="/about"                    
+                            element={<About />} 
                         />
 
                     </Routes>
