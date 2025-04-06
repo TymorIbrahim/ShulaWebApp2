@@ -1,0 +1,142 @@
+/* 🌟 Navbar Styles */
+.navbar {
+  background: linear-gradient(to right, #1e3c72, #2a5298); /* ✅ Deep Blue Elegant Gradient */
+  color: white;
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  padding: 18px 0;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+  z-index: 100;
+  text-align: right;
+  direction: rtl;
+  backdrop-filter: blur(6px); /* ✅ Soft Glassmorphic Effect */
+  transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+/* 🌟 Navbar Container */
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1300px;
+  margin: auto;
+  padding: 0 40px;
+}
+
+/* 🌟 Logo */
+.navbar-logo {
+  font-size: 24px;
+  font-weight: bold;
+  text-decoration: none;
+  color: white;
+  transition: color 0.3s ease-in-out;
+}
+
+.navbar-logo:hover {
+  color: #f1c40f; /* ✅ Elegant Gold Hover Effect */
+}
+
+/* 🌟 Desktop Navigation Links */
+.navbar-links {
+  display: flex;
+  gap: 35px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-direction: row-reverse;
+}
+
+.navbar-links li {
+  display: inline-block;
+}
+
+.navbar-links a {
+  text-decoration: none;
+  color: white;
+  font-size: 18px;
+  font-weight: 500;
+  padding: 10px 16px;
+  border-radius: 8px;
+  transition: background 0.3s, box-shadow 0.3s, transform 0.2s ease-in-out;
+}
+
+.navbar-links a:hover {
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
+}
+
+/* 🌟 Mobile Menu Button */
+.menu-button {
+  display: none;
+  font-size: 30px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.menu-button.active {
+  transform: rotate(90deg);
+}
+
+/* 🌟 Mobile Menu */
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  background: rgba(30, 60, 114, 0.9); /* ✅ Darker blue for contrast */
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 75%;
+  height: 100vh;
+  padding: 40px 25px;
+  text-align: right;
+  direction: rtl;
+  transform: translateX(100%);
+  opacity: 0;
+  transition: transform 0.4s ease-in-out, opacity 0.3s ease-in-out;
+  border-radius: 0 0 20px 20px;
+}
+
+/* 🌟 Mobile Menu Links */
+.mobile-menu a {
+  display: block;
+  color: white;
+  padding: 18px;
+  font-size: 20px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background 0.3s, transform 0.2s;
+  border-radius: 8px;
+}
+
+.mobile-menu a:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateX(-5px);
+}
+
+/* ✅ Open Mobile Menu */
+.mobile-menu.open {
+  display: flex;
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* 🌟 Responsive Design */
+@media (max-width: 900px) {
+  .navbar-container {
+      justify-content: flex-end;
+  }
+
+  .navbar-links {
+      display: none;
+  }
+
+  .menu-button {
+      display: block;
+  }
+}

@@ -1,0 +1,19 @@
+
+
+/* Optional: Add global styles */
+body {
+  direction: rtl; /* ✅ Ensures Right-to-Left Layout */
+  text-align: right; /* ✅ Aligns Text Properly */
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+
+
+
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
