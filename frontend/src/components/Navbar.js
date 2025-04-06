@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./Navbar.css";
+import logoImage from '../assets/logo.avif';
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -9,16 +10,17 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-container">
         {/* Logo */}
+        {/* 👇 2. Replace text with the img tag inside the Link */}
         <Link to="/" className="navbar-logo">
-          שולה - השכרת ציוד קהילתי
+          <img src={logoImage} alt="שולה לוגו" /> {/* <-- Use imported logo */}
         </Link>
 
         {/* Desktop Navigation */}
         <ul className="navbar-links">
           <li><Link to="/">דף הבית</Link></li>
-          <li><Link to="/categories">קטגוריות</Link></li>
+          <li><Link to="/categories">מוצרים</Link></li>
           <li><Link to="/about">אודות</Link></li>
-          <li><Link to="/contact">צור קשר</Link></li>
+          <li><Link to="/contact">FAQ</Link></li>
         </ul>
 
         {/* Mobile Menu Button */}
@@ -30,7 +32,7 @@ const Navbar = () => {
       {/* Mobile Dropdown Menu */}
       <div className={`mobile-menu ${menuOpen ? "open" : ""}`}>
         <Link to="/" onClick={() => setMenuOpen(false)}>דף הבית</Link>
-        <Link to="/categories" onClick={() => setMenuOpen(false)}>קטגוריות</Link>
+        <Link to="/categories" onClick={() => setMenuOpen(false)}>מוצרים</Link>
         <Link to="/about" onClick={() => setMenuOpen(false)}>אודות</Link>
         <Link to="/contact" onClick={() => setMenuOpen(false)}>צור קשר</Link>
       </div>
