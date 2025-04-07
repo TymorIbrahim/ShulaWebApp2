@@ -10,6 +10,7 @@ import FAQs from "./components/FAQs";
 import About from "./components/About";
 import LoginPage from "./components/LoginPage";
 import SignIn from "./components/SignIn";
+import AdminSettings from "./pages/AdminSettings";
 import "./App.css";
 
 function App() {
@@ -65,6 +66,7 @@ function App() {
 
             {/* Sign-up page route */}
             <Route path="/signup" element={<SignIn />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
           </Routes>
         </div>
       </div>
