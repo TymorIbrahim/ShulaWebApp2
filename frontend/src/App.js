@@ -25,6 +25,7 @@ import SignupPage from './pages/SignupPage'
 import AdminDashboard from './pages/AdminDashboard'; 
 import ManageProducts from "./pages/ManageProducts";
 import AdminSettings from "./pages/AdminSettings";
+
 // import ManageRentals from "./pages/ManageRentals"; 
 
 // --- CSS Imports ---
@@ -62,18 +63,28 @@ function App() {
                                 <Route path="/faqs" element={<FAQs />} />
                                 <Route path="/about" element={<About />} />
 
+
+                                <Route path="/admin" element={<AdminDashboard />} /> 
+                                <Route path="/admin/products/new" element={<ProductForm isEditing={false} />} /> 
+                                <Route path="/admin/products/edit/:productId" element={<ProductForm isEditing={true} />} />
+                                <Route path="/admin/settings" element={<AdminSettings />} />
+                                <Route path="/admin/manage-products-page" element={<ManageProducts />} />
+
+
+
                                 {/* === Authentication Route === */}
-                                <Route path="/login" element={<LoginPage />} />
+                                <Route path="/loginpage" element={<LoginPage />} />
                                 <Route path="/signup" element={<SignupPage />} />
 
 
                                 {/* === Protected Admin Routes === */}
                                 <Route element={<ProtectedRoute />}> 
-                                    <Route path="/admin" element={<AdminDashboard />} /> 
-                                    <Route path="/admin/products" element={<ManageProducts />} />
-                                    <Route path="/admin/products/new" element={<ProductForm isEditing={false} />} /> 
-                                    <Route path="/admin/products/edit/:productId" element={<ProductForm isEditing={true} />} />
-                                    <Route path="/admin/settings" element={<AdminSettings />} />
+                                    
+
+
+
+
+
                                 </Route>
                             </Routes>
                         </div>

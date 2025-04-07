@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 // Assume service functions exist for admin actions in 'adminService.js'
 import { getAdminProductById, createAdminProduct, updateAdminProduct } from '../services/adminService'; 
-// import './ProductForm.css'; // Create CSS for styling
+import './ProductForm.css';
 
 const ProductForm = ({ isEditing = false }) => {
   // Form field states
@@ -111,55 +111,57 @@ const ProductForm = ({ isEditing = false }) => {
   return (
     // Add a CSS class for styling the form container
     <form onSubmit={handleSubmit} className="product-form"> 
-      <h2>{isEditing ? 'Edit Product' : 'Add New Product'}</h2>
-      
-      {/* Use form-group divs for easier styling */}
-      <div className="form-group">
-          <label htmlFor="name">Name:</label>
-          <input type="text" id="name" value={name} onChange={e => setName(e.target.value)} required />
-      </div>
-      <div className="form-group">
-          <label htmlFor="description">Description:</label>
-          <textarea id="description" value={description} onChange={e => setDescription(e.target.value)} />
-      </div>
-      <div className="form-group">
-          <label htmlFor="price">Price (₪):</label>
-          <input type="number" id="price" value={price} onChange={e => setPrice(e.target.value)} required min="0" step="0.01" />
-      </div>
-      <div className="form-group">
-          <label htmlFor="status">Status:</label> 
-          <select id="status" value={status} onChange={e => setStatus(e.target.value)}>
-              <option value="Available">Available</option>
-              <option value="Rented">Rented</option>
-              <option value="Maintenance">Maintenance</option>
-          </select>
-      </div>
-      <div className="form-group">
-          <label htmlFor="conditionNotes">Condition Notes:</label> 
-          <textarea id="conditionNotes" value={conditionNotes} onChange={e => setConditionNotes(e.target.value)} />
-      </div>
-      <div className="form-group">
-          <label htmlFor="image">Image:</label>
-          {/* Show current image preview if editing and available */}
-          {isEditing && imageUrl && !imageFile && (
-              <img src={imageUrl} alt="Current product" style={{maxWidth: '100px', display: 'block', marginBottom: '10px'}}/>
-          )}
-          <input type="file" id="image" onChange={handleImageChange} accept="image/*" />
-          {imageFile && <p>New file selected: {imageFile.name}</p>}
-      </div>
+      <h2>{isEditing ? 'עריכת מוצר' : 'הוספת מוצר חדש'}</h2>
 
-      {/* Display error messages */}
-      {error && <p className="error-message" style={{color: 'red'}}>{error}</p>} 
-      
-      {/* Submit and Cancel Buttons */}
-      <div className="form-buttons">
-          <button type="submit" disabled={loadingSubmit || loadingFetch} className="admin-button submit-button">
-            {loadingSubmit ? 'Saving...' : (isEditing ? 'Update Product' : 'Add Product')}
-          </button>
-          <button type="button" onClick={() => navigate('/admin/products')} className="admin-button cancel-button" disabled={loadingSubmit}>
-              Cancel
-          </button>
-      </div>
+<div className="form-group">
+  <label htmlFor="name">שם:</label>
+  <input type="text" id="name" value={name} onChange={e => setName(e.target.value)} required />
+</div>
+
+<div className="form-group">
+  <label htmlFor="description">תיאור:</label>
+  <textarea id="description" value={description} onChange={e => setDescription(e.target.value)} />
+</div>
+
+<div className="form-group">
+  <label htmlFor="price">מחיר (₪):</label>
+  <input type="number" id="price" value={price} onChange={e => setPrice(e.target.value)} required min="0" step="0.01" />
+</div>
+
+<div className="form-group">
+  <label htmlFor="status">סטטוס:</label>
+  <select id="status" value={status} onChange={e => setStatus(e.target.value)}>
+    <option value="Available">זמין</option>
+    <option value="Rented">בהשאלה</option>
+    <option value="Maintenance">בתיקון</option>
+  </select>
+</div>
+
+<div className="form-group">
+  <label htmlFor="conditionNotes">הערות למצב:</label>
+  <textarea id="conditionNotes" value={conditionNotes} onChange={e => setConditionNotes(e.target.value)} />
+</div>
+
+<div className="form-group">
+  <label htmlFor="image">תמונה:</label>
+  {isEditing && imageUrl && !imageFile && (
+    <img src={imageUrl} alt="Current product" style={{ maxWidth: '100px', display: 'block', marginBottom: '10px' }} />
+  )}
+  <input type="file" id="image" onChange={handleImageChange} accept="image/*" />
+  {imageFile && <p>הקובץ שנבחר: {imageFile.name}</p>}
+</div>
+
+{error && <p className="error-message" style={{ color: 'red' }}>{error}</p>}
+
+<div className="form-buttons">
+  <button type="submit" disabled={loadingSubmit || loadingFetch} className="admin-button submit-button">
+    {loadingSubmit ? 'שומר...' : isEditing ? 'עדכן מוצר' : 'הוסף מוצר'}
+  </button>
+  <button type="button" onClick={() => navigate('/admin/products')} className="admin-button cancel-button" disabled={loadingSubmit}>
+    ביטול
+  </button>
+</div>
+
     </form>
   );
 };

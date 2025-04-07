@@ -1,122 +1,87 @@
-// src/pages/ManageProducts.js
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-// Assuming you create this service file and functions
-import { getAdminProducts, deleteAdminProduct } from '../services/adminService'; 
-// import './ManageProducts.css'; // Create CSS for styling
+import React, { useEffect, useState } from "react";
+import { getProducts, deleteProduct } from "../services/productService";
+import { useNavigate } from "react-router-dom";
+import "./ManageProducts.css";
 
 const ManageProducts = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Function to fetch products (can be called on mount and after delete)
-  const fetchProducts = async () => {
-    try {
-      setLoading(true);
-      setError('');
-      // Call the service function to get admin products
-      const data = await getAdminProducts(); // Replace with REAL API call
-      // Ensure data has the 'id' field needed for the table key/actions
-      // This mapping assumes the service returns items with '_id' and we want 'id'
-      const formattedData = data.map(p => ({ ...p, id: p._id || p.id })); 
-      setProducts(formattedData);
-    } catch (err) {
-      setError('Failed to fetch products. Please ensure backend is running and API exists.');
-      console.error("Fetch Error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  // Fetch data when component mounts
   useEffect(() => {
-    fetchProducts();
-  }, []); // Empty dependency array means run once on mount
+    const fetchAllProducts = async () => {
+      const data = await getProducts();
+      setProducts(data || []);
+    };
+    fetchAllProducts();
+  }, []);
 
-  // Handle delete button click
-  const handleDelete = async (productId, productName) => {
-    // Confirmation dialog
-    if (window.confirm(`Are you sure you want to delete "${productName}" (ID: ${productId})? This action cannot be undone.`)) {
-      try {
-        setError(''); // Clear previous errors
-        // Call the service function to delete the product via API
-        await deleteAdminProduct(productId); // Replace with REAL API call
-        alert(`Product "${productName}" deleted successfully (simulation).`);
-        // Refetch the product list to show the change
-        fetchProducts(); 
-      } catch (err) {
-        setError('Failed to delete product. Please check console.');
-        console.error("Delete Error:", err);
-        alert(`Error deleting product: ${err.message}`); // Show error to user
-      }
+  const handleDelete = async (productId) => {
+    const confirmDelete = window.confirm("האם אתה בטוח שברצונך למחוק מוצר זה?");
+    if (!confirmDelete) return;
+
+    try {
+      await deleteProduct(productId);
+      setProducts((prev) => prev.filter((p) => p._id !== productId));
+    } catch (err) {
+      alert("שגיאה במחיקת המוצר.");
+      console.error(err);
     }
   };
 
-  // --- Render Logic ---
+  const handleEdit = (productId) => {
+    navigate(`/admin/products/edit/${productId}`);
+  };
 
-  if (loading) return <p>Loading products...</p>;
-  // Display error more prominently
-  if (error) return <p style={{ color: 'red', fontWeight: 'bold' }}>ERROR: {error}</p>;
+  const handleAdd = () => {
+    navigate("/admin/add");
+  };
+
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="manage-products-container"> {/* Add styles for this container */}
-      <h2>Manage Inventory</h2>
-      
-      <div style={{ marginBottom: '20px' }}> {/* Add space below button */}
-        <Link to="/admin/products/new" className="admin-button add-product-button"> 
-          + Add New Product
-        </Link>
-      </div>
+    <div className="/admin/manage-products-page">
+      <div className="top-bar">
+       <h2>ניהול מוצרים</h2>
+       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <input
+           type="text"
+            placeholder="חפש מוצר לפי שם..."
+           value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+           style={{
+             padding: "8px 12px",
+             borderRadius: "6px",
+             border: "1px solid #ccc",
+             fontSize: "14px",
+             direction: "rtl",
+           }}
+         />
+        <button className="add-product-btn" onClick={() => navigate('/admin/products/new')}>
+         ➕ הוסף מוצר חדש
+        </button>
 
-      {/* Table to display products */}
-      <table className="admin-table"> {/* Add styles for this table */}
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Price (₪)</th>
-            <th>Status</th>
-            <th>Condition Notes</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {/* Check if products array exists and has items */}
-          {products && products.length > 0 ? (
-            products.map(product => (
-              <tr key={product.id}> {/* Use consistent 'id' */}
-                <td>{product.id}</td> 
-                <td>{product.name || 'N/A'}</td>
-                <td>{product.price ?? 'N/A'}</td>
-                <td>{product.status || 'N/A'}</td>
-                <td>{product.conditionNotes || 'N/A'}</td>
-                <td className="action-buttons"> {/* Class for easier styling */}
-                  <Link 
-                    to={`/admin/products/edit/${product.id}`} 
-                    className="admin-button edit-button" 
-                  >
-                    Edit
-                  </Link>
-                  <button 
-                    onClick={() => handleDelete(product.id, product.name)}
-                    className="admin-button delete-button" 
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            // Message when no products are found
-            <tr>
-              <td colSpan="6" style={{ textAlign: 'center', padding: '20px' }}>
-                  No products found. Add one!
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+        </div>
+      </div>
+      <div className="product-list">
+       {filteredProducts.map((product) => (
+
+          <div className="product-card" key={product._id}>
+            <img src={product.productImageUrl || "/placeholder.jpg"} alt={product.name} />
+            <div className="info">
+              <h3>{product.name}</h3>
+              <p>{product.price} ₪</p>
+            </div>
+            <div className="actions">
+              <button onClick={() => handleEdit(product._id)}>✏️ ערוך</button>
+              <button onClick={() => handleDelete(product._id)}>🗑️ מחק</button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
