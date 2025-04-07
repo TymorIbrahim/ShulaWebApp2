@@ -1,63 +1,197 @@
+/* Overall Cart Page Container */
 .cart-page {
-    padding: 2rem;
-    max-width: 800px;
-    margin: 0 auto;
-    background-color: #f9f9f9;
-    border-radius: 12px;
-  }
-  
-  .cart-title {
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-  
-  .cart-items {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .cart-item {
-    display: flex;
-    justify-content: space-between;
-    background: white;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  }
-  
-  .item-info h3 {
-    margin: 0 0 0.5rem 0;
-  }
-  
-  .cart-summary {
-    margin-top: 2rem;
-    text-align: right;
-  }
-  
-  .book-button {
-    background-color: #28a745;
-    color: white;
-    font-size: 1.1rem;
-    padding: 0.8rem 1.5rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  
-  .book-button:hover {
-    background-color: #218838;
-  }
+  background: #ffffff;
+  padding: 2rem;
+  max-width: 900px;
+  margin: 2rem auto;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  font-family: 'Roboto', sans-serif;
+  color: #333;
+}
 
-  .cart-banner {
-    width: 200px;     /* adjust as needed */
-    height: auto;
-    display: block;
-    margin: 0 auto 2rem auto; /* centers the image and adds bottom spacing */
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  
-  
+/* Cart Header */
+.cart-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.cart-banner {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin-bottom: 1rem;
+}
+
+.cart-title {
+  font-size: 2.2rem;
+  margin: 0;
+  color: #444;
+}
+
+/* Error and Empty States */
+.error-msg {
+  color: #d9534f;
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.empty-cart {
+  text-align: center;
+  font-size: 1.3rem;
+  color: #777;
+  margin: 2rem 0;
+}
+
+/* Cart Items List */
+.cart-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Each Cart Item Card */
+.cart-item {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: #fdfdfd;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cart-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+}
+
+/* Item Information */
+.item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.item-name {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.item-dates {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #666;
+}
+
+.rental-info {
+  font-size: 0.85rem;
+  color: #888;
+  font-style: italic;
+  margin-top: 0.3rem;
+}
+
+/* Action Buttons */
+.item-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  padding: 0.5rem 0.8rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.edit-btn {
+  background: #ffc107;
+  color: #fff;
+}
+
+.edit-btn:hover {
+  background: #e0a800;
+  transform: scale(1.05);
+}
+
+.delete-btn {
+  background: #dc3545;
+  color: #fff;
+}
+
+.delete-btn:hover {
+  background: #c82333;
+  transform: scale(1.05);
+}
+
+/* Item Price */
+.item-price {
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: right;
+  color: #333;
+}
+
+/* Cart Summary Section */
+.cart-summary {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eaeaea;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.summary-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.total-title {
+  font-size: 1.6rem;
+  margin: 0;
+  color: #333;
+}
+
+.total-amount {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #28a745;
+}
+
+/* Checkout Button */
+.checkout-btn {
+  background: linear-gradient(90deg, #ff7e5f, #feb47b);
+  color: #fff;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.checkout-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Loading State */
+.loading {
+  text-align: center;
+  font-size: 1.3rem;
+  color: #333;
+}

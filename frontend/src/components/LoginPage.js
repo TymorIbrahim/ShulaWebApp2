@@ -1,32 +1,35 @@
 import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { login } from "../services/authService";
 import "./LoginPage.css";
-import { Link } from "react-router-dom"; // make sure this is imported
-
 
 const LoginPage = ({ onLogin }) => {
   const [formData, setFormData] = useState({ email: "", password: "", remember: false });
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: type === "checkbox" ? checked : value,
-    });
+    }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     const { email, password } = formData;
-
     if (!email || !password) {
       setError("Please fill in all fields");
       return;
     }
-
-    setError("");
-    onLogin?.("user");
+    try {
+      const data = await login({ email, password });
+      onLogin(data.user);
+      navigate("/");
+    } catch (err) {
+      setError(err.message || "Login failed");
+    }
   };
 
   return (
@@ -34,7 +37,7 @@ const LoginPage = ({ onLogin }) => {
       <div className="loginpage">
         <form className="login-form" onSubmit={handleSubmit}>
           <h2>התחברות</h2>
-  
+          {error && <p className="error">{error}</p>}
           <input
             type="email"
             name="email"
@@ -49,7 +52,6 @@ const LoginPage = ({ onLogin }) => {
             value={formData.password}
             onChange={handleChange}
           />
-  
           <label className="remember-me">
             <input
               type="checkbox"
@@ -59,13 +61,8 @@ const LoginPage = ({ onLogin }) => {
             />
             זכור אותי ל-30 יום
           </label>
-  
-          {error && <p className="error">{error}</p>}
-  
           <button type="submit" className="login-btn">התחבר</button>
-  
           <div className="divider">או</div>
-  
           <button type="button" className="google-btn">
             <img
               src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
@@ -73,9 +70,7 @@ const LoginPage = ({ onLogin }) => {
             />
             התחברות עם Google
           </button>
-  
           <a href="#" className="forgot-password">שכחת סיסמה?</a>
-  
           <p style={{ marginTop: "20px", fontSize: "14px" }}>
             אין לך חשבון?{" "}
             <Link to="/signup" style={{ color: "#2962ff", textDecoration: "none" }}>

@@ -1,16 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getProduct } from "../services/productService";
-import { getBookedDates } from "../services/orderService"; // Make sure to create this service file
+import { getBookedDates } from "../services/orderService";
 import RentalDatePickerModal from "./RentalDatePickerModal";
+import { addToCart } from "../services/cartService";
+import ChoiceModal from "./ChoiceModal";  // Import the new modal component
 import "./ProductDetails.css";
 
-const ProductDetails = () => {
+const ProductDetails = ({ user }) => {
   const { productId } = useParams();
   const [product, setProduct] = useState(null);
   const [bookedDates, setBookedDates] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [choiceModalOpen, setChoiceModalOpen] = useState(false);
   const navigate = useNavigate();
+
+  // Redirect to login if no user
+  useEffect(() => {
+    if (!user) {
+      navigate("/loginpage");
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     // Fetch product details
@@ -27,7 +37,7 @@ const ProductDetails = () => {
     const fetchBookedDates = async () => {
       try {
         const dates = await getBookedDates(productId);
-        // Convert returned date strings to Date objects (if needed)
+        // Convert returned date strings to Date objects
         const convertedDates = dates.map(dateStr => new Date(dateStr));
         setBookedDates(convertedDates);
       } catch (error) {
@@ -47,12 +57,38 @@ const ProductDetails = () => {
     setModalIsOpen(false);
   };
 
-  const handleConfirmRental = ({ startDate, endDate }) => {
-    // Integrate with your cart logic here.
-    console.log("Rental confirmed:", { startDate, endDate });
-    alert(
-      `המוצר הושכר מה-${startDate.toLocaleDateString()} עד ${endDate.toLocaleDateString()}`
-    );
+  // Instead of window.confirm, open the custom ChoiceModal after successful add-to-cart
+  const handleConfirmRental = async ({ startDate, endDate }) => {
+    if (!user) {
+      alert("נא להתחבר כדי להוסיף לעגלה.");
+      navigate("/loginpage");
+      return;
+    }
+    try {
+      const cartItemData = {
+        user: user._id,
+        product: product._id,
+        rentalPeriod: { startDate, endDate },
+      };
+      console.log("Sending cart item data:", cartItemData);
+      const response = await addToCart(cartItemData);
+      console.log("Item added to cart:", response);
+      // Open the Choice Modal instead of using window.confirm
+      setChoiceModalOpen(true);
+    } catch (error) {
+      console.error("Error adding item to cart:", error);
+      alert("אירעה שגיאה בהוספת הפריט לעגלה.");
+    }
+  };
+
+  const handleViewCart = () => {
+    setChoiceModalOpen(false);
+    navigate("/cart-page");
+  };
+
+  const handleContinueShopping = () => {
+    setChoiceModalOpen(false);
+    navigate("/products");
   };
 
   if (!product) return <div>טוען פרטי מוצר...</div>;
@@ -78,12 +114,20 @@ const ProductDetails = () => {
         </button>
       </div>
 
-      {/* Rental Date Picker Modal receives bookedDates as prop */}
+      {/* Rental Date Picker Modal */}
       <RentalDatePickerModal
         isOpen={modalIsOpen}
         onRequestClose={handleModalClose}
         onConfirm={handleConfirmRental}
         bookedDates={bookedDates}
+      />
+
+      {/* Choice Modal for next action after adding to cart */}
+      <ChoiceModal
+        isOpen={choiceModalOpen}
+        onClose={() => setChoiceModalOpen(false)}
+        onViewCart={handleViewCart}
+        onContinueShopping={handleContinueShopping}
       />
     </div>
   );

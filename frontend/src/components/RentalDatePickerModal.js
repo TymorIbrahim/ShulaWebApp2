@@ -7,12 +7,12 @@ import "./RentalDatePickerModal.css";
 // Bind modal for accessibility
 Modal.setAppElement("#root");
 
-const RentalDatePickerModal = ({ isOpen, onRequestClose, onConfirm }) => {
-  // Use a single state array for range selection [start, end]
+const RentalDatePickerModal = ({ isOpen, onRequestClose, onConfirm, bookedDates }) => {
+  // Use a state array for range selection [start, end]
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
 
-  // Only allow Sundays (0), Tuesdays (2), and Thursdays (4)
+  // Allow only Sundays (0), Tuesdays (2), and Thursdays (4)
   const filterDates = (date) => {
     const day = date.getDay();
     return day === 0 || day === 2 || day === 4;

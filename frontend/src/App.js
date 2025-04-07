@@ -14,14 +14,15 @@ import "./App.css";
 
 function App() {
   const [products, setProducts] = useState([]);
-  const [userRole, setUserRole] = useState(null);
+  const [user, setUser] = useState(null); // holds logged in user details
 
-  // Example login handler, which sets the user role
-  const handleLogin = (role) => {
-    setUserRole(role);
-    console.log("User logged in as:", role);
+  // Handler for successful login/sign-up
+  const handleLogin = (userData) => {
+    setUser(userData);
+    console.log("User logged in:", userData);
   };
 
+  // Fetch products when app loads
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -38,33 +39,19 @@ function App() {
   return (
     <Router>
       <div className="app-container">
-        {/* Navbar appears on all pages */}
-        <Navbar />
+        {/* Navbar appears on all pages; pass the user and logout handler if needed */}
+        <Navbar user={user} />
         <div className="content-wrapper">
           <Routes>
-            {/* Home page route */}
             <Route path="/" element={<HeroSection />} />
-
-            {/* Products grid route */}
             <Route path="/products" element={<ProductGrid products={products} />} />
-
-            {/* Product details route, uses URL parameter */}
-            <Route path="/products/:productId" element={<ProductDetails />} />
-
-            {/* Cart page route */}
-            <Route path="/cart-page" element={<CartPage />} />
-
-            {/* FAQs page */}
+            {/* Pass the user prop to ProductDetails */}
+            <Route path="/products/:productId" element={<ProductDetails user={user} />} />
+            <Route path="/cart-page" element={<CartPage user={user} />} />
             <Route path="/faqs" element={<FAQs />} />
-
-            {/* About page */}
             <Route path="/about" element={<About />} />
-
-            {/* Login page route */}
             <Route path="/loginpage" element={<LoginPage onLogin={handleLogin} />} />
-
-            {/* Sign-up page route */}
-            <Route path="/signup" element={<SignIn />} />
+            <Route path="/signup" element={<SignIn onLogin={handleLogin} />} />
           </Routes>
         </div>
       </div>
