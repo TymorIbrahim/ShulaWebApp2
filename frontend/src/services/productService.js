@@ -12,3 +12,14 @@ export const getProducts = async () => {
         return [];
     }
 };
+
+// Fetch a single product by its ID
+export const getProduct = async (productId) => {
+    try {
+        const response = await axios.get(`${API_URL}/${productId}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching product details:", error);
+        throw error;
+    }
+};

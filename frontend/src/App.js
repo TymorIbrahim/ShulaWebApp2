@@ -8,6 +8,8 @@ import ProductGrid from "./components/ProductGrid"; // Your Products Page compon
 import "./App.css"; // Global styles
 import FAQs from "./components/FAQs";
 import About from "./components/About";
+import ProductDetails from "./components/ProductDetails";
+
 
 function App() {
     const [products, setProducts] = useState([]);
@@ -47,6 +49,8 @@ function App() {
                             path="/cart-page"                   
                             element={<CartPage />} 
                         />
+                        <Route path="/products/:productId" element={<ProductDetails />} />
+
                         <Route 
                             path="/faqs"                    
                             element={<FAQs />}

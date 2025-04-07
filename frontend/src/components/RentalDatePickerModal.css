@@ -1,0 +1,65 @@
+/* RentalDatePickerModal.css */
+
+.rental-modal {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 40px;
+    border-radius: 10px;
+    max-width: 500px;
+    width: 90%;
+    direction: rtl;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  }
+  
+  .rental-modal-overlay {
+    background: rgba(0, 0, 0, 0.5);
+  }
+  
+  .date-picker-group {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    gap: 20px;
+  }
+  
+  .date-picker-item {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .date-picker-item label {
+    margin-bottom: 8px;
+    font-weight: bold;
+  }
+  
+  .modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  
+  .confirm-button,
+  .cancel-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .confirm-button {
+    background: linear-gradient(90deg, #ff7e5f, #feb47b);
+    color: #fff;
+  }
+  
+  .cancel-button {
+    background: #ccc;
+    color: #333;
+  }
+  
