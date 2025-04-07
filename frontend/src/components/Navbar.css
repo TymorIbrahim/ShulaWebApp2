@@ -1,142 +1,164 @@
-/* 🌟 Navbar Styles */
+/* src/components/Navbar.css */
 .navbar {
-  background: linear-gradient(to right, #3a61ab, #5c6b86); /* ✅ Deep Blue Elegant Gradient */
-  color: white;
+  /* Use a color from the palette - primary-dark (muted rose) */
+  background-color: var(--primary-color-dark); /* Was --primary-dark-brown */
+  height: var(--navbar-height);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.05rem; /* Slightly smaller base font */
   position: fixed;
   top: 0;
-  right: 0;
+  left: 0;
   width: 100%;
-  padding: 18px 0;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
-  z-index: 100;
-  text-align: right;
-  direction: rtl;
-  backdrop-filter: blur(6px); /* ✅ Soft Glassmorphic Effect */
-  transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  z-index: 999;
+  /* Use theme shadow color */
+  box-shadow: 0 2px 6px rgba(102, 84, 94, 0.15); /* Tinted with aesthetic-dark-purple */
 }
 
-/* 🌟 Navbar Container */
 .navbar-container {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1300px;
-  margin: auto;
-  padding: 0 40px;
+  justify-content: space-between; /* Keep space-between */
+  align-items: center; /* Vertically align items */
+  height: var(--navbar-height);
+  width: 100%;
+  /* Constrain width and center */
+  max-width: var(--content-max-width); /* Match main content width */
+  padding: 0 var(--spacing-xl); /* Match main content padding */
+  margin: 0 auto; /* Center container */
 }
 
-/* 🌟 Logo */
 .navbar-logo {
-  font-size: 24px;
-  font-weight: bold;
+  color: var(--text-light); /* Keep text/logo light */
+  cursor: pointer;
   text-decoration: none;
-  color: white;
-  transition: color 0.3s ease-in-out;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  /* Adjust margin if needed */
+  margin-left: var(--spacing-md); /* Add some margin for RTL */
 }
 
-.navbar-logo:hover {
-  color: #f1c40f; /* ✅ Elegant Gold Hover Effect */
+.navbar-logo img {
+  /* Adjust logo height based on navbar height */
+  height: calc(var(--navbar-height) - 25px); /* Slightly smaller logo */
+  width: auto;
+  display: block;
 }
 
-/* 🌟 Desktop Navigation Links */
 .navbar-links {
   display: flex;
-  gap: 35px;
+  align-items: center;
   list-style: none;
-  margin: 0;
-  padding: 0;
-  flex-direction: row-reverse;
+  text-align: center;
+  margin: 0; /* Reset default ul margin */
+  padding: 0; /* Reset default ul padding */
 }
 
 .navbar-links li {
-  display: inline-block;
+  height: var(--navbar-height);
+  display: flex; /* Use flex on li to center link vertically */
+  align-items: center;
 }
 
 .navbar-links a {
+  color: var(--text-light); /* Light text for links */
+  display: flex;
+  align-items: center;
   text-decoration: none;
-  color: white;
-  font-size: 18px;
-  font-weight: 500;
-  padding: 10px 16px;
-  border-radius: 8px;
-  transition: background 0.3s, box-shadow 0.3s, transform 0.2s ease-in-out;
+  padding: 0 1.1rem; /* Adjust horizontal padding */
+  height: 100%;
+  transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+  font-weight: 400; /* Normal weight */
+  border-bottom: 3px solid transparent; /* Prepare for active indicator */
+  box-sizing: border-box;
 }
 
-.navbar-links a:hover {
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
-  transform: scale(1.05);
+.navbar-links a:hover,
+.navbar-links a:focus { /* Add focus state */
+  /* Use primary color (terracotta) for hover background */
+  background-color: var(--primary-color);
+  color: var(--text-light); /* Keep text light */
+  border-bottom-color: transparent; /* Hide border on hover */
+  outline: none; /* Remove focus outline if bg change is enough */
 }
 
-/* 🌟 Mobile Menu Button */
+/* Optional: Style for active link (requires NavLink from react-router-dom) */
+.navbar-links a.active {
+    border-bottom-color: var(--accent-color); /* Use accent color for underline */
+    /* background-color: rgba(255, 255, 255, 0.05); Optional subtle bg */
+    font-weight: 500; /* Slightly bolder active link */
+}
+
+
+/* Mobile styles */
 .menu-button {
   display: none;
-  font-size: 30px;
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-  transition: transform 0.2s ease-in-out;
 }
-
-.menu-button.active {
-  transform: rotate(90deg);
-}
-
-/* 🌟 Mobile Menu */
 .mobile-menu {
   display: none;
-  flex-direction: column;
-  background: rgba(30, 60, 114, 0.9); /* ✅ Darker blue for contrast */
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 75%;
-  height: 100vh;
-  padding: 40px 25px;
-  text-align: right;
-  direction: rtl;
-  transform: translateX(100%);
-  opacity: 0;
-  transition: transform 0.4s ease-in-out, opacity 0.3s ease-in-out;
-  border-radius: 0 0 20px 20px;
 }
 
-/* 🌟 Mobile Menu Links */
-.mobile-menu a {
-  display: block;
-  color: white;
-  padding: 18px;
-  font-size: 20px;
-  font-weight: bold;
-  text-decoration: none;
-  transition: background 0.3s, transform 0.2s;
-  border-radius: 8px;
-}
-
-.mobile-menu a:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateX(-5px);
-}
-
-/* ✅ Open Mobile Menu */
-.mobile-menu.open {
-  display: flex;
-  opacity: 1;
-  transform: translateX(0);
-}
-
-/* 🌟 Responsive Design */
-@media (max-width: 900px) {
+@media screen and (max-width: 960px) {
   .navbar-container {
-      justify-content: flex-end;
+     /* Adjust padding for smaller screens if needed */
+     padding: 0 var(--spacing-lg);
+     /* Ensure max-width doesn't cause issues */
+     max-width: 100%;
   }
-
   .navbar-links {
-      display: none;
+    display: none; /* Hide desktop links */
   }
 
   .menu-button {
-      display: block;
+    display: block;
+    background: none;
+    border: none;
+    color: var(--text-light); /* Ensure contrast */
+    font-size: 1.8rem;
+    cursor: pointer;
+    padding: 0; /* Remove default padding */
+    margin-right: var(--spacing-sm); /* Adjust margin for RTL */
+  }
+
+  .mobile-menu {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    position: absolute;
+    top: var(--navbar-height);
+    left: -100%; /* Start off-screen */
+    opacity: 0;
+    transition: all 0.4s ease;
+    /* Use primary dark (muted rose) or primary (terracotta) */
+    background: var(--primary-color-dark);
+    padding: var(--spacing-sm) 0; /* Reduced padding */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow to dropdown */
+  }
+
+  .mobile-menu.open {
+    left: 0; /* Slide in */
+    opacity: 1;
+    z-index: 998;
+  }
+
+  .mobile-menu a {
+    text-align: center;
+    padding: 0.9rem 1.5rem; /* Adjust padding */
+    width: 100%;
+    display: block; /* Make link take full width */
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 1.1rem; /* Slightly larger font for mobile */
+    transition: background-color 0.2s ease;
+  }
+
+  .mobile-menu a:hover,
+  .mobile-menu a:focus {
+    /* Use primary color (terracotta) for hover */
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    outline: none;
   }
 }

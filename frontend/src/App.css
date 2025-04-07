@@ -1,160 +1,170 @@
-body {
-  font-family: Arial, sans-serif;
-  /* Updated: Cool blue gradient background */
-  background: linear-gradient(to bottom, #eaf5ff, #d4e8ff); 
-  background-attachment: fixed; /* Keep background fixed during scroll */
-  background-size: cover;
-  margin: 0;
-  padding: 0;
-  direction: rtl; 
+/* src/components/About.css */
+
+.about-page-container {
+  color: var(--text-medium);
+  line-height: var(--line-height-base);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl); /* Space between sections */
 }
 
-/* Main App Container */
-.app-container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 20px;
+/* Section Styling - RESTORED card look */
+.about-section {
+  background-color: var(--background-white);
+  padding: var(--spacing-xl); /* Generous padding */
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-light); /* Use light shadow */
+  border: 1px solid var(--border-color);
+  overflow: hidden; /* Contain background/padding */
+}
+.about-section:hover {
+    box-shadow: var(--shadow-medium); /* Add hover effect */
 }
 
-/* Section Title (like "המוצרים שלנו") */
-.section-title {
-  text-align: right; 
-  font-size: 26px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  /* Updated: Dark blue color */
-  color: #1a5276; 
+/* --- Layout Wrapper using Flexbox --- */
+.section-content-wrapper {
+  display: flex;
+  align-items: center; /* Vertically center items */
+  /* align-items: flex-start; */ /* Or align to top */
+  gap: var(--spacing-xl); /* Gap between columns */
+  flex-wrap: wrap; /* Allow wrapping */
 }
 
-/* Product Grid */
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 25px; /* Slightly increased gap */
-  padding: 20px 0; /* Removed horizontal padding to rely on app-container */
-  justify-items: center;
+/* Reverse order for specific sections */
+.section-content-wrapper.reverse-wrap {
+   flex-direction: row-reverse;
 }
 
-/* Product Card */
-.card {
-  /* Updated: Lighter blue border */
-  border: 1px solid #aed6f1; 
-  border-radius: 10px;
-  padding: 16px;
-  background-color: #fff; /* Keep card background white for contrast */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* Slightly softer shadow */
-  width: 100%;
-  max-width: 230px;
-  text-align: center;
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Added transition for shadow */
+/* Columns using Flexbox */
+.image-column {
+  flex: 1 1 35%; /* Grow, Shrink, Basis (e.g., 35% width) */
+  min-width: 250px; /* Minimum width before wrapping */
 }
 
-.card:hover {
-  transform: translateY(-5px);
-   /* Updated: Slightly stronger shadow on hover */
-  box-shadow: 0 8px 16px rgba(74, 144, 226, 0.2);
-  /* Optional: Add blue border highlight on hover */
-  /* border-color: #3498db; */
+.text-column {
+  flex: 1 1 60%; /* Grow, Shrink, Basis (e.g., 60% width) */
+  min-width: 300px; /* Minimum width before wrapping */
+}
+/* --- End Flexbox Layout --- */
+
+
+/* Heading styles within text column */
+.text-column h2,
+.text-column h3,
+.text-column h4 {
+  color: var(--text-dark);
+  margin-top: 0;
+  margin-bottom: var(--spacing-md);
+  line-height: 1.3;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--border-color);
+  text-align: right;
+}
+.text-column h2 { font-size: 1.8rem; }
+.text-column h3 { font-size: 1.4rem; }
+.text-column h4 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  border-bottom: none;
+  margin-bottom: var(--spacing-xs);
 }
 
-/* Product Image */
-.product-image {
-  width: 100%;
-  height: 180px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 12px; /* Increased space */
+/* Paragraph styles within text column */
+.text-column p {
+  text-align: right;
+  /* text-align: justify; */ /* Optional */
+  hyphens: auto;
+  margin-bottom: var(--spacing-md);
+  color: var(--text-medium);
+  max-width: 65ch; /* Limit line length */
+}
+.text-column p:last-of-type {
+  margin-bottom: 0;
 }
 
-/* Product Name */
-.card h2 {
-  font-size: 18px;
-  margin-bottom: 8px;
-   /* Updated: Medium blue color */
-  color: #2980b9;
-  text-align: right; 
-  font-weight: 600; /* Slightly bolder */
-}
-
-/* Price */
-.card p {
-  font-size: 16px;
-  font-weight: bold;
-   /* Updated: Consistent primary blue */
-  color: #3498db; 
-  text-align: right; 
-}
-
-/* === Home Page Content Block Styles === */
-
-.home-content-container {
-  max-width: 900px; 
-  margin: 40px auto; 
-  padding: 20px;
-  /* Optional: Add a subtle background if body gradient is too much */
-  /* background-color: rgba(255, 255, 255, 0.8); */
-  /* border-radius: 8px; */
-}
-
-.content-block {
-   /* Updated: Light blue background for content blocks */
-  background-color: #e4effa; 
-   /* Updated: Medium blue border */
-  border: 1px solid #aed6f1; 
-  padding: 25px; /* Increased padding */
-  margin-bottom: 30px; 
-  display: flex;       
-  align-items: center; 
-  gap: 25px;  /* Increased gap */         
-  border-radius: 8px; /* Slightly larger radius */
-   /* Added subtle shadow */
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
-}
-
-.content-image {
-  flex-basis: 250px; 
-}
-
-.content-image img {
+/* Image styles within image column */
+.image-column img.about-image {
+  display: block;
+  width: 100%; /* Fill column */
   max-width: 100%;
   height: auto;
-  display: block;
-   /* Added border radius to image */
-  border-radius: 5px;
+  border-radius: var(--border-radius);
+  margin: 0; /* Reset margin */
+  /* Optional: add background/border if needed */
+  /* background-color: var(--background-light-gray); */
+  /* border: 1px solid var(--border-color); */
 }
 
-.content-text {
-  flex: 1; 
-  text-align: right; 
+/* List styles within text column */
+.text-column ul,
+.text-column li {
+  text-align: right;
+}
+.text-column ul.about-link-list {
+  list-style: disc; /* Use standard bullets */
+  padding-right: var(--spacing-lg); /* Indent list */
+  margin-top: var(--spacing-md);
+  margin-bottom: 0;
+}
+.text-column ul.about-link-list li {
+  margin-bottom: var(--spacing-sm);
+}
+.text-column ul.about-link-list li:last-child {
+  margin-bottom: 0;
+}
+.text-column ul.about-link-list li a {
+  color: var(--primary-color);
+  text-decoration: none; /* Remove underline by default */
+}
+.text-column ul.about-link-list li a:hover {
+  color: var(--primary-color-dark);
+  text-decoration: underline; /* Add underline on hover */
 }
 
-.content-text h2 {
-  font-family: 'Arial', sans-serif; 
-  font-size: 1.9em; /* Slightly larger heading */
-  font-weight: bold;
-   /* Updated: Primary blue heading */
-  color: #3498db; 
-  margin-bottom: 15px; 
+/* SDG Grid Styling (If used) */
+.sdg-column { /* If using column specifically for grid */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.sdg-grid {
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+   gap: var(--spacing-sm);
+   width: 100%;
+   max-width: 350px; /* Limit grid width */
+   margin: var(--spacing-md) 0; /* Vertical margin */
+}
+.sdg-grid img.sdg-icon {
+   max-width: 100%;
+   height: auto;
+   border-radius: 4px;
+   margin: 0;
 }
 
-.content-text p {
-  font-family: 'Arial', sans-serif; 
-  font-size: 1em;
-  line-height: 1.7; /* Slightly increased line height */
-   /* Updated: Dark slate blue/grey text for readability */
-  color: #2c3e50; 
-}
 
-@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap');
-
-body {
-  /* Apply Rubik as the default font */
-  font-family: 'Rubik', Arial, sans-serif; 
-  /* Keep other body styles */
-  background: linear-gradient(to bottom, #eaf5ff, #d4e8ff); 
-  background-attachment: fixed;
-  background-size: cover;
-  margin: 0;
-  padding: 0;
-  direction: rtl; 
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .section-content-wrapper,
+  .section-content-wrapper.reverse-wrap {
+      flex-direction: column; /* Stack columns */
+  }
+  .image-column, .text-column {
+      flex-basis: 100%; /* Full width when stacked */
+      width: 100%;
+  }
+  .image-column {
+      order: 1; /* Ensure image comes first when stacked */
+      max-width: 80%; /* Limit image width */
+      margin: 0 auto var(--spacing-lg) auto; /* Center */
+  }
+   .text-column {
+       order: 2; /* Ensure text comes second */
+   }
+  .about-section {
+     padding: var(--spacing-lg); /* Adjust padding */
+  }
+  .text-column p {
+       max-width: 100%; /* Allow full width text */
+   }
 }

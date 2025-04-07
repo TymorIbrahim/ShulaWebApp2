@@ -1,115 +1,164 @@
-.loginpage {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-top: 120px;
-    min-height: 100vh;
-    background: linear-gradient(to bottom, #e3f2fd, #fff);
-    box-sizing: border-box;
-    width: 100vw;        /* 👈 Make it span full screen */
-    position: relative;  /* needed to not overflow the screen */
-  }
-  
-  
-  
-  .login-form {
-    width: 100%;
-    max-width: 400px;
-    background: #fff;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    text-align: center;
-  }
-  
-  
-  .login-form h2 {
-    margin-bottom: 24px;
-    font-size: 24px;
-    font-weight: 700;
-    color: #333;
-  }
-  
-  .login-form input[type="email"],
-  .login-form input[type="password"] {
-    width: 100%;
-    padding: 12px 14px;
-    margin-bottom: 16px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 16px;
-  }
-  
-  .remember-me {
-    display: flex;
-    align-items: center;
-    font-size: 14px;
-    margin-bottom: 20px;
-    color: #555;
-    text-align: left;
-  }
-  
-  .remember-me input {
-    margin-left: 8px;
-  }
-  
-  .login-btn {
-    width: 100%;
-    padding: 12px;
-    background: #2962ff;
-    color: white;
-    font-weight: bold;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  
-  .login-btn:hover {
-    background: #1e47cc;
-  }
-  
-  .divider {
-    margin: 20px 0;
-    color: #999;
-    font-size: 14px;
-  }
-  
-  .google-btn {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    background: white;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    cursor: pointer;
-  }
-  
-  .google-btn img {
-    width: 20px;
-    height: 20px;
-  }
-  
-  .forgot-password {
-    display: block;
-    margin-top: 20px;
-    font-size: 14px;
-    color: #2962ff;
-    text-decoration: none;
-  }
-  
-  .forgot-password:hover {
-    text-decoration: underline;
-  }
-  
-  .error {
-    color: red;
-    font-size: 14px;
-    margin-bottom: 10px;
-  }
-  
+/* src/pages/LoginPage.css */
+
+.login-page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - var(--navbar-height) - 50px); /* Adjust if you add a footer */
+  padding: var(--spacing-lg);
+  width: 100%; /* Ensure it takes full width */
+}
+
+.login-form-container {
+  background-color: var(--background-white);
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-medium);
+  width: 100%;
+  max-width: 420px; /* Slightly wider max-width */
+  text-align: center; /* Center title */
+}
+
+.login-form-container h2 {
+  margin-bottom: var(--spacing-xl); /* More space below title */
+  color: var(--primary-dark-brown);
+  font-size: 1.8em; /* Slightly larger title */
+}
+
+/* Style the form itself for layout */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md); /* Consistent gap between direct children */
+  text-align: right; /* Align labels/placeholders right for RTL */
+}
+
+/* Ensure form groups take full width */
+.login-form .form-group {
+  width: 100%;
+  margin-bottom: 0; /* Remove bottom margin as gap handles spacing */
+}
+
+/* Ensure inputs use full width and theme styles */
+.login-form input[type="email"],
+.login-form input[type="password"] {
+  /* Inherits from global .form-group input styles in App.css */
+  width: 100%;
+  text-align: right; /* Ensure text alignment for RTL */
+}
+
+/* Style the 'Remember Me' group */
+.remember-me-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* Align to the right for RTL */
+  gap: var(--spacing-sm);
+  margin-top: calc(-1 * var(--spacing-sm)); /* Pull up slightly */
+  margin-bottom: var(--spacing-sm); /* Add space below */
+}
+
+.remember-me-label {
+  font-size: 0.9em;
+  color: var(--text-dark-secondary);
+  cursor: pointer;
+}
+
+.remember-me-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary-medium-brown);
+  cursor: pointer;
+}
+
+/* Specific error message style for login */
+.login-error {
+  width: 100%;
+  text-align: center; /* Center error message */
+  font-size: 0.9em;
+  padding: var(--spacing-sm);
+  background-color: rgba(201, 76, 76, 0.1); /* Light red background */
+  border: 1px solid var(--admin-red);
+  border-radius: var(--border-radius);
+  margin-top: calc(-1 * var(--spacing-xs)); /* Pull up */
+  margin-bottom: var(--spacing-xs); /* Space below */
+}
+
+/* Style primary login button */
+.login-btn {
+  width: 100%; /* Make login button full width */
+  padding: var(--spacing-md); /* Larger padding */
+  font-size: 1.1em;
+  /* Inherits colors/hover from .button-primary */
+}
+
+/* Divider styling */
+.divider {
+  text-align: center;
+  color: var(--primary-medium-brown);
+  font-size: 0.9em;
+  position: relative;
+  width: 100%;
+  margin: var(--spacing-sm) 0; /* Add vertical space */
+}
+.divider span {
+  background-color: var(--background-white); /* Match form background */
+  padding: 0 var(--spacing-md);
+  position: relative;
+  z-index: 1;
+}
+.divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: var(--border-light);
+  z-index: 0;
+}
+
+/* Style Google button */
+.google-btn {
+  width: 100%;
+  background-color: var(--background-white);
+  color: var(--text-dark-secondary);
+  border: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  font-weight: 500;
+  transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+}
+.google-btn:hover, .google-btn:focus-visible {
+  background-color: #f8f8f8; /* Slight grey background on hover */
+  border-color: var(--primary-medium-brown);
+  color: var(--text-dark-secondary); /* Keep text color */
+  transform: none; /* Override base button transform */
+  outline: none; /* Override focus outline if needed */
+}
+.google-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Forgot password link */
+.forgot-password-link {
+  display: block; /* Make it block level */
+  text-align: center;
+  margin-top: var(--spacing-sm);
+  font-size: 0.9em;
+  /* Inherits link color/hover from index.css */
+}
+
+/* Signup link paragraph */
+.signup-link-text {
+  text-align: center;
+  margin-top: var(--spacing-lg); /* More space above */
+  font-size: 0.95em;
+  color: var(--text-dark-secondary);
+}
+.signup-link-text a {
+  font-weight: 500;
+  /* Inherits link color/hover from index.css */
+}
