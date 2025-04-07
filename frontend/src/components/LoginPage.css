@@ -1,0 +1,115 @@
+.loginpage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 120px;
+    min-height: 100vh;
+    background: linear-gradient(to bottom, #e3f2fd, #fff);
+    box-sizing: border-box;
+    width: 100vw;        /* 👈 Make it span full screen */
+    position: relative;  /* needed to not overflow the screen */
+  }
+  
+  
+  
+  .login-form {
+    width: 100%;
+    max-width: 400px;
+    background: #fff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  
+  .login-form h2 {
+    margin-bottom: 24px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+  }
+  
+  .login-form input[type="email"],
+  .login-form input[type="password"] {
+    width: 100%;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+  }
+  
+  .remember-me {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    margin-bottom: 20px;
+    color: #555;
+    text-align: left;
+  }
+  
+  .remember-me input {
+    margin-left: 8px;
+  }
+  
+  .login-btn {
+    width: 100%;
+    padding: 12px;
+    background: #2962ff;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .login-btn:hover {
+    background: #1e47cc;
+  }
+  
+  .divider {
+    margin: 20px 0;
+    color: #999;
+    font-size: 14px;
+  }
+  
+  .google-btn {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    background: white;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+  }
+  
+  .google-btn img {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .forgot-password {
+    display: block;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #2962ff;
+    text-decoration: none;
+  }
+  
+  .forgot-password:hover {
+    text-decoration: underline;
+  }
+  
+  .error {
+    color: red;
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  

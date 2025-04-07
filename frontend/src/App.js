@@ -9,10 +9,17 @@ import "./App.css"; // Global styles
 import FAQs from "./components/FAQs";
 import About from "./components/About";
 import ProductDetails from "./components/ProductDetails";
+import LoginPage from "./components/LoginPage";
+import SignIn from "./components/SignIn";
 
 
 function App() {
     const [products, setProducts] = useState([]);
+    const [userRole, setUserRole] = useState(null);
+    const handleLogin = (role) => {
+        setUserRole(role);
+        console.log("User logged in as:", role);
+      };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -35,22 +42,20 @@ function App() {
                         
                         {/* Route for the Home Page */}
                         <Route 
-                            path="/"                             // When URL is "yourdomain.com/"
-                            element={<HeroSection />}            // Show the HeroSection component
+                            path="/"                             
+                            element={<HeroSection />}            
                         /> 
 
                         {/* Route for the Products Page */}
                         <Route 
-                            path="/products"                    // When URL is "yourdomain.com/products"
-                            element={<ProductGrid products={products} />} // Show the ProductGrid component
+                            path="/products"                   
+                            element={<ProductGrid products={products} />} 
                         />
                         {/* Route for the Products Page */}
                         <Route 
                             path="/cart-page"                   
                             element={<CartPage />} 
                         />
-                        <Route path="/products/:productId" element={<ProductDetails />} />
-
                         <Route 
                             path="/faqs"                    
                             element={<FAQs />}
@@ -60,10 +65,17 @@ function App() {
                             element={<About />} 
                         />
 
+                        <Route path="/loginpage"
+                         element={<LoginPage onLogin={handleLogin} />}
+                         />
+
+                        <Route path="/signup" 
+                        element={<SignIn />} 
+                        />
+
+
                     </Routes>
                 </div>
-
-                {/* A Footer could go here, outside Routes, to show on all pages */}
             </div>
         </Router>
     );
