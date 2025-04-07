@@ -8,8 +8,8 @@ import ProductDetails from "./components/ProductDetails"; // Product details pag
 import CartPage from "./components/CartPage"; // Cart page component
 import FAQs from "./components/FAQs";
 import About from "./components/About";
-import LoginPage from "./components/LoginPage";
-import SignIn from "./components/SignIn";
+import LoginPage from "./pages/LoginPage";
+import SignIn from "./pages/Signup";
 import "./App.css";
 
 function App() {
