@@ -22,7 +22,7 @@ const Navbar = () => {
           <li><Link to="/about">אודות</Link></li>
           <li><Link to="/faqs">שאלות ותשובות</Link></li>
           <li><Link to="/cart-page">העגלה שלי</Link></li>
-          <li><Link to="/loginpage">Log In</Link></li>
+          <li><Link to="/login">Log In</Link></li>
           <li><Link to="/admin/settings">הגדרות ניהול</Link></li>
 
         </ul>
@@ -40,7 +40,7 @@ const Navbar = () => {
         <Link to="/about" onClick={() => setMenuOpen(false)}>אודות</Link>
         <Link to="/contact" onClick={() => setMenuOpen(false)}>צור קשר</Link>
         <Link to="/faqs" onClick={() => setMenuOpen(false)}>שאלות ותשובות</Link>
-        <Link to="/loginpage" onClick={() => setMenuOpen(false)}>Log In </Link>
+        <Link to="/login" onClick={() => setMenuOpen(false)}>Log In </Link>
         <Link to="/admin/settings" onClick={() => setMenuOpen(false)}>הגדרות ניהול</Link> 
       </div>
     </nav>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./SignIn.css";
+import "./SignupPage.css";
 
 const SignIn = () => {
   const [formData, setFormData] = useState({
