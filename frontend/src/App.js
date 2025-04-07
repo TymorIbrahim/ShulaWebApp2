@@ -1,84 +1,75 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // Make sure Routes and Route are imported
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { getProducts } from "./services/productService";
 import Navbar from "./components/Navbar";
-import HeroSection from "./components/HeroSection"; // Your Home Page component
-import CartPage from "./components/CartPage"; // Your Home Page component
-import ProductGrid from "./components/ProductGrid"; // Your Products Page component
-import "./App.css"; // Global styles
+import HeroSection from "./components/HeroSection"; // Home page component
+import ProductGrid from "./components/ProductGrid"; // Products listing component
+import ProductDetails from "./components/ProductDetails"; // Product details page
+import CartPage from "./components/CartPage"; // Cart page component
 import FAQs from "./components/FAQs";
 import About from "./components/About";
-import ProductDetails from "./components/ProductDetails";
 import LoginPage from "./components/LoginPage";
 import SignIn from "./components/SignIn";
-
+import "./App.css";
 
 function App() {
-    const [products, setProducts] = useState([]);
-    const [userRole, setUserRole] = useState(null);
-    const handleLogin = (role) => {
-        setUserRole(role);
-        console.log("User logged in as:", role);
-      };
+  const [products, setProducts] = useState([]);
+  const [userRole, setUserRole] = useState(null);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const data = await getProducts();
-            console.log("Fetched products:", data);
-            setProducts(data);
-        };
-        fetchData();
-    }, []);
+  // Example login handler, which sets the user role
+  const handleLogin = (role) => {
+    setUserRole(role);
+    console.log("User logged in as:", role);
+  };
 
-    return (
-        <Router>
-            <div className="app-container">
-                {/* Navbar outside Routes: shows on ALL pages */}
-                <Navbar />
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getProducts();
+        console.log("Fetched products:", data);
+        setProducts(data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
-                {/* Content area where page changes based on route */}
-                <div className="content-wrapper"> {/* Optional wrapper */}
-                    <Routes> {/* Use Routes to define page routes */}
-                        
-                        {/* Route for the Home Page */}
-                        <Route 
-                            path="/"                             
-                            element={<HeroSection />}            
-                        /> 
+  return (
+    <Router>
+      <div className="app-container">
+        {/* Navbar appears on all pages */}
+        <Navbar />
+        <div className="content-wrapper">
+          <Routes>
+            {/* Home page route */}
+            <Route path="/" element={<HeroSection />} />
 
-                        {/* Route for the Products Page */}
-                        <Route 
-                            path="/products"                   
-                            element={<ProductGrid products={products} />} 
-                        />
-                        {/* Route for the Products Page */}
-                        <Route 
-                            path="/cart-page"                   
-                            element={<CartPage />} 
-                        />
-                        <Route 
-                            path="/faqs"                    
-                            element={<FAQs />}
-                        />
-                         <Route 
-                            path="/about"                    
-                            element={<About />} 
-                        />
+            {/* Products grid route */}
+            <Route path="/products" element={<ProductGrid products={products} />} />
 
-                        <Route path="/loginpage"
-                         element={<LoginPage onLogin={handleLogin} />}
-                         />
+            {/* Product details route, uses URL parameter */}
+            <Route path="/products/:productId" element={<ProductDetails />} />
 
-                        <Route path="/signup" 
-                        element={<SignIn />} 
-                        />
+            {/* Cart page route */}
+            <Route path="/cart-page" element={<CartPage />} />
 
+            {/* FAQs page */}
+            <Route path="/faqs" element={<FAQs />} />
 
-                    </Routes>
-                </div>
-            </div>
-        </Router>
-    );
+            {/* About page */}
+            <Route path="/about" element={<About />} />
+
+            {/* Login page route */}
+            <Route path="/loginpage" element={<LoginPage onLogin={handleLogin} />} />
+
+            {/* Sign-up page route */}
+            <Route path="/signup" element={<SignIn />} />
+          </Routes>
+        </div>
+      </div>
+    </Router>
+  );
 }
 
 export default App;
