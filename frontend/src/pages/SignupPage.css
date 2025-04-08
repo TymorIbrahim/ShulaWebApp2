@@ -1,0 +1,155 @@
+/* src/pages/SignupPage.css */
+
+.signup-page-container { /* Use styles similar to login page */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - var(--navbar-height) - 50px); /* Adjust if footer added */
+  padding: var(--spacing-lg);
+  width: 100%;
+}
+
+.signup-form-container { /* Use styles similar to login page */
+  background-color: var(--background-white);
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-medium);
+  width: 100%;
+  max-width: 480px; /* Slightly wider for name fields */
+  text-align: center;
+}
+
+.signup-form-container h2 {
+  margin-bottom: var(--spacing-xl);
+  color: var(--primary-dark-brown);
+  font-size: 1.8em;
+}
+
+/* Style the form itself for layout */
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md); /* Consistent gap */
+  text-align: right; /* Align labels/placeholders right for RTL */
+}
+
+/* Style the name fields container */
+.name-fields {
+  display: flex;
+  gap: var(--spacing-md); /* Gap between name inputs */
+  width: 100%;
+}
+/* Ensure form groups within name-fields take up equal space */
+.name-fields .form-group {
+  flex: 1; /* Each name field takes half the space */
+  margin-bottom: 0; /* Remove bottom margin as main form gap handles it */
+}
+
+/* Ensure all form groups take full width */
+.signup-form .form-group {
+  width: 100%;
+  margin-bottom: 0; /* Remove bottom margin as gap handles spacing */
+}
+
+/* Ensure inputs use full width and theme styles */
+.signup-form input[type="text"],
+.signup-form input[type="email"],
+.signup-form input[type="tel"],
+.signup-form input[type="password"] {
+  /* Inherits from global .form-group input styles in App.css */
+  width: 100%;
+  text-align: right; /* Ensure text alignment for RTL */
+}
+
+/* Specific error/success message styles */
+.signup-error, .success-message {
+  width: 100%;
+  text-align: center;
+  font-size: 0.9em;
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius);
+  margin-top: calc(-1 * var(--spacing-xs)); /* Pull up */
+  margin-bottom: var(--spacing-xs); /* Space below */
+}
+.signup-error {
+  background-color: rgba(201, 76, 76, 0.1); /* Light red background */
+  border: 1px solid var(--admin-red);
+  color: var(--admin-red); /* Already set globally but can be explicit */
+}
+.success-message {
+  background-color: rgba(90, 154, 90, 0.1); /* Light green background */
+  border: 1px solid var(--admin-green);
+  color: var(--admin-green-dark);
+}
+
+
+/* Style primary signup button */
+.signup-btn {
+  width: 100%;
+  padding: var(--spacing-md);
+  font-size: 1.1em;
+  /* Inherits colors/hover from .button-primary */
+}
+
+/* Divider styling - Reuse from LoginPage.css */
+.divider {
+  text-align: center;
+  color: var(--primary-medium-brown);
+  font-size: 0.9em;
+  position: relative;
+  width: 100%;
+  margin: var(--spacing-sm) 0;
+}
+.divider span {
+  background-color: var(--background-white);
+  padding: 0 var(--spacing-md);
+  position: relative;
+  z-index: 1;
+}
+.divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: var(--border-light);
+  z-index: 0;
+}
+
+/* Style Google button - Reuse from LoginPage.css */
+.google-btn {
+  width: 100%;
+  background-color: var(--background-white);
+  color: var(--text-dark-secondary);
+  border: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  font-weight: 500;
+  transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+}
+.google-btn:hover, .google-btn:focus-visible {
+  background-color: #f8f8f8;
+  border-color: var(--primary-medium-brown);
+  color: var(--text-dark-secondary);
+  transform: none;
+  outline: none;
+}
+.google-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Login link paragraph */
+.login-link-text {
+  text-align: center;
+  margin-top: var(--spacing-lg);
+  font-size: 0.95em;
+  color: var(--text-dark-secondary);
+}
+.login-link-text a {
+  font-weight: 500;
+  /* Inherits link color/hover from index.css */
+}

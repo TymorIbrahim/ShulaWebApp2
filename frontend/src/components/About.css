@@ -1,0 +1,174 @@
+/* src/components/About.css */
+
+.about-page-container {
+    color: var(--text-medium);
+    line-height: var(--line-height-base);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl); /* Space between section cards */
+  }
+  
+  /* Section Card Styling */
+  .about-section {
+    background-color: var(--background-white);
+    padding: var(--spacing-xl);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-medium);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+  }
+  
+  /* --- NEW: Flex Layout for Section Content --- */
+  .section-content-wrapper {
+    display: flex;
+    /* align-items: flex-start; /* Align items to the top */
+    align-items: center; /* Or center vertically */
+    gap: var(--spacing-xl); /* Gap between image and text columns */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  }
+  
+  /* Reverse order for specific sections */
+  .section-content-wrapper.reverse-wrap {
+     flex-direction: row-reverse;
+  }
+  
+  .image-column {
+    flex: 1; /* Adjust flex basis as needed */
+    min-width: 250px; /* Minimum width before wrapping */
+    /* max-width: 40%; */ /* Optional: Limit image column width */
+  }
+  
+  .text-column {
+    flex: 2; /* Allow text column to take more space */
+    min-width: 300px; /* Minimum width before wrapping */
+  }
+  /* --- End NEW Flex Layout --- */
+  
+  
+  /* Heading styles within text column */
+  .text-column h2,
+  .text-column h3,
+  .text-column h4 {
+    color: var(--text-dark);
+    margin-top: 0;
+    margin-bottom: var(--spacing-md); /* Reduced margin below heading */
+    line-height: 1.3;
+    padding-bottom: var(--spacing-sm); /* Reduced padding below text */
+    border-bottom: 1px solid var(--border-color);
+    text-align: right;
+  }
+  /* Remove border only if it's the last heading AND no content follows */
+  /* .text-column h4:last-of-type { border-bottom: none; } */
+  
+  .text-column h2 { font-size: 1.8rem; }
+  .text-column h3 { font-size: 1.4rem; }
+  .text-column h4 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-bottom: none;
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  /* Paragraph styles within text column */
+  .text-column p {
+    text-align: right;
+    /* text-align: justify; */ /* Optional */
+    hyphens: auto;
+    margin-bottom: var(--spacing-md);
+    color: var(--text-medium);
+    /* --- NEW: Limit paragraph width --- */
+    max-width: 65ch; /* Limit line length to ~65 characters */
+  }
+  .text-column p:last-of-type {
+    margin-bottom: 0;
+  }
+  
+  /* Image styles within image column */
+  .image-column img.about-image {
+    display: block;
+    width: 100%; /* Fill the column width */
+    max-width: 100%; /* Ensure it doesn't overflow */
+    height: auto;
+    border-radius: var(--border-radius);
+    /* Remove auto margins, handled by flexbox/gap */
+    margin: 0;
+  }
+  
+  /* List styles within text column */
+  .text-column ul,
+  .text-column li {
+    text-align: right;
+  }
+  .text-column ul.about-link-list {
+    list-style: none;
+    padding-right: 0;
+    margin-top: var(--spacing-sm);
+    margin-bottom: 0;
+  }
+  .text-column ul.about-link-list li {
+    margin-bottom: var(--spacing-sm);
+  }
+  .text-column ul.about-link-list li:last-child {
+      margin-bottom: 0;
+  }
+  .text-column ul.about-link-list li a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color var(--transition-speed) ease;
+  }
+  .text-column ul.about-link-list li a:hover {
+    color: var(--primary-color-dark);
+    text-decoration: underline;
+  }
+  
+  /* SDG Grid Styling (within its column) */
+  .sdg-column {
+      /* Styles specific to the column holding the SDG grid, if needed */
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* Center grid horizontally if column is wider */
+  }
+  .sdg-grid {
+    display: grid;
+    /* Adjust columns based on available space in the column */
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+    gap: var(--spacing-sm); /* Smaller gap for icons */
+    justify-content: center;
+    width: 100%; /* Take full width of its column */
+    max-width: 300px; /* Limit grid width */
+    margin-top: var(--spacing-md);
+  }
+  .sdg-grid img.sdg-icon { /* Be specific */
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin: 0;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .section-content-wrapper,
+    .section-content-wrapper.reverse-wrap {
+        flex-direction: column; /* Stack image and text vertically */
+    }
+    .image-column, .text-column {
+        flex-basis: auto; /* Reset flex basis */
+        width: 100%; /* Take full width when stacked */
+        max-width: 100%; /* Override any max-width */
+    }
+    .image-column img.about-image {
+         max-width: 80%; /* Center image within the stacked column */
+         margin-left: auto;
+         margin-right: auto;
+         margin-bottom: var(--spacing-lg);
+     }
+     .sdg-column {
+         margin-bottom: var(--spacing-lg);
+     }
+     .text-column p {
+         max-width: 100%; /* Allow text full width on mobile */
+     }
+    .about-section {
+       padding: var(--spacing-lg);
+    }
+  }

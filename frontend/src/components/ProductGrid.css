@@ -1,165 +1,114 @@
-/* 🌟 Product Grid Container - Warm & Inviting */
+/* src/components/ProductGrid.css */
+
 .product-grid-container {
-    text-align: center;
-    padding: 100px 40px;
-    direction: rtl;
-    background: linear-gradient(to bottom, #f8f9fa, #e9ecef); /* Soft, neutral gradient */
+  /* max-width: 1200px; */ /* Handled by main-content-container */
+  /* margin: var(--spacing-xl) auto; */ /* Handled by main-content-container */
+  padding: 0; /* Remove padding if parent has it */
 }
 
-/* 🌟 Grid Title - Elegant & Readable */
 .grid-title {
-    font-size: 42px;
-    font-weight: bold;
-    margin-bottom: 60px;
-    color: #2c3e50; /* Deep slate blue for contrast */
-    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  font-size: 2.2em;
+  font-weight: 600; /* Match global heading weight */
+  margin-bottom: var(--spacing-xl);
+  color: var(--text-dark); /* Use theme dark text */
 }
 
-/* 🌟 Product Grid Layout - More Spacious */
 .product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 80px 50px; /* Increased spacing for a balanced layout */
-    justify-content: center;
-    padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--spacing-lg);
 }
 
-/* 🌟 Product Card - Clean & Professional */
-.product-card {
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    transition: all 0.4s ease-in-out;
-    cursor: pointer;
-    position: relative;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
+/* Link wrapping the card */
+.product-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
     height: 100%;
 }
 
-/* 🌟 Soft Floating Effect on Hover */
-.product-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0px 14px 35px rgba(0, 0, 0, 0.2);
+/* Card styling */
+.product-card {
+  border: 1px solid var(--border-color); /* Use theme border */
+  border-radius: var(--border-radius);
+  background-color: var(--background-white); /* Use theme white */
+  box-shadow: var(--shadow-light);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* 🌟 Image Container - Optimized for All Image Sizes */
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-medium);
+}
+
+/* Image container - keep aspect ratio */
 .image-container {
     width: 100%;
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border-radius: 12px;
-    background: rgba(0, 0, 0, 0.05);
+    padding-top: 75%; /* 4:3 aspect ratio - Keep for consistent card height */
+    position: relative;
+    background-color: var(--background-white); /* White background for contain */
+    /* Alt: use a very light color from palette: var(--vintage-bg-cream); */
+    overflow: hidden; /* Hide potential overflow from image */
 }
 
-/* 🌟 Product Image - Best Aspect Ratio */
 .product-image {
-    width: 100% !important;
-    height: auto !important;
-    max-height: 100% !important;
-    object-fit: contain !important;
-    display: block !important;
-    border-radius: 10px;
-    transition: transform 0.3s ease-in-out;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* --- CHANGED: Use contain to show full image --- */
+  object-fit: contain;
+  padding: var(--spacing-xs); /* Optional small padding around image */
+  box-sizing: border-box; /* Include padding in dimensions */
 }
 
-/* 🌟 Subtle Image Zoom on Hover */
-.product-card:hover .product-image {
-    transform: scale(1.05);
-}
-
-/* 🌟 Product Info - Clean & Readable */
+/* Text info section */
 .product-info {
-    padding: 15px 0;
-    width: 100%;
+  padding: var(--spacing-md);
+  text-align: right; /* RTL */
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-/* 🌟 Product Name - Clear & Professional */
 .product-name {
-    font-size: 24px;
-    font-weight: bold;
-    color: #34495e; /* Darker blue-gray for readability */
-    margin: 12px 0;
-    transition: color 0.3s ease-in-out;
+  font-size: 1.1em; /* Slightly smaller */
+  font-weight: 600; /* Bold name */
+  color: var(--text-dark); /* Use theme dark text */
+  margin-bottom: var(--spacing-xs); /* Less space below name */
+  min-height: 2.6em; /* Keep min height for alignment */
+  line-height: 1.3;
 }
 
-/* 🌟 Product Price - Premium Yet Simple */
 .product-price {
-    font-size: 22px;
-    color: #007bff;
-    font-weight: bold;
-    transition: transform 0.3s ease-in-out;
+  font-size: 1.2em; /* Slightly smaller */
+  font-weight: 500; /* Medium weight */
+  color: var(--text-medium); /* Use theme medium text */
+  margin-bottom: var(--spacing-md);
 }
 
-/* 🌟 Call-To-Action Button - Warm & Trustworthy */
-.buy-button {
-    display: inline-block;
-    padding: 14px 28px;
-    font-size: 18px;
-    color: white;
-    background: linear-gradient(to right, #ff9500, #ff7300); /* Warm orange gradient */
-    border: none;
-    border-radius: 30px;
-    transition: all 0.3s ease-in-out;
-    font-weight: bold;
-    box-shadow: 0px 6px 20px rgba(255, 149, 0, 0.4);
-    cursor: pointer;
+/* Div styled like button */
+.buy-button-styled {
+  /* Use styles consistent with actual buttons */
+  background-color: var(--primary-color); /* Use theme primary */
+  color: var(--text-light);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 500;
+  text-align: center;
+  margin-top: auto; /* Push to bottom */
+  transition: background-color var(--transition-speed) ease;
 }
 
-/* 🌟 Button Hover Effect */
-.buy-button:hover {
-    background: linear-gradient(to right, #ff7300, #ff4500); /* More contrast on hover */
-    transform: scale(1.08);
-    box-shadow: 0px 8px 25px rgba(255, 69, 0, 0.5);
-}
-
-/* 🌟 Subtle Hover Effects */
-.product-card:hover .product-name {
-    color: #ff7300;
-}
-
-.product-card:hover .product-price {
-    transform: scale(1.1);
-}
-
-/* 🌟 Mobile Optimizations */
-@media (max-width: 768px) {
-    .grid-title {
-        font-size: 34px;
-    }
-
-    .product-grid {
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 40px 50px; /* Increased spacing for mobile */
-    }
-
-    .product-card {
-        padding: 22px;
-    }
-
-    .image-container {
-        min-height: 180px;
-    }
-
-    .product-name {
-        font-size: 22px;
-    }
-
-    .product-price {
-        font-size: 18px;
-    }
-
-    .buy-button {
-        font-size: 16px;
-        padding: 10px 22px;
-    }
+.buy-button-styled:hover {
+  background-color: var(--primary-color-dark); /* Use theme primary dark */
 }

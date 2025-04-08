@@ -1,167 +1,105 @@
-/* === Hero Section Styling === */
+/* src/components/HeroSection.css */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 .hero-section-container {
-    min-height: 65vh; /* Adjust height: 60% of viewport height */
-    /* Background image set inline in JS */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    
-    display: flex; /* Use flexbox to center content */
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    
-    position: relative; /* Needed for the overlay */
-    color: #ffffff; /* Default text color (white) */
-    padding: 30px 20px; /* Add padding for smaller screens */
-  }
-  
-  .hero-overlay {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    /* Dark semi-transparent overlay - adjust opacity (0.6) as needed */
-    background-color: rgba(0, 0, 0, 0.6); 
-    z-index: 1;
-    padding: 10px; /* Overlay sits above background image */
-  }
-  
-  .hero-content {
-    position: relative; /* Position above the overlay */
-    z-index: 2;
-    max-width: 800px; /* Limit width of text content */
-    margin: 0 auto; /* Center content horizontally */
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5); /* Shadow for text readability */
-  }
-  
-  .hero-content h1 {
-    font-size: 3.5em; /* Large headline */
-    font-weight: bold;
-    margin-bottom: 0.5em; /* Space below headline */
-    line-height: 1.2;
-     /* Optional: Specific font */
-    /* font-family: 'YourChosenFont', Arial, sans-serif; */
-  }
-  
-  .hero-content p {
-    font-size: 1.4em; /* Clear description size */
-    margin-bottom: 1.5em; /* Space below description */
-    line-height: 1.6;
-    max-width: 600px; /* Limit paragraph width slightly more */
-    margin-left: auto; /* Center paragraph if max-width applies */
-    margin-right: auto;
-  }
-  
-  .hero-cta-button {
-    display: inline-block; /* Allow padding and margin */
-    background-color: #3498db; /* Blue button background */
-    color: #ffffff; /* White text */
-    font-size: 1.2em;
-    font-weight: bold;
-    padding: 12px 30px; /* Button padding */
-    border: none;
-    border-radius: 8px; /* Rounded corners */
-    text-decoration: none; /* Remove underline from link */
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .hero-cta-button:hover {
-    background-color: #2980b9; /* Darker blue on hover */
-    transform: translateY(-2px); /* Slight lift on hover */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-  }
+  min-height: 75vh; /* Keep increased height */
+  /* Background image set inline in JS */
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-attachment: fixed; /* Optional: Parallax effect */
 
-  .hero-content h1 {
-    font-family: 'Rubik', sans-serif; /* Ensure it uses the font */
-    font-size: 3.8em; /* Slightly larger */
-    font-weight: 700; /* Bolder */
-    margin-bottom: 0.4em; 
-    line-height: 1.2;
-    letter-spacing: -0.5px; /* Optional: Tighten spacing slightly */
-  }
-  
-  .hero-content p {
-    font-family: 'Rubik', sans-serif; /* Ensure it uses the font */
-    font-size: 1.4em; 
-    font-weight: 400; /* Regular weight */
-    margin-bottom: 1.8em; /* More space before buttons */
-    line-height: 1.6;
-    max-width: 600px; 
-    margin-left: auto; 
-    margin-right: auto;
-    color: #f0f0f0; /* Make slightly less bright than pure white if needed */
-  }
-  /* Base button style */
+  display: flex; /* Use flex to center hero-content vertically */
+  align-items: center;
+  justify-content: center;
+  text-align: center; /* Center text within hero-content */
+
+  position: relative; /* Needed for overlay */
+  color: var(--text-light);
+  width: 100%; /* Take full width of its parent */
+  /* REMOVED: width: 100vw, left, transform */
+  box-sizing: border-box;
+  padding: var(--spacing-xl) 0; /* Keep vertical padding */
+}
+
+/* Overlay */
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(74, 63, 51, 0.7); /* Keep overlay */
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: var(--content-max-width); /* Keep content width constraint */
+  width: 100%;
+  padding: 0 var(--spacing-lg); /* Keep horizontal padding */
+  margin: 0 auto;
+  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+  animation: fadeIn 1s ease-out forwards;
+
+  /* --- ADDED FOR CENTERING --- */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center children (h1, p, .hero-buttons) horizontally */
+  /* text-align: center; /* Already set on parent, inherited */
+}
+
+.hero-content h1 {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+  line-height: 1.2;
+  color: var(--text-light);
+}
+
+.hero-content p {
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
+  font-weight: 400;
+  margin-bottom: var(--spacing-xl);
+  line-height: 1.6;
+  max-width: 650px;
+  /* Removed margin-left/right: auto; as flex alignment handles centering */
+  color: #f0f0f0;
+}
+
+/* Button container */
+.hero-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Center buttons within this container */
+    gap: var(--spacing-md);
+    width: 100%; /* Allow button container to take width */
+}
+
+/* Button styles */
 .hero-cta-button {
-    display: inline-block; 
-    color: #ffffff; 
-    font-size: 1.15em; /* Slightly adjusted size */
-    font-weight: 500; /* Medium weight */
-    padding: 14px 35px; /* Adjusted padding */
-    border: 2px solid #3498db; /* Add border */
-    border-radius: 30px; /* More rounded corners */
-    text-decoration: none; 
-    cursor: pointer;
-    transition: all 0.3s ease; /* Smooth transition for all properties */
-    margin: 5px 10px; /* Add margin between buttons */
-    text-shadow: none; /* Remove text shadow from button text */
-  }
-  
-  /* Primary button style (Search) */
-  .hero-cta-button {
-    background-color: #3498db; /* Blue background */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  }
-  
-  .hero-cta-button:hover {
-    background-color: #2980b9; /* Darker blue on hover */
-    border-color: #2980b9;
-    transform: translateY(-3px); /* More lift */
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
-  }
-  
-  /* Secondary button style (Join) - Outline */
-  .hero-cta-button.secondary {
-    background-color: #3498db; /* Blue background */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  }
-  
-  .hero-cta-button.secondary:hover {
-    background-color: #2980b9; /* Darker blue on hover */
-    border-color: #2980b9;
-    transform: translateY(-3px); /* More lift */
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
-  }
-  
-  /* Active state (when clicked) */
-   .hero-cta-button:active {
-     transform: translateY(-1px);
-     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-   }
-   .hero-cta-button.secondary:active {
-      background-color: rgba(255, 255, 255, 0.25);
-      transform: translateY(-1px);
-      box-shadow: none;
-   }
-   .hero-overlay {
-    /* Keep existing position styles */
-    content: "";
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    z-index: 1; 
-  
-    /* Option 1: Adjust Darkness/Opacity */
-    background-color: rgba(0, 0, 0, 0.65); /* Slightly darker? */
-  
-    /* Option 2: Tinted Overlay */
-    /* background-color: rgba(44, 62, 80, 0.7); */ /* Example: Dark slate blue tint */
-  
-    /* Option 3: Subtle Gradient Overlay */
-    /* background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.7)); */
-  }
+  font-size: clamp(1rem, 2vw, 1.1rem);
+  font-weight: 500;
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-radius: var(--border-radius);
+  min-width: 180px;
+  /* Inherits .button and .button-primary/secondary */
+}
+
+.hero-cta-button.secondary {
+   background-color: transparent;
+   border-color: var(--text-light);
+   color: var(--text-light);
+}
+.hero-cta-button.secondary:hover,
+.hero-cta-button.secondary:focus-visible {
+   background-color: rgba(255, 255, 255, 0.15);
+   border-color: var(--text-light);
+   color: var(--text-light);
+   outline: none;
+}

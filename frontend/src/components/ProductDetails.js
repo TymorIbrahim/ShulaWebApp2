@@ -1,3 +1,4 @@
+// src/components/ProductDetails.js
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getProduct } from "../services/productService";
@@ -53,9 +54,9 @@ const ProductDetails = ({ user }) => {
     setModalIsOpen(true);
   };
 
-  const handleModalClose = () => {
-    setModalIsOpen(false);
-  };
+    const handleModalClose = () => {
+        setModalIsOpen(false);
+    };
 
   // Instead of window.confirm, open the custom ChoiceModal after successful add-to-cart
   const handleConfirmRental = async ({ startDate, endDate }) => {
@@ -93,26 +94,33 @@ const ProductDetails = ({ user }) => {
 
   if (!product) return <div>טוען פרטי מוצר...</div>;
 
-  return (
-    <div className="product-details-container">
-      <img src={product.productImageUrl} alt={product.name} />
-      <div className="product-info-section">
-        <h2>{product.name}</h2>
-        <div
-          className="product-description"
-          dangerouslySetInnerHTML={{ __html: product.description }}
-        />
-        <div className="product-price">₪{product.price}</div>
-        <button className="buy-button" onClick={handleAddToCart}>
-          הוסף לסל
-        </button>
-        <button 
-          className="buy-button back-button" 
-          onClick={() => navigate(-1)}
-        >
-          חזרה למוצרים
-        </button>
-      </div>
+    return (
+        <div className="product-details-container">
+            <img 
+              src={product.productImageUrl || '/placeholder-image.png'} // Use placeholder
+              alt={product.name || 'Product Image'} 
+              className="product-details-image"
+            /> 
+            <div className="product-info-section">
+                <h2>{product.name || 'Product Name'}</h2>
+                <div
+                    className="product-description"
+                    // Ensure description is treated as safe HTML if using this
+                    dangerouslySetInnerHTML={{ __html: product.description || 'No description available.' }} 
+                />
+                <div className="product-price">₪{product.price ?? 'N/A'}</div> 
+                
+                <button className="buy-button" onClick={handleAddToCartClick}>
+                    הוסף לסל
+                </button>
+                
+                <button 
+                    className="buy-button back-button" 
+                    onClick={() => navigate('/products')} // Navigate explicitly back
+                >
+                    חזרה למוצרים
+                </button>
+            </div>
 
       {/* Rental Date Picker Modal */}
       <RentalDatePickerModal

@@ -1,0 +1,83 @@
+/* src/components/ProductForm.css */
+
+.product-form {
+    max-width: 500px;
+    margin: 100px auto;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    direction: rtl;
+    text-align: right;
+  }
+  
+  .product-form h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #222;
+    text-align: center;
+  }
+  
+  .form-group {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .form-group label {
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+  }
+  
+  .form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  
+  .form-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .admin-button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+  }
+  
+  .submit-button {
+    background-color: #2962ff;
+    color: white;
+  }
+  
+  .cancel-button {
+    background-color: #ccc;
+    color: black;
+  }
+  
+  .submit-button:hover {
+    background-color: #0039cb;
+  }
+  
+  .cancel-button:hover {
+    background-color: #999;
+  }
+  
+  .error-message {
+    color: red;
+    margin-top: 10px;
+    font-size: 14px;
+  }
+  

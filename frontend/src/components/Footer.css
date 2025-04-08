@@ -1,0 +1,94 @@
+/* src/components/Footer.css */
+
+.site-footer {
+    background-color: var(--text-dark); /* Use dark background from palette */
+    color: var(--primary-color-light); /* Use light text from palette */
+    padding: var(--spacing-lg) 0 0; /* Padding top, remove bottom padding handled by footer-bottom */
+    margin-top: auto; /* Push footer to bottom if using flex column on body */
+    width: 100%;
+    font-size: 0.9em;
+  }
+  
+  .footer-content {
+    /* Inherits max-width and padding from .main-content-container */
+    display: flex;
+    flex-wrap: wrap; /* Allow sections to wrap on smaller screens */
+    justify-content: space-between;
+    gap: var(--spacing-lg); /* Gap between sections */
+    padding-bottom: var(--spacing-lg); /* Space before bottom bar */
+    text-align: right; /* Default text align for RTL */
+  }
+  
+  .footer-section {
+    flex: 1; /* Allow sections to grow */
+    min-width: 180px; /* Minimum width before wrapping */
+  }
+  
+  .footer-section h4 {
+    color: var(--text-light); /* White or light color for headings */
+    margin-bottom: var(--spacing-md);
+    font-size: 1.1em;
+    border-bottom: 1px solid var(--primary-color-dark); /* Use a subtle border */
+    padding-bottom: var(--spacing-xs);
+  }
+  
+  .footer-section p {
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.5;
+    color: var(--primary-color-light); /* Ensure paragraphs use light color */
+  }
+  
+  .footer-section a {
+    color: var(--background-white); /* White links for high contrast */
+    text-decoration: none;
+    transition: color var(--transition-speed) ease;
+    display: inline-block; /* Needed for margin/padding on links */
+    margin-bottom: var(--spacing-xs);
+  }
+  
+  .footer-section a:hover,
+  .footer-section a:focus {
+    color: var(--accent-color); /* Use accent color for hover */
+    text-decoration: none; /* Keep underline off if desired */
+  }
+  
+  .social-links a {
+    display: flex; /* Align icon and text */
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  /* Style for react-icons example */
+  .social-links svg {
+    font-size: 1.4em;
+  }
+  
+  .footer-bottom {
+    background-color: rgba(0, 0, 0, 0.2); /* Slightly darker shade for bottom bar */
+    text-align: center;
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin-top: var(--spacing-lg); /* Space above bottom bar */
+    font-size: 0.85em;
+    color: var(--primary-color-light); /* Light color for copyright */
+  }
+  
+  .footer-bottom p {
+      margin: 0;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .footer-content {
+      flex-direction: column; /* Stack sections vertically */
+      align-items: flex-end; /* Align sections right for RTL */
+      text-align: right;
+    }
+    .footer-section {
+        width: 100%; /* Full width on smaller screens */
+        max-width: 350px; /* Limit width for readability */
+    }
+    .social-links a {
+        justify-content: flex-end; /* Align social links right */
+    }
+  }
