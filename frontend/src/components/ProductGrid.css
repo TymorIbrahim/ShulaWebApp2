@@ -1,101 +1,114 @@
-/* src/components/ProductGrid.css (Example Styling) */
+/* src/components/ProductGrid.css */
 
 .product-grid-container {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 0 15px;
-  }
-  
-  .grid-title {
-    text-align: center; /* Center title */
-    font-size: 2em; /* Adjusted size */
-    font-weight: bold;
-    margin-bottom: 30px; /* Increased space */
-    color: #1a5276; /* Dark blue consistent color */
-  }
-  
-  .product-grid {
-    display: grid;
-    /* Responsive grid columns */
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); 
-    gap: 25px; 
-  }
-  
-  .product-card-link {
-      text-decoration: none;
-      color: inherit;
-  }
-  
-  .product-card {
-    border: 1px solid #aed6f1; /* Light blue border */
-    border-radius: 10px;
-    background-color: #fff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-    overflow: hidden; /* Contain image corners */
-    display: flex;
-    flex-direction: column;
-    height: 100%; /* Make cards in a row equal height if needed */
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  }
-  
-  .product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(74, 144, 226, 0.2);
-  }
-  
-  .image-container {
-      width: 100%;
-      padding-top: 75%; /* Aspect ratio for image container (e.g., 4:3) */
-      position: relative;
-      background-color: #f8f9fa; /* Placeholder background */
-  }
-  
-  .product-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+  /* max-width: 1200px; */ /* Handled by main-content-container */
+  /* margin: var(--spacing-xl) auto; */ /* Handled by main-content-container */
+  padding: 0; /* Remove padding if parent has it */
+}
+
+.grid-title {
+  text-align: center;
+  font-size: 2.2em;
+  font-weight: 600; /* Match global heading weight */
+  margin-bottom: var(--spacing-xl);
+  color: var(--text-dark); /* Use theme dark text */
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+/* Link wrapping the card */
+.product-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
     height: 100%;
-    object-fit: cover; /* Cover the container */
-  }
-  
-  .product-info {
-    padding: 15px;
-    text-align: right; /* Align text right */
-    flex-grow: 1; /* Allow info section to grow */
-    display: flex;
-    flex-direction: column; /* Stack elements vertically */
-  }
-  
-  .product-name {
-    font-size: 1.1em; /* Adjusted size */
-    font-weight: 600; /* Slightly bolder */
-    color: #2980b9; /* Medium blue */
-    margin-bottom: 8px;
-    min-height: 40px; /* Ensure space for 2 lines */
-  }
-  
-  .product-price {
-    font-size: 1.2em; /* Slightly larger price */
-    font-weight: bold;
-    color: #3498db; /* Primary blue */
-    margin-bottom: 15px; /* Space before button */
-  }
-  
-  .buy-button-styled { /* Style the div like the old button */
-    background-color: #ff9800; /* Orange background */
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-    font-weight: bold;
-    text-align: center;
-    margin-top: auto; /* Push button to bottom */
-    transition: background-color 0.2s ease;
-  }
-  
-  .buy-button-styled:hover {
-    background-color: #e68900; /* Darker orange on hover */
-  }
+}
+
+/* Card styling */
+.product-card {
+  border: 1px solid var(--border-color); /* Use theme border */
+  border-radius: var(--border-radius);
+  background-color: var(--background-white); /* Use theme white */
+  box-shadow: var(--shadow-light);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-medium);
+}
+
+/* Image container - keep aspect ratio */
+.image-container {
+    width: 100%;
+    padding-top: 75%; /* 4:3 aspect ratio - Keep for consistent card height */
+    position: relative;
+    background-color: var(--background-white); /* White background for contain */
+    /* Alt: use a very light color from palette: var(--vintage-bg-cream); */
+    overflow: hidden; /* Hide potential overflow from image */
+}
+
+.product-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* --- CHANGED: Use contain to show full image --- */
+  object-fit: contain;
+  padding: var(--spacing-xs); /* Optional small padding around image */
+  box-sizing: border-box; /* Include padding in dimensions */
+}
+
+/* Text info section */
+.product-info {
+  padding: var(--spacing-md);
+  text-align: right; /* RTL */
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-name {
+  font-size: 1.1em; /* Slightly smaller */
+  font-weight: 600; /* Bold name */
+  color: var(--text-dark); /* Use theme dark text */
+  margin-bottom: var(--spacing-xs); /* Less space below name */
+  min-height: 2.6em; /* Keep min height for alignment */
+  line-height: 1.3;
+}
+
+.product-price {
+  font-size: 1.2em; /* Slightly smaller */
+  font-weight: 500; /* Medium weight */
+  color: var(--text-medium); /* Use theme medium text */
+  margin-bottom: var(--spacing-md);
+}
+
+/* Div styled like button */
+.buy-button-styled {
+  /* Use styles consistent with actual buttons */
+  background-color: var(--primary-color); /* Use theme primary */
+  color: var(--text-light);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 1em;
+  font-weight: 500;
+  text-align: center;
+  margin-top: auto; /* Push to bottom */
+  transition: background-color var(--transition-speed) ease;
+}
+
+.buy-button-styled:hover {
+  background-color: var(--primary-color-dark); /* Use theme primary dark */
+}

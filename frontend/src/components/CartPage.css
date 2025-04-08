@@ -1,63 +1,112 @@
+/* src/components/CartPage.css */
 .cart-page {
-    padding: 2rem;
-    max-width: 800px;
-    margin: 0 auto;
-    background-color: #f9f9f9;
-    border-radius: 12px;
-  }
-  
-  .cart-title {
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-  
-  .cart-items {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .cart-item {
-    display: flex;
-    justify-content: space-between;
-    background: white;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  }
-  
-  .item-info h3 {
-    margin: 0 0 0.5rem 0;
-  }
-  
-  .cart-summary {
-    margin-top: 2rem;
-    text-align: right;
-  }
-  
-  .book-button {
-    background-color: #28a745;
-    color: white;
-    font-size: 1.1rem;
-    padding: 0.8rem 1.5rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  
-  .book-button:hover {
-    background-color: #218838;
-  }
+  max-width: 900px;
+  margin: var(--spacing-xl) auto;
+  padding: var(--spacing-lg);
+  background-color: var(--background-white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-light);
+}
 
-  .cart-banner {
-    width: 200px;     /* adjust as needed */
+.cart-title {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+  color: var(--primary-dark-brown);
+}
+
+.cart-image-container {
+    text-align: center;
+    margin-bottom: var(--spacing-lg);
+}
+
+.cart-banner {
+    max-width: 100%;
     height: auto;
-    display: block;
-    margin: 0 auto 2rem auto; /* centers the image and adds bottom spacing */
-    border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  
-  
+    max-height: 150px; /* Limit banner height */
+    border-radius: var(--border-radius);
+}
+
+.empty-cart-message {
+  text-align: center;
+  font-size: 1.2em;
+  color: var(--text-dark-secondary);
+  padding: var(--spacing-xl) 0;
+}
+
+.cart-items {
+  margin-bottom: var(--spacing-xl);
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) 0;
+  border-bottom: 1px solid var(--border-light);
+  gap: var(--spacing-md);
+}
+
+.cart-item:last-child {
+  border-bottom: none;
+}
+
+.cart-item-image {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+    margin-left: var(--spacing-md); /* RTL: margin left */
+}
+
+.item-info {
+  flex-grow: 1;
+  text-align: right;
+}
+
+.item-info h3 {
+  margin-bottom: var(--spacing-xs);
+  font-size: 1.1em;
+}
+.item-info p {
+  margin-bottom: var(--spacing-xs);
+  font-size: 0.95em;
+  color: var(--text-dark-secondary);
+}
+
+.item-total {
+  font-weight: bold;
+  font-size: 1.1em;
+  color: var(--primary-dark-brown);
+  min-width: 80px; /* Ensure space */
+  text-align: left; /* RTL: total on left */
+}
+
+.remove-button { /* Style if/when added */
+  background: none;
+  border: none;
+  color: #c94c4c; /* Red */
+  cursor: pointer;
+  font-size: 0.9em;
+  padding: var(--spacing-xs);
+}
+.remove-button:hover {
+  text-decoration: underline;
+}
+
+.cart-summary {
+  border-top: 2px solid var(--primary-medium-brown);
+  padding-top: var(--spacing-lg);
+  text-align: center; /* Center summary content */
+  margin-top: var(--spacing-lg);
+}
+
+.cart-summary h2 {
+  font-size: 1.5em;
+  margin-bottom: var(--spacing-lg);
+  color: var(--primary-dark-brown);
+}
+
+.book-button {
+   /* Inherits from App.css .button-primary */
+   font-size: 1.1em;
+}

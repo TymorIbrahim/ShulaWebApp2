@@ -1,173 +1,101 @@
-/* RentalDatePickerModal.css - Premium Styling with Enhanced Flow and Centered, LTR Calendar */
+/* src/components/RentalDatePickerModal.css */
 
-/* Modal Container */
-.rental-modal {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #ffffff;
-  padding: 40px;
-  border-radius: 15px;
-  max-width: 500px;
-  width: 90%;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-  border: 1px solid #e0e0e0;
-  font-family: 'Roboto', sans-serif;
-  direction: rtl;
-  animation: slideIn 0.5s ease-out;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translate(-50%, -60%);
-    opacity: 0;
-  }
-  to {
-    transform: translate(-50%, -50%);
-    opacity: 1;
-  }
-}
-
+/* Overlay */
 .rental-modal-overlay {
-  background: rgba(0, 0, 0, 0.6);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(74, 63, 51, 0.75); /* Dark brown overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal Content */
+.rental-modal {
+  background: var(--background-white);
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 500px;
+  outline: none;
+  position: relative; /* For potential absolute elements inside */
+  direction: rtl; /* Ensure RTL */
 }
 
 .rental-modal h2 {
+  text-align: center;
+  color: var(--primary-dark-brown);
   margin-top: 0;
-  margin-bottom: 20px;
-  text-align: center;
-  color: #333;
-  font-size: 24px;
+  margin-bottom: var(--spacing-lg);
 }
 
-/* Instructions text above the calendar */
-.calendar-instructions {
-  text-align: center;
-  font-size: 16px;
-  color: #555;
-  margin-bottom: 15px;
-}
-
-/* Centered calendar container with LTR direction */
-.date-picker-container {
-  direction: ltr;
+.date-picker-group {
   display: flex;
-  justify-content: center;
-  margin-bottom: 15px;
+  justify-content: space-around; /* Space out date pickers */
+  margin-bottom: var(--spacing-lg);
+  gap: var(--spacing-md);
+  flex-wrap: wrap; /* Allow wrapping on small screens */
 }
 
-/* Custom Calendar Styling */
-.custom-calendar {
-  border: none;
-  font-family: 'Roboto', sans-serif;
+.date-picker-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* Align labels right */
+  flex-basis: 45%; /* Approx width for two columns */
+  min-width: 180px; /* Prevent getting too small */
 }
 
-/* Calendar Header Styling */
-.custom-calendar .react-datepicker__header {
-  background-color: #ff7e5f;
-  border-bottom: none;
-  border-radius: 15px 15px 0 0;
+.date-picker-item label {
+  margin-bottom: var(--spacing-sm);
+  color: var(--primary-dark-brown);
+  font-weight: 500;
 }
 
-.custom-calendar .react-datepicker__current-month {
-  color: #fff;
-  font-weight: bold;
-  font-size: 18px;
+/* Styling react-datepicker */
+.react-datepicker-wrapper {
+  width: 100%;
+}
+.react-datepicker__input-container input {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-light);
+  border-radius: var(--border-radius);
+  font-size: 1em;
+  font-family: var(--font-primary);
+  text-align: right;
+}
+/* Add more specific styles for react-datepicker elements if needed */
+.react-datepicker__day--selected {
+    background-color: var(--primary-medium-brown) !important;
+}
+.react-datepicker__day--keyboard-selected {
+    background-color: var(--primary-light-brown) !important;
 }
 
-/* Day names and cells */
-.custom-calendar .react-datepicker__day-name,
-.custom-calendar .react-datepicker__day {
-  width: 2.5rem;
-  line-height: 2.5rem;
-  margin: 0.2rem;
-  font-size: 14px;
-  text-align: center;
-}
 
-/* Style for available (selectable) days */
-.custom-calendar .react-datepicker__day:not(.react-datepicker__day--disabled) {
-  font-weight: bold;
-  color: #333;
-}
-
-/* Highlight selected and in-range dates */
-.custom-calendar .react-datepicker__day--selected,
-.custom-calendar .react-datepicker__day--in-selecting-range,
-.custom-calendar .react-datepicker__day--in-range {
-  background-color: #feb47b;
-  color: #fff;
-  border-radius: 50%;
-}
-
-/* Keyboard selection highlight */
-.custom-calendar .react-datepicker__day--keyboard-selected {
-  background-color: #ff7e5f;
-  color: #fff;
-}
-
-/* Style for disabled days (unavailable) */
-.custom-calendar .react-datepicker__day--disabled {
-  color: #ccc;
-  opacity: 0.5;
-}
-
-/* Legend Styling */
-.date-picker-legend {
-  text-align: center;
-  margin-bottom: 20px;
-  font-size: 14px;
-  color: #555;
-}
-
-.legend-available {
-  color: #ff7e5f;
-  font-size: 20px;
-  margin-left: 5px;
-}
-
-/* Modal buttons styling */
 .modal-buttons {
   display: flex;
-  justify-content: center;
-  gap: 15px;
+  justify-content: center; /* Center buttons */
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
 }
 
-.confirm-button,
-.reset-button,
-.cancel-button {
-  padding: 12px 30px;
-  border: none;
-  border-radius: 30px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.3s ease;
+.modal-buttons .confirm-button {
+  /* Inherits .button-primary */
 }
 
-.confirm-button {
-  background: linear-gradient(90deg, #ff7e5f, #feb47b);
-  color: #fff;
+.modal-buttons .cancel-button {
+  /* Inherits .button-secondary */
 }
 
-.confirm-button:hover {
-  transform: scale(1.05);
-}
-
-.reset-button {
-  background: #ddd;
-  color: #333;
-}
-
-.reset-button:hover {
-  transform: scale(1.05);
-}
-
-.cancel-button {
-  background: #ccc;
-  color: #333;
-}
-
-.cancel-button:hover {
-  transform: scale(1.05);
+/* Disabled state for confirm button */
+.modal-buttons .confirm-button:disabled {
+    background-color: #cccccc;
+    border-color: #cccccc;
+    cursor: not-allowed;
 }
