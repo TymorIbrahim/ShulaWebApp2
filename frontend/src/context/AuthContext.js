@@ -1,106 +1,49 @@
 // src/context/AuthContext.js
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom'; 
+import React, { createContext, useContext, useState, useEffect } from "react";
 
-// 1. Create Context
-const AuthContext = createContext(null); // Initialize with null
+const AuthContext = createContext();
 
-// 2. Create Provider
+// Provider wraps your app so any component can access the authentication state
 export const AuthProvider = ({ children }) => {
-  // Initialize state from localStorage if available (basic persistence)
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-      return localStorage.getItem('isAuthenticated') === 'true';
-  }); 
+  // Initialize the user from localStorage if available, otherwise null.
   const [user, setUser] = useState(() => {
-      const storedUser = localStorage.getItem('user');
-      try {
-          return storedUser ? JSON.parse(storedUser) : null;
-      } catch (e) {
-          return null; // Handle potential JSON parsing error
-      }
-  }); 
-  
-  const navigate = useNavigate(); // Hook for navigation (safe here as Provider is inside Router)
+    const storedUser = localStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
-  // Update localStorage when auth state changes
-  useEffect(() => {
-      localStorage.setItem('isAuthenticated', isAuthenticated);
-      if (isAuthenticated && user) {
-          localStorage.setItem('user', JSON.stringify(user));
-      } else {
-          localStorage.removeItem('user');
-      }
-  }, [isAuthenticated, user]);
-
-
-  // Function to login (replace with actual API call later)
-  const login = async (username, password) => {
-    console.log("AuthContext: Attempting login with:", username);
-    // --- TODO: Replace with actual fetch call to your backend API ---
-    // Example: const response = await fetch('/api/auth/login', { method: 'POST', body: JSON.stringify({username, password}), headers: {'Content-Type': 'application/json'} }); 
-    // const data = await response.json();
-    // if (response.ok && data.token) { ... } 
-
-    // --- Simulation for now ---
-    // Use slightly more realistic dummy check
-    if (username === 'manager@shula.com' && password === 'password123') { 
-      console.log("AuthContext: Login successful (simulated)");
-      const loggedInUser = { username: username, role: 'manager', id: 'admin1' }; // Example user object
-      setIsAuthenticated(true);
-      setUser(loggedInUser); 
-      // Navigation logic moved to where login is called (e.g., LoginPage) for flexibility
-      // navigate('/admin'); // Don't navigate automatically from context
-      return true; // Indicate success
-    } else {
-      console.log("AuthContext: Login failed (simulated)");
-      setIsAuthenticated(false);
-      setUser(null);
-      // Clear localStorage on failed login attempt too
-      localStorage.removeItem('isAuthenticated');
-      localStorage.removeItem('user');
-      return false; // Indicate failure
-    }
+  // A function to log in the user globally.
+  const loginUser = (userData) => {
+    setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
   };
 
-  // Function to logout
-  const logout = () => {
-    console.log("AuthContext: Logging out");
-    // --- TODO: Call backend logout API if necessary (e.g., invalidate token) ---
-    setIsAuthenticated(false);
+  // A function to log out the user.
+  const logoutUser = () => {
     setUser(null);
-    // Clear localStorage on logout
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('user');
-    navigate('/login'); // Redirect to login page after logout
+    localStorage.removeItem("user");
   };
 
-  // Memoize the context value to prevent unnecessary re-renders
-  const value = React.useMemo(() => ({
-      isAuthenticated,
-      user,
-      login,
-      logout
-  }), [isAuthenticated, user]); // Dependencies for memoization
+  // Optionally, if you wish to automatically refresh the state from localStorage when needed
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const storedUser = localStorage.getItem("user");
+      setUser(storedUser ? JSON.parse(storedUser) : null);
+    };
 
-  console.log("AuthContext: AuthProvider rendering. isAuthenticated:", isAuthenticated);
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ user, loginUser, logoutUser }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// 3. Custom hook to use context
+// Custom hook for accessing the auth context conveniently
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === null) {
-      throw new Error("useAuth must be used within an AuthProvider");
-  }
-  if (context === undefined) { // Added check for undefined, potentially during initial render cycle
-      console.warn("AuthContext value is undefined. Ensure AuthProvider wraps the component calling useAuth.");
-      // Return a default structure or handle appropriately
-      return { isAuthenticated: false, user: null, login: async () => false, logout: () => {} };
-  }
-  return context;
+  return useContext(AuthContext);
 };

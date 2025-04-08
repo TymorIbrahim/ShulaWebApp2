@@ -1,48 +1,43 @@
 /* src/components/Navbar.css */
 .navbar {
-  /* Use a color from the palette - primary-dark (muted rose) */
-  background-color: var(--primary-color-dark); /* Was --primary-dark-brown */
+  background-color: var(--primary-color-dark);
   height: var(--navbar-height);
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.05rem; /* Slightly smaller base font */
+  font-size: 1.05rem;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   z-index: 999;
-  /* Use theme shadow color */
-  box-shadow: 0 2px 6px rgba(102, 84, 94, 0.15); /* Tinted with aesthetic-dark-purple */
+  box-shadow: 0 2px 6px rgba(102, 84, 94, 0.15);
 }
 
 .navbar-container {
   display: flex;
-  justify-content: space-between; /* Keep space-between */
-  align-items: center; /* Vertically align items */
+  justify-content: space-between;
+  align-items: center;
   height: var(--navbar-height);
   width: 100%;
-  /* Constrain width and center */
-  max-width: var(--content-max-width); /* Match main content width */
-  padding: 0 var(--spacing-xl); /* Match main content padding */
-  margin: 0 auto; /* Center container */
+  max-width: var(--content-max-width);
+  padding: 0 var(--spacing-xl);
+  margin: 0 auto;
 }
 
 .navbar-logo {
-  color: var(--text-light); /* Keep text/logo light */
+  color: var(--text-light);
   cursor: pointer;
   text-decoration: none;
   font-size: 1.5rem;
   display: flex;
   align-items: center;
   font-weight: bold;
-  /* Adjust margin if needed */
-  margin-left: var(--spacing-md); /* Add some margin for RTL */
+  margin-left: var(--spacing-md);
 }
 
 .navbar-logo img {
-  /* Adjust logo height based on navbar height */
-  height: calc(var(--navbar-height) - 25px); /* Slightly smaller logo */
+  height: calc(var(--navbar-height) - 25px);
   width: auto;
   display: block;
 }
@@ -52,45 +47,107 @@
   align-items: center;
   list-style: none;
   text-align: center;
-  margin: 0; /* Reset default ul margin */
-  padding: 0; /* Reset default ul padding */
+  margin: 0;
+  padding: 0;
 }
 
 .navbar-links li {
   height: var(--navbar-height);
-  display: flex; /* Use flex on li to center link vertically */
+  display: flex;
   align-items: center;
 }
 
 .navbar-links a {
-  color: var(--text-light); /* Light text for links */
+  color: var(--text-light);
   display: flex;
   align-items: center;
   text-decoration: none;
-  padding: 0 1.1rem; /* Adjust horizontal padding */
+  padding: 0 1.1rem;
   height: 100%;
   transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
-  font-weight: 400; /* Normal weight */
-  border-bottom: 3px solid transparent; /* Prepare for active indicator */
+  font-weight: 400;
+  border-bottom: 3px solid transparent;
   box-sizing: border-box;
 }
 
 .navbar-links a:hover,
-.navbar-links a:focus { /* Add focus state */
-  /* Use primary color (terracotta) for hover background */
+.navbar-links a:focus {
   background-color: var(--primary-color);
-  color: var(--text-light); /* Keep text light */
-  border-bottom-color: transparent; /* Hide border on hover */
-  outline: none; /* Remove focus outline if bg change is enough */
+  color: var(--text-light);
+  border-bottom-color: transparent;
+  outline: none;
 }
 
-/* Optional: Style for active link (requires NavLink from react-router-dom) */
 .navbar-links a.active {
-    border-bottom-color: var(--accent-color); /* Use accent color for underline */
-    /* background-color: rgba(255, 255, 255, 0.05); Optional subtle bg */
-    font-weight: 500; /* Slightly bolder active link */
+  border-bottom-color: var(--accent-color);
+  font-weight: 500;
 }
 
+/* New styles for the profile button */
+.navbar-profile {
+  position: relative;
+}
+
+.profile-btn {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-light);
+  font: inherit;
+  padding: 0 1.1rem;
+}
+
+.profile-btn .avatar {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--accent-color);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.profile-btn .user-name {
+  display: inline-block;
+}
+
+/* Dropdown menu for profile */
+.profile-dropdown {
+  position: absolute;
+  top: calc(100% + 5px);
+  right: 0;
+  background-color: var(--primary-color-dark);
+  padding: var(--spacing-sm);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: var(--border-radius);
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+  z-index: 1000;
+}
+
+.profile-dropdown a,
+.profile-dropdown button {
+  color: var(--text-light);
+  text-decoration: none;
+  background: none;
+  border: none;
+  padding: var(--spacing-xs) 0;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.profile-dropdown a:hover,
+.profile-dropdown button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
 
 /* Mobile styles */
 .menu-button {
@@ -102,61 +159,58 @@
 
 @media screen and (max-width: 960px) {
   .navbar-container {
-     /* Adjust padding for smaller screens if needed */
-     padding: 0 var(--spacing-lg);
-     /* Ensure max-width doesn't cause issues */
-     max-width: 100%;
+    padding: 0 var(--spacing-lg);
+    max-width: 100%;
   }
   .navbar-links {
-    display: none; /* Hide desktop links */
+    display: none;
   }
-
   .menu-button {
     display: block;
     background: none;
     border: none;
-    color: var(--text-light); /* Ensure contrast */
+    color: var(--text-light);
     font-size: 1.8rem;
     cursor: pointer;
-    padding: 0; /* Remove default padding */
-    margin-right: var(--spacing-sm); /* Adjust margin for RTL */
+    padding: 0;
+    margin-right: var(--spacing-sm);
   }
-
   .mobile-menu {
     display: flex;
     flex-direction: column;
     width: 100%;
     position: absolute;
     top: var(--navbar-height);
-    left: -100%; /* Start off-screen */
+    left: -100%;
     opacity: 0;
     transition: all 0.4s ease;
-    /* Use primary dark (muted rose) or primary (terracotta) */
     background: var(--primary-color-dark);
-    padding: var(--spacing-sm) 0; /* Reduced padding */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow to dropdown */
+    padding: var(--spacing-sm) 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
-
   .mobile-menu.open {
-    left: 0; /* Slide in */
+    left: 0;
     opacity: 1;
     z-index: 998;
   }
-
-  .mobile-menu a {
+  .mobile-menu a,
+  .mobile-menu button {
     text-align: center;
-    padding: 0.9rem 1.5rem; /* Adjust padding */
+    padding: 0.9rem 1.5rem;
     width: 100%;
-    display: block; /* Make link take full width */
+    display: block;
     color: var(--text-light);
     text-decoration: none;
-    font-size: 1.1rem; /* Slightly larger font for mobile */
+    font-size: 1.1rem;
     transition: background-color 0.2s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
   }
-
   .mobile-menu a:hover,
-  .mobile-menu a:focus {
-    /* Use primary color (terracotta) for hover */
+  .mobile-menu button:hover,
+  .mobile-menu a:focus,
+  .mobile-menu button:focus {
     background-color: var(--primary-color);
     color: var(--text-light);
     outline: none;

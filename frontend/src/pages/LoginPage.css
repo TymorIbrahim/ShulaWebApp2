@@ -1,115 +1,190 @@
-.loginpage {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-top: 120px;
-    min-height: 100vh;
-    background: linear-gradient(to bottom, #e3f2fd, #fff);
-    box-sizing: border-box;
-    width: 100vw;        /* 👈 Make it span full screen */
-    position: relative;  /* needed to not overflow the screen */
-  }
-  
-  
-  
-  .login-form {
-    width: 100%;
-    max-width: 400px;
-    background: #fff;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    text-align: center;
-  }
-  
-  
-  .login-form h2 {
-    margin-bottom: 24px;
-    font-size: 24px;
-    font-weight: 700;
-    color: #333;
-  }
-  
-  .login-form input[type="email"],
-  .login-form input[type="password"] {
-    width: 100%;
-    padding: 12px 14px;
-    margin-bottom: 16px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 16px;
-  }
-  
-  .remember-me {
-    display: flex;
-    align-items: center;
-    font-size: 14px;
-    margin-bottom: 20px;
-    color: #555;
-    text-align: left;
-  }
-  
-  .remember-me input {
-    margin-left: 8px;
-  }
-  
-  .login-btn {
-    width: 100%;
-    padding: 12px;
-    background: #2962ff;
-    color: white;
-    font-weight: bold;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  
-  .login-btn:hover {
-    background: #1e47cc;
-  }
-  
-  .divider {
-    margin: 20px 0;
-    color: #999;
-    font-size: 14px;
-  }
-  
-  .google-btn {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    background: white;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    cursor: pointer;
-  }
-  
-  .google-btn img {
-    width: 20px;
-    height: 20px;
-  }
-  
-  .forgot-password {
-    display: block;
-    margin-top: 20px;
-    font-size: 14px;
-    color: #2962ff;
-    text-decoration: none;
-  }
-  
-  .forgot-password:hover {
-    text-decoration: underline;
-  }
-  
-  .error {
-    color: red;
-    font-size: 14px;
-    margin-bottom: 10px;
-  }
-  
+/* Container with a subtle background gradient for a premium feel */
+.login-page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - var(--navbar-height));
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, rgba(245,245,245,0.8) 0%, rgba(255,255,255,0.8) 100%);
+}
+
+/* Card style for the login form */
+.login-form-container {
+  background-color: var(--background-white);
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.login-form-container:hover {
+  transform: translateY(-4px);
+}
+
+/* Header styling */
+.login-form-container h2 {
+  margin-bottom: var(--spacing-xl);
+  color: var(--primary-dark-brown);
+  font-size: 1.8em;
+  font-weight: 600;
+}
+
+/* Form layout */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  text-align: right;
+}
+
+/* Input group styling */
+.form-group input[type="email"],
+.form-group input[type="password"] {
+  width: 100%;
+  padding: 0.75em;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  font-size: 1em;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus {
+  border-color: var(--primary-dark-brown);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  outline: none;
+  background-color: #fafafa;
+}
+
+/* Styling for the "remember me" group */
+.remember-me-group {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Error message styling */
+.error-message.login-error {
+  color: var(--admin-red);
+  background-color: rgba(201,76,76,0.1);
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius);
+  text-align: center;
+  margin-bottom: var(--spacing-sm);
+  font-size: 0.9em;
+}
+
+/* Primary login button styling */
+.login-btn {
+  width: 100%;
+  padding: var(--spacing-md);
+  font-size: 1.1em;
+  font-weight: 600;
+  background-color: var(--primary-dark-brown);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.login-btn:hover,
+.login-btn:focus {
+  background-color: var(--primary-medium-brown);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+/* Divider styling */
+.divider {
+  text-align: center;
+  color: var(--primary-medium-brown);
+  font-size: 0.9em;
+  margin: var(--spacing-sm) 0;
+  position: relative;
+}
+.divider span {
+  background-color: var(--background-white);
+  padding: 0 var(--spacing-md);
+  position: relative;
+  z-index: 1;
+}
+.divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: var(--border-light);
+  z-index: 0;
+}
+
+/* Google button styling */
+.google-btn {
+  width: 100%;
+  padding: var(--spacing-md);
+  border: 1px solid var(--border-light);
+  background-color: var(--background-white);
+  border-radius: var(--border-radius);
+  font-size: 1em;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.google-btn:hover,
+.google-btn:focus-visible {
+  background-color: #f8f8f8;
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.google-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Forgot password link styling */
+.forgot-password-link {
+  display: block;
+  margin-top: var(--spacing-md);
+  font-size: 0.95em;
+  color: var(--primary-dark-brown);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.forgot-password-link:hover,
+.forgot-password-link:focus {
+  color: var(--primary-medium-brown);
+  text-decoration: underline;
+}
+
+/* Signup link styling */
+.signup-link-text {
+  text-align: center;
+  margin-top: var(--spacing-lg);
+  font-size: 0.95em;
+  color: var(--text-dark-secondary);
+}
+
+.signup-link-text a {
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.signup-link-text a:hover,
+.signup-link-text a:focus {
+  color: var(--primary-dark-brown);
+  text-decoration: underline;
+}

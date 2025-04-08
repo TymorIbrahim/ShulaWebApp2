@@ -1,23 +1,26 @@
+// src/components/CartPage.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import "./CartPage.css";
 import cartBanner from "../assets/cart-banner.jpg";
 import EditRentalModal from "./EditRentalModal";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 
-const CartPage = ({ user }) => {
+const CartPage = () => {
+  const { user } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Modal controls
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedCartItem, setSelectedCartItem] = useState(null);
 
+  const navigate = useNavigate();
   const userId = user?._id;
 
-  // Fetch cart items for the user
   const fetchCartItems = async () => {
     try {
       setLoading(true);
@@ -25,7 +28,7 @@ const CartPage = ({ user }) => {
       setCartItems(response.data);
       setLoading(false);
     } catch (err) {
-      setError(err.response?.data?.message || "Error fetching cart items");
+      setError(err.response?.data?.message || "שגיאה בטעינת עגלת הקניות");
       setLoading(false);
     }
   };
@@ -36,19 +39,16 @@ const CartPage = ({ user }) => {
     }
   }, [userId]);
 
-  // Open edit modal for a cart item
   const openEditModal = (item) => {
     setSelectedCartItem(item);
     setEditModalOpen(true);
   };
 
-  // Open delete modal for a cart item
   const openDeleteModal = (item) => {
     setSelectedCartItem(item);
     setDeleteModalOpen(true);
   };
 
-  // Delete a cart item
   const handleDelete = async () => {
     try {
       await axios.delete(`http://localhost:5002/api/carts/${selectedCartItem._id}`);
@@ -57,45 +57,49 @@ const CartPage = ({ user }) => {
       fetchCartItems();
     } catch (err) {
       console.error(err);
-      setError("Failed to delete item");
+      setError("מחיקה נכשלה");
       setDeleteModalOpen(false);
     }
   };
 
-  // Update a cart item with new rental dates
   const handleUpdate = async (newDates) => {
     try {
       await axios.put(`http://localhost:5002/api/carts/${selectedCartItem._id}`, {
-        rentalPeriod: newDates
+        rentalPeriod: newDates,
       });
       setEditModalOpen(false);
       setSelectedCartItem(null);
       fetchCartItems();
     } catch (err) {
       console.error(err);
-      setError("Failed to update item");
+      setError("עדכון נכשל");
       setEditModalOpen(false);
     }
   };
 
-  // Checkout: move cart items to orders and clear the cart
   const handleCheckout = async () => {
     try {
-      const response = await axios.post("http://localhost:5002/api/carts/checkout", { user: userId });
-      alert("Checkout successful!");
+      await axios.post("http://localhost:5002/api/carts/checkout", { user: userId });
+      alert("הזמנה בוצעה בהצלחה!");
       fetchCartItems();
     } catch (err) {
       console.error(err);
-      setError("Checkout failed");
+      setError("ההזמנה נכשלה");
     }
   };
 
-  // Calculate total price (assuming product.price exists)
-  const total = cartItems.reduce((acc, item) => acc + (item.product.price || 0), 0);
+  const calculateRentalPrice = (item) => {
+    const { startDate, endDate } = item.rentalPeriod;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const hours = (end - start) / 1000 / 3600;
+    const periods = Math.max(1, Math.ceil(hours / 48));
+    return periods * item.product.price;
+  };
 
-  if (loading) {
-    return <p className="loading">טוען עגלה...</p>;
-  }
+  const total = cartItems.reduce((sum, item) => sum + calculateRentalPrice(item), 0);
+
+  if (loading) return <p className="loading">טוען עגלה...</p>;
 
   return (
     <div className="cart-page">
@@ -104,23 +108,27 @@ const CartPage = ({ user }) => {
         <h1 className="cart-title">🛒 העגלה שלי</h1>
       </div>
       {error && <p className="error-msg">{error}</p>}
+
       {cartItems.length === 0 ? (
         <p className="empty-cart">העגלה שלך ריקה.</p>
       ) : (
         <>
           <div className="cart-items">
-            {cartItems.map(item => (
+            {cartItems.map((item) => (
               <div key={item._id} className="cart-item">
+                <div className="item-image">
+                  <img
+                    src={item.product.productImageUrl || "/placeholder-image.png"}
+                    alt={item.product.name}
+                  />
+                </div>
                 <div className="item-info">
                   <h3 className="item-name">{item.product.name}</h3>
                   <p className="item-dates">
-                    השכרה:{" "}
-                    {new Date(item.rentalPeriod.startDate).toLocaleDateString()} -{" "}
+                    השכרה: {new Date(item.rentalPeriod.startDate).toLocaleDateString()} - {" "}
                     {new Date(item.rentalPeriod.endDate).toLocaleDateString()}
                   </p>
-                  <p className="rental-info">
-                    השכרה מתבצעת ב-48 שעות בלבד, ניתן לבחור רק ימים: ראשון, שלישי וחמישי.
-                  </p>
+                  <p className="rental-info">השכרה ב-48 שעות בלבד (ימים: א, ג, ה)</p>
                 </div>
                 <div className="item-actions">
                   <button className="action-btn edit-btn" onClick={() => openEditModal(item)}>
@@ -130,23 +138,29 @@ const CartPage = ({ user }) => {
                     מחק
                   </button>
                 </div>
-                <div className="item-price">₪{item.product.price}</div>
+                <div className="item-price">
+                  ₪{calculateRentalPrice(item).toFixed(2)}
+                </div>
               </div>
             ))}
           </div>
+
           <div className="cart-summary">
             <div className="summary-info">
-              <h2 className="total-title">סה"כ:</h2>
-              <p className="total-amount">₪{total}</p>
+              <h2 className="total-title">סה"כ לתשלום:</h2>
+              <p className="total-amount">₪{total.toFixed(2)}</p>
             </div>
             <button className="checkout-btn" onClick={handleCheckout}>
               📦 הזמן את הפריטים
+            </button>
+            <button className="secondary" onClick={() => navigate("/products")}>
+              ← המשך בקנייה
             </button>
           </div>
         </>
       )}
 
-      {/* Edit Rental Modal */}
+      {/* Modals */}
       {editModalOpen && selectedCartItem && (
         <EditRentalModal
           isOpen={editModalOpen}
@@ -155,8 +169,6 @@ const CartPage = ({ user }) => {
           onSave={handleUpdate}
         />
       )}
-
-      {/* Confirm Delete Modal */}
       {deleteModalOpen && selectedCartItem && (
         <ConfirmDeleteModal
           isOpen={deleteModalOpen}

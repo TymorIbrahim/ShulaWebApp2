@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // Import the auth context hook
 import "./Navbar.css";
 import logoImage from "../assets/logo.avif";
 
-const Navbar = ({ user, onLogout }) => {
+const Navbar = () => {
+  // Get the current logged in user and logout function from AuthContext
+  const { user, logoutUser } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -17,8 +20,8 @@ const Navbar = ({ user, onLogout }) => {
   };
 
   const handleLogoutClick = () => {
-    onLogout();
-    // Optionally, navigate to the home page after logout.
+    logoutUser();
+    setProfileMenuOpen(false);
     navigate("/");
   };
 
@@ -29,25 +32,95 @@ const Navbar = ({ user, onLogout }) => {
           <img src={logoImage} alt="שולה לוגו" />
         </Link>
         <ul className="navbar-links">
-          <li><Link to="/">דף הבית</Link></li>
-          <li><Link to="/products">מוצרים</Link></li>
-          <li><Link to="/about">אודות</Link></li>
-          <li><Link to="/faqs">שאלות ותשובות</Link></li>
-          <li><Link to="/cart-page">העגלה שלי</Link></li>
-          <li><Link to="/login">Log In</Link></li>
-
+          <li>
+            <Link to="/">דף הבית</Link>
+          </li>
+          <li>
+            <Link to="/products">מוצרים</Link>
+          </li>
+          <li>
+            <Link to="/about">אודות</Link>
+          </li>
+          <li>
+            <Link to="/faqs">שאלות ותשובות</Link>
+          </li>
+          <li>
+            <Link to="/cart-page">העגלה שלי</Link>
+          </li>
+          {user ? (
+            <li className="navbar-profile">
+              <button className="profile-btn" onClick={toggleProfileMenu}>
+                <span className="avatar">
+                  {user.firstName
+                    ? user.firstName.charAt(0).toUpperCase()
+                    : "U"}
+                </span>
+                <span className="user-name">{user.firstName}</span>
+              </button>
+              {profileMenuOpen && (
+                <div className="profile-dropdown">
+                  <Link to="/profile" onClick={() => setProfileMenuOpen(false)}>
+                    פרופיל
+                  </Link>
+                  <Link to="/orders" onClick={() => setProfileMenuOpen(false)}>
+                    הזמנות קודמות
+                  </Link>
+                  <button onClick={handleLogoutClick}>התנתק</button>
+                </div>
+              )}
+            </li>
+          ) : (
+            <li>
+              <Link to="/login">Log In</Link>
+            </li>
+          )}
         </ul>
-        <button className={`menu-button ${menuOpen ? "active" : ""}`} onClick={toggleMobileMenu}>
+        <button
+          className={`menu-button ${menuOpen ? "active" : ""}`}
+          onClick={toggleMobileMenu}
+        >
           ☰
         </button>
       </div>
       <div className={`mobile-menu ${menuOpen ? "open" : ""}`}>
-        <Link to="/" onClick={() => setMenuOpen(false)}>דף הבית</Link>
-        <Link to="/products" onClick={() => setMenuOpen(false)}>מוצרים</Link>
-        <Link to="/about" onClick={() => setMenuOpen(false)}>אודות</Link>
-        <Link to="/contact" onClick={() => setMenuOpen(false)}>צור קשר</Link>
-        <Link to="/faqs" onClick={() => setMenuOpen(false)}>שאלות ותשובות</Link>
-        <Link to="/login" onClick={() => setMenuOpen(false)}>Log In </Link>
+        <Link to="/" onClick={() => setMenuOpen(false)}>
+          דף הבית
+        </Link>
+        <Link to="/products" onClick={() => setMenuOpen(false)}>
+          מוצרים
+        </Link>
+        <Link to="/about" onClick={() => setMenuOpen(false)}>
+          אודות
+        </Link>
+        <Link to="/contact" onClick={() => setMenuOpen(false)}>
+          צור קשר
+        </Link>
+        <Link to="/faqs" onClick={() => setMenuOpen(false)}>
+          שאלות ותשובות
+        </Link>
+        {user ? (
+          <>
+            <Link to="/profile" onClick={() => setMenuOpen(false)}>
+              פרופיל
+            </Link>
+            <Link to="/orders" onClick={() => setMenuOpen(false)}>
+              הזמנות קודמות
+            </Link>
+            <button
+              className="mobile-logout-btn"
+              onClick={() => {
+                handleLogoutClick();
+                setMenuOpen(false);
+              }}
+            >
+              התנתק
+            </button>
+          </>
+        ) : (
+          <Link to="/login" onClick={() => setMenuOpen(false)}>
+            Log In
+          </Link>
+        )}
       </div>
     </nav>
   );

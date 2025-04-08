@@ -1,97 +1,121 @@
 /* src/pages/SignupPage.css */
 
-.signup-page-container { /* Use styles similar to login page */
+/* Full-screen container with a subtle background gradient for a premium feel */
+.signup-page-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - var(--navbar-height) - 50px); /* Adjust if footer added */
+  min-height: calc(100vh - var(--navbar-height) - 50px);
   padding: var(--spacing-lg);
-  width: 100%;
+  background: linear-gradient(135deg, rgba(245,245,245,0.8) 0%, rgba(255,255,255,0.8) 100%);
 }
 
-.signup-form-container { /* Use styles similar to login page */
+/* Card style for the signup form with improved shadow and smooth hover effect */
+.signup-form-container {
   background-color: var(--background-white);
   padding: var(--spacing-xl);
   border-radius: var(--border-radius);
-  box-shadow: var(--shadow-medium);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 480px; /* Slightly wider for name fields */
+  max-width: 480px;
   text-align: center;
+  transition: transform 0.3s ease;
 }
 
+.signup-form-container:hover {
+  transform: translateY(-4px);
+}
+
+/* Header styling for a clean look */
 .signup-form-container h2 {
   margin-bottom: var(--spacing-xl);
   color: var(--primary-dark-brown);
   font-size: 1.8em;
+  font-weight: 600;
 }
 
-/* Style the form itself for layout */
+/* Form layout with balanced spacing */
 .signup-form {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md); /* Consistent gap */
-  text-align: right; /* Align labels/placeholders right for RTL */
+  gap: var(--spacing-md);
+  text-align: right;
 }
 
-/* Style the name fields container */
+/* Name fields layout for balance and consistency */
 .name-fields {
   display: flex;
-  gap: var(--spacing-md); /* Gap between name inputs */
+  gap: var(--spacing-md);
   width: 100%;
 }
-/* Ensure form groups within name-fields take up equal space */
+
 .name-fields .form-group {
-  flex: 1; /* Each name field takes half the space */
-  margin-bottom: 0; /* Remove bottom margin as main form gap handles it */
+  flex: 1;
 }
 
-/* Ensure all form groups take full width */
-.signup-form .form-group {
+/* Common input styles with enhanced padding and focus effects */
+.signup-form .form-group input[type="text"],
+.signup-form .form-group input[type="email"],
+.signup-form .form-group input[type="tel"],
+.signup-form .form-group input[type="password"] {
   width: 100%;
-  margin-bottom: 0; /* Remove bottom margin as gap handles spacing */
+  padding: 0.75em;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  font-size: 1em;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Ensure inputs use full width and theme styles */
-.signup-form input[type="text"],
-.signup-form input[type="email"],
-.signup-form input[type="tel"],
-.signup-form input[type="password"] {
-  /* Inherits from global .form-group input styles in App.css */
-  width: 100%;
-  text-align: right; /* Ensure text alignment for RTL */
+.signup-form .form-group input:focus {
+  border-color: var(--primary-dark-brown);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  outline: none;
+  background-color: #fafafa;
 }
 
-/* Specific error/success message styles */
+/* Elegant message styling for errors and successes */
 .signup-error, .success-message {
   width: 100%;
   text-align: center;
   font-size: 0.9em;
   padding: var(--spacing-sm);
   border-radius: var(--border-radius);
-  margin-top: calc(-1 * var(--spacing-xs)); /* Pull up */
-  margin-bottom: var(--spacing-xs); /* Space below */
+  margin-top: calc(-1 * var(--spacing-xs));
+  margin-bottom: var(--spacing-xs);
 }
 .signup-error {
-  background-color: rgba(201, 76, 76, 0.1); /* Light red background */
+  background-color: rgba(201, 76, 76, 0.1);
   border: 1px solid var(--admin-red);
-  color: var(--admin-red); /* Already set globally but can be explicit */
+  color: var(--admin-red);
 }
 .success-message {
-  background-color: rgba(90, 154, 90, 0.1); /* Light green background */
+  background-color: rgba(90, 154, 90, 0.1);
   border: 1px solid var(--admin-green);
   color: var(--admin-green-dark);
 }
 
-
-/* Style primary signup button */
+/* Primary signup button with refined style and hover transition */
 .signup-btn {
   width: 100%;
   padding: var(--spacing-md);
   font-size: 1.1em;
-  /* Inherits colors/hover from .button-primary */
+  font-weight: 600;
+  background-color: var(--primary-dark-brown);
+  color: #fff;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-/* Divider styling - Reuse from LoginPage.css */
+.signup-btn:hover,
+.signup-btn:focus {
+  background-color: var(--primary-medium-brown);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+/* Divider styling with clear visual separation */
 .divider {
   text-align: center;
   color: var(--primary-medium-brown);
@@ -117,7 +141,7 @@
   z-index: 0;
 }
 
-/* Style Google button - Reuse from LoginPage.css */
+/* Google button with refined layout and interactive hover effect */
 .google-btn {
   width: 100%;
   background-color: var(--background-white);
@@ -128,28 +152,41 @@
   justify-content: center;
   gap: var(--spacing-sm);
   font-weight: 500;
-  transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+  cursor: pointer;
 }
-.google-btn:hover, .google-btn:focus-visible {
+
+.google-btn:hover,
+.google-btn:focus-visible {
   background-color: #f8f8f8;
   border-color: var(--primary-medium-brown);
-  color: var(--text-dark-secondary);
-  transform: none;
+  transform: translateY(-2px);
   outline: none;
 }
+
 .google-icon {
   width: 18px;
   height: 18px;
 }
 
-/* Login link paragraph */
+/* Login link styling with emphasis on clarity and interactivity */
 .login-link-text {
   text-align: center;
   margin-top: var(--spacing-lg);
   font-size: 0.95em;
   color: var(--text-dark-secondary);
 }
+
 .login-link-text a {
   font-weight: 500;
-  /* Inherits link color/hover from index.css */
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.login-link-text a:hover,
+.login-link-text a:focus {
+  color: var(--primary-dark-brown);
+  text-decoration: underline;
 }

@@ -5,21 +5,23 @@ import { getProduct } from "../services/productService";
 import { getBookedDates } from "../services/orderService";
 import RentalDatePickerModal from "./RentalDatePickerModal";
 import { addToCart } from "../services/cartService";
-import ChoiceModal from "./ChoiceModal";  // Import the new modal component
+import ChoiceModal from "./ChoiceModal";  // Import the modal component
+import { useAuth } from "../context/AuthContext"; // Import AuthContext hook
 import "./ProductDetails.css";
 
-const ProductDetails = ({ user }) => {
+const ProductDetails = () => {
   const { productId } = useParams();
+  const { user } = useAuth();
   const [product, setProduct] = useState(null);
   const [bookedDates, setBookedDates] = useState([]);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [choiceModalOpen, setChoiceModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Redirect to login if no user
+  // Redirect to login if no user (using AuthContext)
   useEffect(() => {
     if (!user) {
-      navigate("/loginpage");
+      navigate("/login");
     }
   }, [user, navigate]);
 
@@ -34,11 +36,10 @@ const ProductDetails = ({ user }) => {
       }
     };
 
-    // Fetch booked dates (accepted orders) for this product
+    // Fetch booked dates for this product (convert date strings to Date objects)
     const fetchBookedDates = async () => {
       try {
         const dates = await getBookedDates(productId);
-        // Convert returned date strings to Date objects
         const convertedDates = dates.map(dateStr => new Date(dateStr));
         setBookedDates(convertedDates);
       } catch (error) {
@@ -54,15 +55,15 @@ const ProductDetails = ({ user }) => {
     setModalIsOpen(true);
   };
 
-    const handleModalClose = () => {
-        setModalIsOpen(false);
-    };
+  const handleModalClose = () => {
+    setModalIsOpen(false);
+  };
 
-  // Instead of window.confirm, open the custom ChoiceModal after successful add-to-cart
+  // Confirm rental (add to cart) with the selected dates
   const handleConfirmRental = async ({ startDate, endDate }) => {
     if (!user) {
       alert("נא להתחבר כדי להוסיף לעגלה.");
-      navigate("/loginpage");
+      navigate("/login");
       return;
     }
     try {
@@ -74,7 +75,7 @@ const ProductDetails = ({ user }) => {
       console.log("Sending cart item data:", cartItemData);
       const response = await addToCart(cartItemData);
       console.log("Item added to cart:", response);
-      // Open the Choice Modal instead of using window.confirm
+      // Open the choice modal to decide on next actions
       setChoiceModalOpen(true);
     } catch (error) {
       console.error("Error adding item to cart:", error);
@@ -94,33 +95,33 @@ const ProductDetails = ({ user }) => {
 
   if (!product) return <div>טוען פרטי מוצר...</div>;
 
-    return (
-        <div className="product-details-container">
-            <img 
-              src={product.productImageUrl || '/placeholder-image.png'} // Use placeholder
-              alt={product.name || 'Product Image'} 
-              className="product-details-image"
-            /> 
-            <div className="product-info-section">
-                <h2>{product.name || 'Product Name'}</h2>
-                <div
-                    className="product-description"
-                    // Ensure description is treated as safe HTML if using this
-                    dangerouslySetInnerHTML={{ __html: product.description || 'No description available.' }} 
-                />
-                <div className="product-price">₪{product.price ?? 'N/A'}</div> 
+  return (
+    <div className="product-details-container">
+      <img 
+        src={product.productImageUrl || '/placeholder-image.png'} 
+        alt={product.name || 'Product Image'} 
+        className="product-details-image"
+      /> 
+      <div className="product-info-section">
+        <h2>{product.name || 'Product Name'}</h2>
+        <div
+          className="product-description"
+          // Use dangerouslySetInnerHTML if product.description is HTML
+          dangerouslySetInnerHTML={{ __html: product.description || 'No description available.' }} 
+        />
+        <div className="product-price">₪{product.price ?? 'N/A'}</div> 
                 
-                <button className="buy-button" onClick={handleAddToCartClick}>
-                    הוסף לסל
-                </button>
+        <button className="buy-button" onClick={handleAddToCart}>
+          הוסף לסל
+        </button>
                 
-                <button 
-                    className="buy-button back-button" 
-                    onClick={() => navigate('/products')} // Navigate explicitly back
-                >
-                    חזרה למוצרים
-                </button>
-            </div>
+        <button 
+          className="buy-button back-button" 
+          onClick={() => navigate('/products')}
+        >
+          חזרה למוצרים
+        </button>
+      </div>
 
       {/* Rental Date Picker Modal */}
       <RentalDatePickerModal
@@ -130,7 +131,7 @@ const ProductDetails = ({ user }) => {
         bookedDates={bookedDates}
       />
 
-      {/* Choice Modal for next action after adding to cart */}
+      {/* Choice Modal after adding item to cart */}
       <ChoiceModal
         isOpen={choiceModalOpen}
         onClose={() => setChoiceModalOpen(false)}

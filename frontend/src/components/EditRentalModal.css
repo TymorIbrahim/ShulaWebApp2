@@ -37,6 +37,7 @@
   }
   
   .date-picker-wrapper {
+    direction: ltr;
     margin: 1rem 0;
   }
   

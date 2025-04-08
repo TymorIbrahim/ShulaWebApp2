@@ -232,31 +232,4 @@ hr {
 }
 
 
-/* React Modal */
-.ReactModal__Overlay {
-  opacity: 0;
-  transform: scale(0.95);
-  transition: opacity var(--transition-speed) ease-in-out, transform var(--transition-speed) ease-in-out;
-  background-color: var(--overlay-dark); /* Use new overlay color */
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--spacing-md);
-}
-.ReactModal__Overlay--after-open{ opacity: 1; transform: scale(1); }
-.ReactModal__Overlay--before-close{ opacity: 0; transform: scale(0.95); }
 
-.ReactModal__Content {
-  position: relative !important;
-  inset: auto !important;
-  border: none !important;
-  background: var(--background-white) !important; /* Use white modal bg */
-  overflow: auto !important;
-  border-radius: var(--border-radius) !important;
-  outline: none !important;
-  padding: var(--spacing-xl) !important;
-  max-width: 600px;
-  width: 100%;
-  box-shadow: var(--shadow-medium);
-}
