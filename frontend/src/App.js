@@ -74,14 +74,23 @@ function App() {
                         <Route path="/signup" element={<SignupPage />} />
 
 
+
+                        <Route path="/admin" element={<AdminDashboard />} />
+                        <Route path="/admin/products" element={<ManageProducts />} />
+                        <Route path="/admin/products/new" element={<ProductForm isEditing={false} />} />
+                        <Route path="/admin/products/edit/:productId" element={<ProductForm isEditing={true} />} />
+                        <Route path="/admin/settings" element={<AdminSettings />} />
+                        <Route path="/admin/products/edit" element={<ManageProducts/>} />
+
+
+
+
                         {/* === Protected Admin Routes === */}
                         <Route element={<ProtectedRoute />}>
                             {/* These components should also ideally wrap their content in .main-content-container */}
-                            <Route path="/admin" element={<AdminDashboard />} />
-                            <Route path="/admin/products" element={<ManageProducts />} />
-                            <Route path="/admin/products/new" element={<ProductForm isEditing={false} />} />
-                            <Route path="/admin/products/edit/:productId" element={<ProductForm isEditing={true} />} />
-                            <Route path="/admin/settings" element={<AdminSettings />} />
+                            
+
+                            
                             {/* <Route path="/admin/rentals" element={<ManageRentals />} /> */}
                         </Route>
 
