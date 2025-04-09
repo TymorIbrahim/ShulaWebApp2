@@ -1,46 +1,52 @@
 /* src/components/Navbar.css */
 .navbar {
-  background-color: var(--primary-color-dark);
+  background-color: var(--bg-light); /* Light background */
   height: var(--navbar-height);
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.05rem;
+  font-size: 1rem;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   z-index: 999;
-  box-shadow: 0 2px 6px rgba(102, 84, 94, 0.15);
-}
+  box-shadow: 0 2px 6px var(--shadow-color); /* Subtle shadow */
+  border-bottom: 0px solid var(--border-color); /* Add a subtle border */
+ }
+ 
 
-.navbar-container {
+ .navbar-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Keeps logo left, links group right */
   align-items: center;
   height: var(--navbar-height);
   width: 100%;
   max-width: var(--content-max-width);
-  padding: 0 var(--spacing-xl);
+  padding: 0 var(--spacing-xl); /* Keep container padding */
   margin: 0 auto;
 }
+ 
 
-.navbar-logo {
-  color: var(--text-light);
+ .navbar-logo {
+  color: var(--text-primary); /* Darker logo text */
   cursor: pointer;
   text-decoration: none;
-  font-size: 1.5rem;
+  font-size: 1.4rem; /* Slightly smaller logo */
   display: flex;
   align-items: center;
   font-weight: bold;
   margin-left: var(--spacing-md);
-}
+ }
+ 
 
-.navbar-logo img {
-  height: calc(var(--navbar-height) - 25px);
-  width: auto;
+ .navbar-logo img {
+  height: 150px ; /* Slightly smaller logo */
+  width: 150px;
   display: block;
-}
+ }
+ 
+
 
 .navbar-links {
   display: flex;
@@ -55,86 +61,106 @@
   height: var(--navbar-height);
   display: flex;
   align-items: center;
+  margin: 0;
 }
 
+/* Ensure this rule is still present */
+.navbar-links li:last-child {
+  margin-left: var(--spacing-xxl); /* This pushes this item away from others to the far left */
+}
+
+
 .navbar-links a {
-  color: var(--text-light);
+  color: var(--ocean-darkest-blue);
   display: flex;
   align-items: center;
   text-decoration: none;
-  padding: 0 1.1rem;
+  padding: 0 var(--spacing-md); /* Base padding for most links */
   height: 100%;
   transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
-  font-weight: 400;
-  border-bottom: 3px solid transparent;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
   box-sizing: border-box;
+  padding: 0 var(--spacing-md); /* Base padding for most links */
+  white-space: nowrap; /* Prevent links from wrapping */
 }
 
-.navbar-links a:hover,
-.navbar-links a:focus {
-  background-color: var(--primary-color);
-  color: var(--text-light);
+ 
+
+ .navbar-links a:hover,
+ .navbar-links a:focus {
+  background-color: var(--bg-lighter); /* Lighter hover background */
+  color: var(--darker-blue); /* Darker text on hover */
   border-bottom-color: transparent;
   outline: none;
-}
+ }
+ 
 
-.navbar-links a.active {
+ .navbar-links a.active {
   border-bottom-color: var(--accent-color);
-  font-weight: 500;
-}
+  font-weight: 600; /* Even bolder active link */
+ }
+ 
 
-/* New styles for the profile button */
-.navbar-profile {
+ /* New styles for the profile button */
+ .navbar-profile {
   position: relative;
-}
+ }
+ 
 
-.profile-btn {
+ .profile-btn {
   display: flex;
   align-items: center;
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--text-light);
+  color: var(--text-primary); /* Darker profile text */
   font: inherit;
-  padding: 0 1.1rem;
-}
+  padding: 0 var(--spacing-md);
+ }
+ 
 
-.profile-btn .avatar {
+ .profile-btn .avatar {
   display: inline-flex;
   justify-content: center;
   align-items: center;
   background-color: var(--accent-color);
   color: #fff;
-  width: 32px;
-  height: 32px;
+  width: 28px; /* Slightly smaller avatar */
+  height: 28px;
   border-radius: 50%;
   margin-right: 0.5rem;
   font-weight: bold;
   font-size: 0.9rem;
-}
+ }
+ 
 
-.profile-btn .user-name {
+ .profile-btn .user-name {
   display: inline-block;
-}
+  font-weight: 500; /* Slightly bolder name */
+ }
+ 
 
-/* Dropdown menu for profile */
-.profile-dropdown {
+ /* Dropdown menu for profile */
+ .profile-dropdown {
   position: absolute;
   top: calc(100% + 5px);
   right: 0;
-  background-color: var(--primary-color-dark);
+  background-color: var(--bg-light); /* Light background */
   padding: var(--spacing-sm);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px var(--shadow-color);
   border-radius: var(--border-radius);
   display: flex;
   flex-direction: column;
   min-width: 160px;
   z-index: 1000;
-}
+  border: 1px solid var(--border-color); /* Add a border */
+ }
+ 
 
-.profile-dropdown a,
-.profile-dropdown button {
-  color: var(--text-light);
+ .profile-dropdown a,
+ .profile-dropdown button {
+  color: var(--text-primary); /* Darker dropdown text */
   text-decoration: none;
   background: none;
   border: none;
@@ -142,77 +168,84 @@
   text-align: left;
   cursor: pointer;
   font-size: 0.95rem;
-}
+  transition: background-color 0.2s ease, color 0.2s ease;
+ }
+ 
 
-.profile-dropdown a:hover,
-.profile-dropdown button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
+ .profile-dropdown a:hover,
+ .profile-dropdown button:hover {
+  background-color: var(--bg-lighter); /* Lighter hover background */
+  color: var(--darker-blue); /* Darker text on hover */
+ }
+ 
 
-/* Mobile styles */
-.menu-button {
+ /* Mobile styles */
+ .menu-button {
   display: none;
-}
-.mobile-menu {
+ }
+ .mobile-menu {
   display: none;
-}
+ }
+ 
 
-@media screen and (max-width: 960px) {
+ @media screen and (max-width: 960px) {
   .navbar-container {
-    padding: 0 var(--spacing-lg);
-    max-width: 100%;
+  padding: 0 var(--spacing-lg);
+  max-width: 100%;
   }
   .navbar-links {
-    display: none;
+  display: none;
   }
   .menu-button {
-    display: block;
-    background: none;
-    border: none;
-    color: var(--text-light);
-    font-size: 1.8rem;
-    cursor: pointer;
-    padding: 0;
-    margin-right: var(--spacing-sm);
+  display: block;
+  background: none;
+  border: none;
+  color: var(--text-primary); /* Darker menu icon */
+  font-size: 1.6rem; /* Slightly smaller menu icon */
+  cursor: pointer;
+  padding: 0;
+  margin-right: var(--spacing-sm);
   }
   .mobile-menu {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    position: absolute;
-    top: var(--navbar-height);
-    left: -100%;
-    opacity: 0;
-    transition: all 0.4s ease;
-    background: var(--primary-color-dark);
-    padding: var(--spacing-sm) 0;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: absolute;
+  top: var(--navbar-height);
+  left: -100%;
+  opacity: 0;
+  transition: all 0.4s ease;
+  background: var(--bg-light); /* Light background */
+  padding: var(--spacing-sm) 0;
+  box-shadow: 0 4px 6px var(--shadow-color);
+  border-top: 1px solid var(--border-color); /* Add a top border */
   }
   .mobile-menu.open {
-    left: 0;
-    opacity: 1;
-    z-index: 998;
+  left: 0;
+  opacity: 1;
+  z-index: 998;
   }
   .mobile-menu a,
   .mobile-menu button {
-    text-align: center;
-    padding: 0.9rem 1.5rem;
-    width: 100%;
-    display: block;
-    color: var(--text-light);
-    text-decoration: none;
-    font-size: 1.1rem;
-    transition: background-color 0.2s ease;
-    background: none;
-    border: none;
-    cursor: pointer;
+  text-align: center;
+  padding: 0.7rem 1.5rem; /* Reduced padding */
+  width: 100%;
+  display: block;
+  color: var(--text-primary); /* Darker mobile menu text */
+  text-decoration: none;
+  font-size: 1rem; /* Slightly smaller mobile menu text */
+  transition: background-color 0.2s ease, color 0.2s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 500; /* Slightly bolder mobile menu text */
   }
   .mobile-menu a:hover,
   .mobile-menu button:hover,
   .mobile-menu a:focus,
   .mobile-menu button:focus {
-    background-color: var(--primary-color);
-    color: var(--text-light);
-    outline: none;
+  background-color: var(--bg-lighter); /* Lighter hover background */
+  color: var(--darker-blue); /* Darker hover text */
+  outline: none;
   }
-}
+ }

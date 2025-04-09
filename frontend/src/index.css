@@ -1,80 +1,37 @@
 /* src/index.css */
+ 
 
-/* Define CSS Variables for the Cappuccino Cream Palette */
-:root {
-  /* --- NEW Color Palette (Cappuccino cream) --- */
-  --cappuccino-lightest: #dbc6b6;
-  --cappuccino-light: #ccb49d;
-  --cappuccino-medium: #b69e8b;
-  --cappuccino-dark: #ab9a7f;
-  --cappuccino-darkest: #a18d68;
-
-  /* Primary Action/Brand Colors */
-  --primary-color: var(--cappuccino-medium);     /* #b69e8b */
-  --primary-color-dark: var(--cappuccino-darkest);/* #a18d68 */
-  --primary-color-light: var(--cappuccino-light); /* #ccb49d */
-
-  /* Accent Color */
-  --accent-color: var(--cappuccino-dark);        /* #ab9a7f */
-  --accent-color-dark: var(--cappuccino-darkest);/* #a18d68 */
-
-  /* Neutral Backgrounds */
-  --background-light-gray: var(--cappuccino-lightest);/* #dbc6b6 */
-  --background-white: #ffffff;                      /* Keep white */
+ /* Define CSS Variables for the "Oceanography" Palette */
+ :root {
+  /* Main Colors */
+  --ocean-light-blue: #7ebbff;
+  --ocean-blue: #3366ff;
+  --ocean-medium-blue: #1340c8;
+  --ocean-dark-blue: #0029a3;
+  --ocean-darkest-blue: #1c1d7c;
+ 
 
   /* Text Colors */
-  /* NOTE: Keeping darker text colors from previous theme for readability, as this palette lacks sufficient darks */
-  --text-dark: #343a40;                            /* Dark Charcoal Gray */
-  --text-medium: #5a6268;                          /* Medium Gray */
-  --text-light: #ffffff;                            /* White (for text on primary color buttons) */
-  --text-muted: var(--cappuccino-dark);           /* #ab9a7f */
+  --text-primary: #333;/* Dark gray or black for main text */
+  --text-secondary: #555; /* Medium gray for secondary text */
+  --text-light: #fff; /* White for contrast */
+ 
 
-  /* Borders and Shadows */
-  --border-color: var(--cappuccino-light);        /* #ccb49d */
-  /* Adjust shadows - using the darkest palette color */
-  --shadow-light: 0 4px 8px rgba(161, 141, 104, 0.1);
-  --shadow-medium: 0 6px 12px rgba(161, 141, 104, 0.15);
+  /* Backgrounds */
+  --bg-light: #f8f8f8;/* Very light gray/off-white (or use white) */
+  --bg-overlay: rgba(0, 0, 0, 0.6); /* Dark overlay */
+ 
 
-  /* Status/Admin/Utility Colors (Keep previous or adjust) */
-  --admin-green: #5cb85c;
-  --admin-green-dark: #4cae4c;
-  --admin-red: #d9534f;
-  --admin-red-dark: #c9302c;
-  --disabled-bg: #e9ecef;
-  --disabled-border: #ced4da;
-  --disabled-text: var(--text-muted);
-  --zebra-stripe-light: #efe8e1; /* Slightly lighter than main bg */
-  --overlay-dark: rgba(161, 141, 104, 0.75);   /* Darkest palette color overlay */
-
-  /* --- Mapped Variables (Original names pointing to new colors) --- */
-  --primary-dark-brown: var(--primary-color);
-  --primary-medium-brown: var(--primary-color-dark);
-  --primary-light-brown: var(--primary-color-light);
-  --background-beige: var(--background-light-gray);
-  --accent-terracotta: var(--accent-color);
-  --accent-terracotta-dark: var(--accent-color-dark);
-  --text-dark-secondary: var(--text-medium);
-  --border-light: var(--border-color);
-  --link-hover-light-brown: var(--primary-color-dark);
-  /* Map previous specific palette names if used */
-  --nude-cream: var(--background-light-gray);
-  --nude-light-peach: var(--primary-color-light);
-  --nude-terracotta: var(--primary-color);
-  --nude-muted-rose: var(--primary-color-dark);
-  --nude-dusty-rose: var(--accent-color);
-  --aesthetic-dark-purple: var(--text-dark);
-  --aesthetic-taupe: var(--text-medium);
-  --aesthetic-muted-rose: var(--primary-color);
-  --aesthetic-peach: var(--primary-color-light);
-  --aesthetic-light-yellow: var(--background-light-gray);
-  --slytherin-dark-green: var(--primary-color-dark);
-  --slytherin-medium-green: var(--primary-color);
-  --slytherin-dark-gray: var(--text-medium);
-  --slytherin-silver: var(--border-color);
-  --slytherin-black: var(--text-dark);
+  /* Borders & Accents */
+  --border-color: #ccc; /* Light gray border */
+  --accent-color: var(--ocean-light-blue); /* Use light blue as accent */
+  --shadow-color: rgba(0, 0, 0, 0.1); /* Light shadow */
+ 
 
   /* Fonts */
-  --font-primary: 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --font-primary: 'Rubik', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+  'Open Sans', 'Helvetica Neue', sans-serif;
+ 
 
   /* Spacing */
   --spacing-xs: 4px;
@@ -83,32 +40,36 @@
   --spacing-lg: 24px;
   --spacing-xl: 32px;
   --spacing-xxl: 48px;
+ 
 
   /* Other */
-  --border-radius: 6px;
-  --navbar-height: 65px;
+  --border-radius: 8px;
+  --navbar-height: 60px;
   --transition-speed: 0.2s;
   --content-max-width: 1000px;
   --line-height-base: 1.6;
-}
+ }
+ 
 
-/* Global Reset / Base Styles */
-*,
-*::before,
-*::after {
+ /* Global Reset / Base Styles */
+ *,
+ *::before,
+ *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-}
+ }
+ 
 
-html {
+ html {
   scroll-behavior: smooth;
-}
+ }
+ 
 
-body {
+ body {
   font-family: var(--font-primary);
-  background-color: var(--background-light-gray); /* Use new bg variable */
-  color: var(--text-medium);             /* Use new text variable */
+  background-color: var(--bg-light);
+  color: var(--text-primary);
   line-height: var(--line-height-base);
   direction: rtl;
   min-height: 100vh;
@@ -116,120 +77,132 @@ body {
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
+  padding-top: var(--navbar-height); /* Pushes content down below the fixed navbar */
 
-/* --- Helper class for Centering Main Content --- */
-.main-content-container {
-  width: 100%;
-  max-width: var(--content-max-width);
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: var(--spacing-xl);
-  padding-right: var(--spacing-xl);
-  flex-grow: 1;
-  padding-top: var(--spacing-xl);
-  padding-bottom: var(--spacing-xl);
-}
+ }
+ 
 
-/* General Content Styling */
-h1, h2, h3, h4, h5, h6 {
-  color: var(--text-dark); /* Use dark text for readability */
+ /* --- Helper class for Centering Main Content --- */
+ .main-content-container {
+    width: 100%;
+    max-width: var(--content-max-width);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--spacing-xl);
+    padding-right: var(--spacing-xl);
+    flex-grow: 1;
+    padding-bottom: var(--spacing-xl);
+  }
+ 
+
+ /* General Content Styling */
+ h1,
+ h2,
+ h3,
+ h4,
+ h5,
+ h6 {
+  color: var(--ocean-darkest-blue);
   margin-top: var(--spacing-lg);
   margin-bottom: var(--spacing-md);
   line-height: 1.3;
   font-weight: 600;
-}
-.main-content-container > h1:first-child,
-.main-content-container > h2:first-child,
-.main-content-container > h3:first-child,
-.main-content-container > h4:first-child,
-.main-content-container > h5:first-child,
-.main-content-container > h6:first-child {
-    margin-top: 0;
-}
+ }
+ .main-content-container > h1:first-child,
+ .main-content-container > h2:first-child,
+ .main-content-container > h3:first-child,
+ .main-content-container > h4:first-child,
+ .main-content-container > h5:first-child,
+ .main-content-container > h6:first-child {
+  margin-top: 0;
+ }
+ 
 
-
-p {
+ p {
   margin-bottom: var(--spacing-md);
-  color: var(--text-medium); /* Use medium gray text */
-}
-.main-content-container > *:last-child {
-    margin-bottom: 0;
-}
+  color: var(--text-secondary);
+ }
+ .main-content-container > *:last-child {
+  margin-bottom: 0;
+ }
+ 
 
-
-a {
-  color: var(--primary-color); /* Use new link color */
+ a {
+  color: var(--ocean-blue);
   text-decoration: none;
   transition: color var(--transition-speed) ease;
-}
+ }
+ 
 
-a:hover, a:focus {
-  color: var(--primary-color-dark); /* Use new link hover color */
+ a:hover,
+ a:focus {
+  color: var(--ocean-dark-blue);
   text-decoration: underline;
-}
+ }
+ 
 
-img {
+ img {
   max-width: 100%;
   height: auto;
   display: block;
   border-radius: var(--border-radius);
   margin-bottom: var(--spacing-md);
-}
+ }
+ 
 
-button {
+ button {
   font-family: var(--font-primary);
   cursor: pointer;
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--border-radius);
-  /* --- Default Button Style --- */
-  border: 1px solid var(--primary-color);
-  background-color: var(--primary-color);
-  /* Text on button needs high contrast - using white */
-  color: var(--text-light);
+  border: 1px solid var(--ocean-blue);
+  background-color: var(--ocean-blue);
+  color: var(--text-primary);
   font-size: 1rem;
-  transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease, transform var(--transition-speed) ease;
-}
+  transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease,
+  transform var(--transition-speed) ease;
+ }
+ 
 
-button:hover, button:focus {
-  background-color: var(--primary-color-dark);
-  border-color: var(--primary-color-dark);
+ button:hover,
+ button:focus {
+  background-color: var(--ocean-light-blue);
+  border-color: var(--ocean-dark-blue);
   transform: translateY(-1px);
-  /* Text on button needs high contrast - using white */
-  color: var(--text-light);
-}
+  color: var(--text-primary);
+ }
+ 
 
-/* Secondary/Outline Button Style Example */
-button.secondary {
+ /* Secondary/Outline Button Style Example */
+ button.secondary {
   background-color: transparent;
-  border-color: var(--primary-color);
-  color: var(--primary-color);
-}
+  border-color: var(--ocean-blue);
+  color: var(--ocean-blue);
+ }
+ 
 
-button.secondary:hover, button.secondary:focus {
-  background-color: var(--primary-color-light); /* Use light primary bg */
-  border-color: var(--primary-color-dark);
-  /* Text color needs contrast with light bg - use dark text */
-  color: var(--text-dark);
-}
+ button.secondary:hover,
+ button.secondary:focus {
+  background-color: var(--ocean-light-blue);
+  border-color: var(--ocean-dark-blue);
+  color: var(--text-light);
+ }
+ 
 
-
-hr {
+ hr {
   border: 0;
   height: 1px;
-  background-color: var(--border-color); /* Use new border color */
+  background-color: var(--border-color);
   margin: var(--spacing-lg) 0;
-}
+ }
+ 
 
-/* Accessibility */
-*:focus-visible {
-  outline: 2px solid var(--accent-color); /* Use new accent for focus */
+ /* Accessibility */
+ *:focus-visible {
+  outline: 2px solid var(--accent-color);
   outline-offset: 3px;
   border-radius: var(--border-radius);
-}
-*:focus:not(:focus-visible) {
+ }
+ *:focus:not(:focus-visible) {
   outline: none;
-}
-
-
-
+ }

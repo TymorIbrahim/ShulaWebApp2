@@ -61,9 +61,9 @@
     background-color: var(--accent-terracotta); /* Explicitly use accent */
     border-color: var(--accent-terracotta);
   }
-  .product-info-section .buy-button:hover {
-     background-color: #c87a57; 
-     border-color: #c87a57;
+  .product-info-section .buy-button {
+     background-color: #6389fc; 
+     border-color: #ffffff;
   }
   
   
