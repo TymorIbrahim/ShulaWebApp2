@@ -85,14 +85,14 @@
   font-size: 1.1em;
   font-weight: 600;
   background-color: var(--primary-dark-brown);
-  color: #fff;
+  color: #3366ff;
   border: none;
   border-radius: var(--border-radius);
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.login-btn:hover,
+.login-btn,
 .login-btn:focus {
   background-color: var(--primary-medium-brown);
   transform: translateY(-2px);
@@ -124,26 +124,27 @@
   z-index: 0;
 }
 
-/* Google button styling */
+/* Google button with refined layout and interactive hover effect */
 .google-btn {
   width: 100%;
-  padding: var(--spacing-md);
+  background-color: #3366ff;
+  color: var(--text-dark-secondary);
   border: 1px solid var(--border-light);
-  background-color: var(--background-white);
-  border-radius: var(--border-radius);
-  font-size: 1em;
-  font-weight: 500;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
+  font-weight: 500;
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.google-btn:hover,
+.google-btn,
 .google-btn:focus-visible {
-  background-color: #f8f8f8;
+  background-color: #ffffff;
+  border-color: var(--primary-medium-brown);
   transform: translateY(-2px);
   outline: none;
 }

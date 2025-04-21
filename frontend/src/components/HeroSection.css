@@ -1,105 +1,176 @@
 /* src/components/HeroSection.css */
+ 
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
-}
+ }
+ 
 
-.hero-section-container {
-  min-height: 75vh; /* Keep increased height */
-  /* Background image set inline in JS */
+ .hero-section-container {
+  min-height: 75vh;
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
-  background-attachment: fixed; /* Optional: Parallax effect */
+  background-attachment: fixed;
+ 
 
-  display: flex; /* Use flex to center hero-content vertically */
+  display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center; /* Center text within hero-content */
+  text-align: center;
+ 
 
-  position: relative; /* Needed for overlay */
+  position: relative;
   color: var(--text-light);
-  width: 100%; /* Take full width of its parent */
-  /* REMOVED: width: 100vw, left, transform */
+  width: 100%;
   box-sizing: border-box;
-  padding: var(--spacing-xl) 0; /* Keep vertical padding */
-}
+  padding: var(--spacing-xl) 0;
+ }
+ 
 
-/* Overlay */
-.hero-overlay {
+ /* Overlay */
+ .hero-overlay {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(74, 63, 51, 0.7); /* Keep overlay */
+  background-color: rgba(74, 63, 51, 0.7);
   z-index: 1;
-}
+ }
+ 
 
-.hero-content {
+ .hero-content {
   position: relative;
   z-index: 2;
-  max-width: var(--content-max-width); /* Keep content width constraint */
+  max-width: var(--content-max-width);
   width: 100%;
-  padding: 0 var(--spacing-lg); /* Keep horizontal padding */
+  padding: 0 var(--spacing-lg);
   margin: 0 auto;
   text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
   animation: fadeIn 1s ease-out forwards;
+ 
 
-  /* --- ADDED FOR CENTERING --- */
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center children (h1, p, .hero-buttons) horizontally */
-  /* text-align: center; /* Already set on parent, inherited */
-}
+  align-items: center;
+ }
+ 
 
-.hero-content h1 {
+ .hero-content h1 {
   font-size: clamp(2.5rem, 6vw, 4rem);
   font-weight: 700;
   margin-bottom: var(--spacing-md);
   line-height: 1.2;
   color: var(--text-light);
-}
+ }
 
-.hero-content p {
+ .hero-content h2 {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+  line-height: 1.2;
+  color: var(--text-light);
+ }
+ 
+ 
+
+ .hero-content p {
   font-size: clamp(1rem, 2.5vw, 1.3rem);
   font-weight: 400;
   margin-bottom: var(--spacing-xl);
   line-height: 1.6;
   max-width: 650px;
-  /* Removed margin-left/right: auto; as flex alignment handles centering */
   color: #f0f0f0;
-}
+ }
+ 
 
-/* Button container */
+ /* Button container */
 .hero-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center; /* Center buttons within this container */
-    gap: var(--spacing-md);
-    width: 100%; /* Allow button container to take width */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  /* Add flex-direction if you want them stacked */
+  /* flex-direction: column; */
+  /* align-items: center; */ /* Useful if stacked */
+  gap: var(--spacing-md); /* Space between buttons */
+  width: 100%;
+  margin-top: var(--spacing-lg); /* Add some space above the buttons */
 }
 
-/* Button styles */
+/* Button styles (common) */
 .hero-cta-button {
-  font-size: clamp(1rem, 2vw, 1.1rem);
+  /* font-size: clamp(1rem, 2vw, 1.1rem); /* Base size */
   font-weight: 500;
-  padding: var(--spacing-md) var(--spacing-xl);
+  /* padding: var(--spacing-md) var(--spacing-xl); /* Base padding */
   border-radius: var(--border-radius);
   min-width: 180px;
-  /* Inherits .button and .button-primary/secondary */
+  text-align: center; /* Ensure text is centered */
+  text-decoration: none; /* Remove underline from Link */
+  display: inline-block; /* Needed for padding/margins */
 }
 
-.hero-cta-button.secondary {
-   background-color: transparent;
-   border-color: var(--text-light);
-   color: var(--text-light);
+/* Primary button - ensure it keeps its original size */
+.hero-cta-button.primary {
+  /* Existing styles */
+  background-color: var(--accent-color);
+  color: var(--text-light);
+  border: none;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  /* Original size */
+  font-size: clamp(1rem, 2vw, 1.1rem);
+  padding: var(--spacing-md) var(--spacing-xl);
+  /* Animation */
+  animation-name: pulse;
+  animation-duration: 2.5s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
 }
+
+/* Styles specific to the second button */
+.hero-cta-button.secondary {
+  /* Existing styles */
+  background-color: transparent;
+  border: 1px solid var(--text-light);
+  color: var(--text-light);
+
+  /* --- Make it smaller --- */
+  font-size: clamp(0.9rem, 1.8vw, 1rem); /* Slightly smaller font */
+  padding: var(--spacing-xs) var(--spacing-lg); /* Reduced padding */
+  min-width: 100px; /* Optionally reduce min-width slightly */
+  /* --- End Smaller Styles --- */
+}
+
+
 .hero-cta-button.secondary:hover,
 .hero-cta-button.secondary:focus-visible {
-   background-color: rgba(255, 255, 255, 0.15);
-   border-color: var(--text-light);
-   color: var(--text-light);
-   outline: none;
+  background-color: rgba(255, 255, 255, 0.2); /* Slightly darker bg */
+  border-color: var(--text-light);
+  color: var(--text-light);
+  outline: none;
+  /* Add a slight transform on hover if desired */
+  /* transform: translateY(-1px); */
+}
+
+ /* Reset animation state when hover/focus ends */
+.hero-cta-button.primary:not(:hover):not(:focus-visible) {
+  animation-play-state: running;
+}
+
+ @keyframes pulse {
+  0% {
+    transform: scale(1);
+    /* Use the existing or a slightly adjusted base shadow */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  50% {
+    transform: scale(1.1); /* Slightly larger scale */
+    /* Slightly more prominent shadow */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
 }

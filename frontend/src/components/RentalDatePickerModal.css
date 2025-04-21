@@ -142,6 +142,27 @@
   overflow-y: auto;
 }
 
+.calculated-price-display {
+  text-align: center;
+  margin-top: 15px; /* Add some space above */
+  margin-bottom: 10px; /* Add some space below */
+  font-size: 1.1em; /* Make it slightly larger */
+  color: #333; /* Darker text */
+  background-color: #f0f0f0; /* Light grey background */
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+.calculated-price-display p {
+  margin: 0; /* Remove default paragraph margin */
+}
+
+.calculated-price-display strong {
+  color: #007bff; /* Highlight the price */
+}
+
+
 @keyframes fadeIn {
   from {
     opacity: 0;

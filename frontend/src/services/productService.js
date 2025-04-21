@@ -1,3 +1,4 @@
+//C:\Users\User\ShulaWebApp2\frontend\src\services\productService.js
 import axios from "axios";
 
 const API_URL = "http://localhost:5002/api/products";

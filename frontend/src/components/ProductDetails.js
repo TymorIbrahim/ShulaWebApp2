@@ -1,4 +1,4 @@
-// src/components/ProductDetails.js
+//C:\Users\User\ShulaWebApp2\frontend\src\components\ProductDetails.js
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getProduct } from "../services/productService";
@@ -36,12 +36,11 @@ const ProductDetails = () => {
       }
     };
 
-    // Fetch booked dates for this product (convert date strings to Date objects)
     const fetchBookedDates = async () => {
       try {
-        const dates = await getBookedDates(productId);
-        const convertedDates = dates.map(dateStr => new Date(dateStr));
-        setBookedDates(convertedDates);
+        const dates = await getBookedDates(productId); // dates is now ['YYYY-MM-DD', ...]
+        // Keep the dates as strings in the state
+        setBookedDates(dates); 
       } catch (error) {
         console.error("Error fetching booked dates:", error);
       }
@@ -129,6 +128,7 @@ const ProductDetails = () => {
         onRequestClose={handleModalClose}
         onConfirm={handleConfirmRental}
         bookedDates={bookedDates}
+        productPrice = {product.price}
       />
 
       {/* Choice Modal after adding item to cart */}
