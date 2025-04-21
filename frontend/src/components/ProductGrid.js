@@ -1,56 +1,70 @@
-// src/components/ProductGrid.js
-import React from "react"; 
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "./ProductGrid.css"; // Create and import CSS file
+import "./ProductGrid.css"; // Your custom styles
 
-// Component receives 'products' as a prop from App.js
-const ProductGrid = ({ products }) => { 
+const ProductGrid = ({ products }) => {
+  const [searchTerm, setSearchTerm] = useState("");
 
-    // Handle loading or empty state based on props
-    if (!products) {
-        // If App.js passed down a loading state, you could use that here
-        // Example: if (isLoading) return <p>Loading products...</p>; 
-        return <p>Loading products...</p>; // Simple fallback
-    }
-    if (products.length === 0) {
-        return <p>No products available at the moment.</p>;
-    }
+  // Show loading or empty state if needed
+  if (!products) return <p>Loading products...</p>;
+  if (products.length === 0) return <p>No products available at the moment.</p>;
 
-    return (
-        <div className="product-grid-container">
-            <h2 className="grid-title">המוצרים שלנו</h2>
-            <div className="product-grid">
-                {products.map((product) => (
-                    // Ensure product._id or product.id exists and is unique
-                    <Link
-                        key={product._id || product.id} 
-                        to={`/products/${product._id || product.id}`} // Use correct ID for link
-                        style={{ textDecoration: "none", color: "inherit" }}
-                        className="product-card-link" 
-                    >
-                        <div className="product-card">
-                            <div className="image-container">
-                                <img
-                                    // Use placeholder if image URL missing/invalid
-                                    src={product.productImageUrl || '/placeholder-image.png'} 
-                                    alt={product.name || 'Product Image'}
-                                    className="product-image"
-                                />
-                            </div>
-                            <div className="product-info">
-                                <h3 className="product-name">{product.name || 'Product Name'}</h3>
-                                <p className="product-price">₪{product.price ?? 'N/A'}</p>
-                                {/* Button is now just visual, navigation handled by Link */}
-                                <div className="buy-button-styled"> 
-                                    פרטים נוספים 
-                                </div>
-                            </div>
-                        </div>
-                    </Link>
-                ))}
+  // Filter products based on search term
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div className="product-grid-container">
+      <h2 className="grid-title">המוצרים שלנו</h2>
+
+      {/* 🔍 Search Bar */}
+      <div className="search-bar" style={{ textAlign: "right", marginBottom: "20px" }}>
+        <input
+          type="text"
+          placeholder="חפש מוצר לפי שם..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{
+            padding: "8px 12px",
+            borderRadius: "6px",
+            border: "1px solid #ccc",
+            fontSize: "14px",
+            direction: "rtl",
+            width: "100%",
+            maxWidth: "300px"
+          }}
+        />
+      </div>
+
+      {/* 🧱 Product Cards */}
+      <div className="product-grid">
+        {filteredProducts.map((product) => (
+          <Link
+            key={product._id || product.id}
+            to={`/products/${product._id || product.id}`}
+            style={{ textDecoration: "none", color: "inherit" }}
+            className="product-card-link"
+          >
+            <div className="product-card">
+              <div className="image-container">
+                <img
+                  src={product.productImageUrl || "/placeholder-image.png"}
+                  alt={product.name || "Product"}
+                  className="product-image"
+                />
+              </div>
+              <div className="product-info">
+                <h3 className="product-name">{product.name || "שם מוצר"}</h3>
+                <p className="product-price">₪{product.price ?? "N/A"}</p>
+                <div className="buy-button-styled">פרטים נוספים</div>
+              </div>
             </div>
-        </div>
-    );
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default ProductGrid;
