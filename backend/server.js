@@ -9,12 +9,18 @@ const productRoutes = require("./routes/productRoutes");
 const authRoutes = require("./routes/auth");
 const orderRoutes = require("./routes/orders");
 const cartRoutes = require("./routes/cartRoutes");
+const userRoutes = require('./routes/userRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
+
 
 const app = express();
 
 // Middleware
 app.use(express.json());
 app.use(cors());
+app.use('/api/users', userRoutes);
+app.use('/api/analytics', analyticsRoutes);
+
 
 // Connect to MongoDB
 mongoose

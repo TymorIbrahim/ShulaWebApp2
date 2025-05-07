@@ -19,6 +19,17 @@ router.post("/", async (req, res) => {
     });
 
     const savedOrder = await newOrder.save();
+    
+     //  --- LOGGING FOR ANALYTICS ---
+     console.log("Order Created:", {
+      orderId: savedOrder._id,
+      userId: savedOrder.user,
+      productId: savedOrder.product,
+      orderValue: 0, //  TODO: Calculate order value
+      createdAt: savedOrder.createdAt,
+    });
+    //  --- END LOGGING ---
+
     res.status(201).json({ message: "Order created successfully", order: savedOrder });
   } catch (err) {
     console.error("Order creation error:", err);

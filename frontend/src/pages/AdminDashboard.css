@@ -1,0 +1,111 @@
+/* src/pages/AdminSettings.css */
+
+.admin-settings-container {
+    /* Padding handled by main-content-container */
+    max-width: 850px; /* Limit width of settings content */
+    margin: 0 auto; /* Center */
+  }
+  
+  .admin-settings-container h1 {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-xl);
+    text-align: center;
+    color: var(--primary-dark-brown);
+  }
+  
+  .admin-settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+  }
+  
+  .settings-card {
+    background-color: var(--background-white);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    border: 1px solid var(--border-light); /* Optional subtle border */
+  }
+  
+  .settings-section-title {
+    font-size: 1.5rem;
+    margin-bottom: var(--spacing-lg);
+    color: var(--primary-dark-brown);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--border-light);
+  }
+  
+  .settings-input,
+  .admin-settings-form select /* Target select specifically */ {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 1rem;
+    margin-bottom: var(--spacing-md);
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius);
+    width: 100%;
+    background-color: var(--background-white);
+    font-family: var(--font-primary); /* Inherit */
+    color: var(--text-dark-secondary);
+    transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+  }
+  
+  /* Focus style for inputs and selects */
+  .settings-input:focus-visible,
+  .admin-settings-form select:focus-visible {
+    border-color: var(--primary-medium-brown);
+    box-shadow: 0 0 0 3px rgba(160, 133, 110, 0.2);
+    outline: none;
+  }
+  
+  
+  .settings-button {
+    /* Use global button classes like .button, .delete-button */
+    /* Add specific margin overrides if needed */
+    margin-top: var(--spacing-xs);
+    margin-left: var(--spacing-xs); /* Check RTL impact */
+  }
+  
+  /* Example: Style for the main save button if not using global classes */
+  .settings-button.save {
+    /* Inherits from .button */
+    background-color: #3498db; /* Example specific color - consider adding var(--button-save-bg) */
+    border-color: #3498db;     /* Example specific color - consider adding var(--button-save-border) */
+    color: var(--text-light);
+    font-weight: bold;
+    font-size: 1.1rem;
+    width: 100%; /* Make save button full width */
+    max-width: 300px; /* Limit width */
+    margin: var(--spacing-lg) auto 0; /* Center button */
+    display: block;
+  }
+  .settings-button.save:hover,
+  .settings-button.save:focus-visible {
+    background-color: #2980b9; /* Darker */
+    border-color: #2980b9;
+    outline: none;
+  }
+  
+  
+  .settings-button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+  }
+  
+  .settings-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: 1rem;
+    margin-bottom: var(--spacing-md);
+    cursor: pointer;
+    color: var(--text-dark-secondary);
+  }
+  
+  .settings-checkbox-label input[type="checkbox"] {
+    margin-left: var(--spacing-sm); /* Space between checkbox and label text (RTL) */
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary-medium-brown); /* Style checkbox color */
+  }

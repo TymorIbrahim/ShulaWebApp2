@@ -90,6 +90,15 @@ router.post("/checkout", async (req, res) => {
     // Clear the cart for the user
     await Cart.deleteMany({ user });
 
+    //  --- LOGGING FOR ANALYTICS ---
+    console.log("Checkout Completed:", {
+      userId: user,
+      orderIds: orders.map(order => order._id),
+      totalOrderValue: totalOrderValue,
+      checkoutTime: new Date(),
+    });
+    //  --- END LOGGING ---
+
     res.status(200).json({ message: "Checkout successful", orders });
   } catch (err) {
     console.error("Checkout error:", err);

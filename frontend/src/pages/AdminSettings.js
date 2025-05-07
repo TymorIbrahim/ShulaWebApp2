@@ -15,8 +15,8 @@ const AdminSettings = () => {
 
   // --- Mock User Check (Keep or replace with actual context) ---
   // In a real app, you'd use useAuth() here
-  const user = { role: 'admin' };
-  if (!user || user.role !== 'admin') {
+  const user = { role: 'staff' };
+  if (!user || user.role !== 'staff') {
     // Or redirect using Navigate component from react-router-dom
     return <div style={{ padding: 'var(--spacing-xl)', textAlign: 'center' }}>Access denied. Admins only.</div>;
   }

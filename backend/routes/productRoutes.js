@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Product = require("../models/Product");
+const authorize = require("../middleware/auth"); //  <-- ADD THIS LINE
+
 
 // GET /api/products - Retrieve all products
 router.get("/", async (req, res) => {
@@ -23,6 +25,18 @@ router.get("/:productId", async (req, res) => {
   } catch (err) {
     console.error("Error fetching product:", err);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+// POST /api/products - Create a new product (Protected - Admin only)
+router.post("/", authorize(["staff"]), async (req, res) => {
+  //  Only admins and managers can create products
+  try {
+    const product = new Product(req.body);
+    await product.save();
+    res.status(201).json(product);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 });
 

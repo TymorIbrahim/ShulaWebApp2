@@ -1,27 +1,25 @@
 // src/components/ProtectedRoute.js
 import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // Ensure path is correct
+import { useAuth } from '../context/AuthContext';
 
 const ProtectedRoute = () => {
-  const { isAuthenticated } = useAuth(); // Get auth status from context
-  const location = useLocation(); // Get current location
+    const { user } = useAuth(); // Get user object from context
+    const location = useLocation();
 
-  console.log("ProtectedRoute: isAuthenticated =", isAuthenticated); // Debug log
+    //  Check if the user is authenticated
+    const isAuthenticated = !!user;  //  !! converts user object to boolean (true if user exists, false if null)
 
-  // Check if user is authenticated
-  if (!isAuthenticated) {
-    // If not authenticated, redirect to the login page
-    // Save the location they were trying to access using 'state.from'
-    // So login page can redirect back after successful login
-    console.log("ProtectedRoute: Not authenticated, redirecting to login.");
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
+    console.log("ProtectedRoute: User:", user);
+    console.log("ProtectedRoute: isAuthenticated =", isAuthenticated);
 
-  // If authenticated, render the child component defined in the nested Route
-  // <Outlet /> renders the matched child route element (e.g., AdminDashboard, ManageProducts)
-  console.log("ProtectedRoute: Authenticated, rendering child route.");
-  return <Outlet />; 
+    if (!isAuthenticated) {
+        console.log("ProtectedRoute: Not authenticated, redirecting to login.");
+        return <Navigate to="/login" state={{ from: location }} replace />;
+    }
+
+    console.log("ProtectedRoute: Authenticated, rendering child route.");
+    return <Outlet />; //  Render the protected component
 };
 
 export default ProtectedRoute;

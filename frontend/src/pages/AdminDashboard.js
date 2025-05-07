@@ -1,35 +1,28 @@
-// src/pages/AdminDashboard.js
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // Ensure path is correct
-// import './AdminDashboard.css'; // Create CSS for styling
+import { useAuth } from '../context/AuthContext';
+import './AdminDashboard.css'; // Create this CSS file
 
 const AdminDashboard = () => {
-  const { user, logout } = useAuth(); // Get user info and logout function
+    const { user, logoutUser } = useAuth();
 
-  return (
-    // Add CSS class for styling
-    <div className="admin-dashboard-container"> 
-      {/* Display username if available */}
-      <h2>Admin Dashboard - Welcome, {user?.username || 'Manager'}!</h2> 
-      <p>This is the main admin area. Use the links below to manage the application.</p>
-      
-      {/* Navigation links for admin sections */}
-      <nav className="admin-nav"> 
-        <ul>
-          <li><Link to="/admin/products">Manage Products</Link></li>
-          {/* Add links as you build other sections */}
-          {/* <li><Link to="/admin/rentals">Manage Rentals</Link></li> */}
-          {/* <li><Link to="/admin/settings">Settings</Link></li> */}
-        </ul>
-      </nav>
+    if (!user || user.role !== 'staff') {
+        return <div>Access Denied</div>; // Or redirect
+    }
 
-      {/* Logout Button */}
-      <button onClick={logout} className="admin-button logout-button"> 
-          Logout
-      </button> 
-    </div>
-  );
+    return (
+        <div className="admin-dashboard">
+            <h2>Admin Dashboard</h2>
+            <p>Welcome, {user.firstName}!</p>
+            <nav>
+                <Link to="/admin/products">Manage Products</Link> <br/>
+                <Link to="/admin/users">Manage Users</Link> <br/>
+                <Link to="/admin/analytics">Analytics Dashboard</Link>
+                <Link to="/admin/settings">Admin Settings</Link>
+                <button onClick={logoutUser}>Logout</button>
+            </nav>
+        </div>
+    );
 };
 
 export default AdminDashboard;

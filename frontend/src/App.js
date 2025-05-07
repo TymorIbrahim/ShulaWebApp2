@@ -26,6 +26,10 @@ import SignupPage from './pages/SignupPage'
 import AdminDashboard from './pages/AdminDashboard';
 import ManageProducts from "./pages/ManageProducts";
 import AdminSettings from "./pages/AdminSettings";
+import UserManagement from './pages/UserManagement';
+import EditUserRoles from './pages/EditUserRoles';
+import AnalyticsDashboard from './pages/AnalyticsDashboard';
+
 // import ManageRentals from "./pages/ManageRentals";
 
 // --- CSS Imports ---
@@ -54,9 +58,6 @@ function App() {
                     {/* Navbar is outside main container for full width */}
                     <Navbar />
 
-                    {/* Main content area where routes render */}
-                    {/* Apply main-content-container INSIDE specific pages/routes OR use logic here */}
-                    {/* For simplicity, assuming main-content-container is applied within each page component except Hero */}
                     <Routes>
                         {/* === Public Routes === */}
                         {/* Hero route might render outside main-content-container */}
@@ -74,32 +75,22 @@ function App() {
                         <Route path="/signup" element={<SignupPage />} />
 
 
-
+                        {/* === Protected Admin Routes === */}
+                        <Route element={<ProtectedRoute />}>
+                            {/* These components should also ideally wrap their content in .main-content-container */}
                         <Route path="/admin" element={<AdminDashboard />} />
                         <Route path="/admin/products" element={<ManageProducts />} />
                         <Route path="/admin/products/new" element={<ProductForm isEditing={false} />} />
                         <Route path="/admin/products/edit/:productId" element={<ProductForm isEditing={true} />} />
                         <Route path="/admin/settings" element={<AdminSettings />} />
                         <Route path="/admin/products/edit" element={<ManageProducts/>} />
-
-
-
-
-                        {/* === Protected Admin Routes === */}
-                        <Route element={<ProtectedRoute />}>
-                            {/* These components should also ideally wrap their content in .main-content-container */}
-                            
-
-                            
-                            {/* <Route path="/admin/rentals" element={<ManageRentals />} /> */}
+                        <Route path="/admin/users" element={<UserManagement />} />
+                        <Route path="/admin/users/:userId/edit-roles" element={<EditUserRoles />} />
+                        <Route path="/admin/analytics" element={<AnalyticsDashboard />} />  
                         </Route>
-
-                         {/* Optional: Add a 404 Not Found Route */}
-                         {/* <Route path="*" element={<NotFoundPage />} /> */}
+                           
                     </Routes>
-
-                    {/* Footer is outside main content container for full width */}
-                    <Footer /> {/* --- RENDER FOOTER --- */}
+                    <Footer /> 
 
                 </CartProvider>
             </AuthProvider>
