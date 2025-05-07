@@ -35,3 +35,25 @@ export const deleteProduct = async (productId) => {
       throw error;
     }
   };
+  
+
+  // Create new product
+  export const createProduct = async (formData) => {
+    const response = await axios.post(API_URL, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    });
+    return response.data;
+  };
+
+
+// update existing
+export const updateProduct = async (productId, formData) => {
+  const resp = await axios.put(
+    `${API_URL}/${productId}`,
+    formData,
+    { headers: { "Content-Type": "multipart/form-data" } }
+  );
+  return resp.data;
+};
