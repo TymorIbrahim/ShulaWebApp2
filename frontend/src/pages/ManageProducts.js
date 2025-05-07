@@ -51,6 +51,7 @@ const ManageProducts = () => {
     }
   };
 
+  
   // Edit handler navigates to the edit page
   const handleEdit = (productId) => {
     navigate(`/admin/products/edit/${productId}`);
@@ -62,7 +63,7 @@ const ManageProducts = () => {
   };
 
   return (
-    <div className="admin/manage-products-page">
+    <div className="/admin/manage-products-page">
       <div className="top-bar">
         <h2>ניהול מוצרים</h2>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>

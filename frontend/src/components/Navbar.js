@@ -32,37 +32,34 @@ const Navbar = () => {
           <img src={logoImage} alt="שולה לוגו" />
         </Link>
         <ul className="navbar-links">
-          {/* --- Public links --- */}
-          <li>
-            <Link to="/">דף הבית</Link>
-          </li>
-          <li>
-            <Link to="/products">מוצרים</Link>
-          </li>
-          <li>
-            <Link to="/about">אודות</Link>
-          </li>
-          <li>
-            <Link to="/faqs">שאלות ותשובות</Link>
-          </li>
-
-          {/* --- Conditional Cart Link (Desktop) --- */}
-          {user && ( // Only show if user is logged in
-            <li>
-              <Link to="/cart-page">העגלה שלי</Link>
-            </li>
+          {user?.role === "staff" ? (
+            // Admin links
+            <>
+              <li><Link to="/admin">דשבורד מנהל</Link></li>
+              <li><Link to="/admin/manage-products-page">ניהול מוצרים</Link></li>
+              <li><Link to="/admin/settings">הגדרות</Link></li>
+            </>
+          ) : (
+            // Regular user / public links
+            <>
+              <li><Link to="/">דף הבית</Link></li>
+              <li><Link to="/products">מוצרים</Link></li>
+              <li><Link to="/about">אודות</Link></li>
+              <li><Link to="/faqs">שאלות ותשובות</Link></li>
+              {user && (
+                <li><Link to="/cart-page">העגלה שלי</Link></li>
+              )}
+            </>
           )}
+
           {/* --- End Conditional Cart Link --- */}
 
-
-          {/* --- Profile/Login Section --- */}
+          {/* Profile Section */}
           {user ? (
             <li className="navbar-profile">
               <button className="profile-btn" onClick={toggleProfileMenu}>
                 <span className="avatar">
-                  {user.firstName
-                    ? user.firstName.charAt(0).toUpperCase()
-                    : "U"}
+                  {user.firstName ? user.firstName.charAt(0).toUpperCase() : "U"}
                 </span>
                 <span className="user-name">{user.firstName}</span>
               </button>
@@ -74,15 +71,13 @@ const Navbar = () => {
                   <Link to="/orders" onClick={() => setProfileMenuOpen(false)}>
                     הזמנות קודמות
                   </Link>
-                  {/* Add Admin link conditionally if needed */}
-                  {/* {user.isAdmin && <Link to="/admin">Admin</Link>} */}
                   <button onClick={handleLogoutClick}>התנתק</button>
                 </div>
               )}
             </li>
           ) : (
             <li>
-              <Link to="/login">Log In</Link>
+              <Link to="/login">התחבר</Link>
             </li>
           )}
         </ul>
@@ -94,24 +89,24 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* --- Mobile Menu --- */}
       <div className={`mobile-menu ${menuOpen ? "open" : ""}`}>
-         {/* Public links */}
-        <Link to="/" onClick={() => setMenuOpen(false)}>
-          דף הבית
-        </Link>
-        <Link to="/products" onClick={() => setMenuOpen(false)}>
-          מוצרים
-        </Link>
-        <Link to="/about" onClick={() => setMenuOpen(false)}>
-          אודות
-        </Link>
-        {/* <Link to="/contact" onClick={() => setMenuOpen(false)}>
-          צור קשר
-        </Link> */}
-        <Link to="/faqs" onClick={() => setMenuOpen(false)}>
-          שאלות ותשובות
-        </Link>
+      {user?.role === "staff" ? (
+        <>
+          <Link to="/admin" onClick={() => setMenuOpen(false)}>דשבורד מנהל</Link>
+          <Link to="/admin/manage-products-page" onClick={() => setMenuOpen(false)}>ניהול מוצרים</Link>
+          <Link to="/admin/settings" onClick={() => setMenuOpen(false)}>הגדרות</Link>
+        </>
+      ) : (
+        <>
+          <Link to="/" onClick={() => setMenuOpen(false)}>דף הבית</Link>
+          <Link to="/products" onClick={() => setMenuOpen(false)}>מוצרים</Link>
+          <Link to="/about" onClick={() => setMenuOpen(false)}>אודות</Link>
+          <Link to="/faqs" onClick={() => setMenuOpen(false)}>שאלות ותשובות</Link>
+          {user && (
+            <Link to="/cart-page" onClick={() => setMenuOpen(false)}>העגלה שלי</Link>
+          )}
+        </>
+      )}
 
         {/* --- Conditional Cart Link (Mobile) --- */}
         {user && ( // Only show if user is logged in

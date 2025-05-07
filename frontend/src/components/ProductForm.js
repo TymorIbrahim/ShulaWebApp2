@@ -1,169 +1,226 @@
-// src/components/ProductForm.js 
+// src/components/ProductForm.js
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-// Assume service functions exist for admin actions in 'adminService.js'
-import { getAdminProductById, createAdminProduct, updateAdminProduct } from '../services/adminService'; 
+
+import { useParams } from 'react-router-dom';
+
+import { useNavigate } from 'react-router-dom';
+import { createProduct, updateProduct, getProduct, getProducts } from "../services/productService"; // ייבוא השירות
 import './ProductForm.css';
 
 const ProductForm = ({ isEditing = false }) => {
-  // Form field states
+  const { productId } = useParams();
+  const editing = Boolean(productId);
+
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [status, setStatus] = useState('Available'); // Default status
+  const [status, setStatus] = useState('Available');
   const [conditionNotes, setConditionNotes] = useState('');
-  const [imageFile, setImageFile] = useState(null); // State for the selected file object
-  const [imageUrl, setImageUrl] = useState(''); // State for existing image URL (editing)
-
-  // Component states
+  const [imageFile, setImageFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState('');
   const [error, setError] = useState('');
-  const [loadingSubmit, setLoadingSubmit] = useState(false); // For submission process
-  const [loadingFetch, setLoadingFetch] = useState(isEditing); // For fetching existing data
-
-  const { productId } = useParams(); // Get product ID from URL if editing
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [category, setCategory] = useState(''); // 🆕 הוספת סטייט
+  const [categoriesList, setCategoriesList] = useState([]);
+  const [addingNewCat, setAddingNewCat] = useState(false);
+  const [newCategory, setNewCategory] = useState('');
+  
+  
   const navigate = useNavigate();
 
-  // Fetch existing product data if editing
-  useEffect(() => {
-    if (isEditing && productId) {
-      const fetchProduct = async () => {
-        setLoadingFetch(true); // Start fetching loading state
-        setError('');
-        try {
-          // Ensure this service function exists and works
-          const product = await getAdminProductById(productId); 
-          setName(product.name || '');
-          setDescription(product.description || '');
-          setPrice(product.price || '');
-          setStatus(product.status || 'Available');
-          setConditionNotes(product.conditionNotes || '');
-          setImageUrl(product.productImageUrl || ''); // Store existing image URL
-        } catch (err) { 
-            setError('Failed to load product data for editing.'); 
-            console.error(err);
-        }
-        setLoadingFetch(false); // End fetching loading state
-      };
-      fetchProduct();
-    } else {
-      setLoadingFetch(false); // Not editing, so not fetching
-    }
-  }, [isEditing, productId]); // Dependencies
+    // when editing, load existing product
+    useEffect(() => {
+       // fetch existing categories
+     getProducts().then(all => {
+      const uniq = Array.from(new Set(all.map(p => p.category).filter(c => !!c)));
+      setCategoriesList(uniq);
+      });
+      if (editing) {
+        getProduct(productId)
+          .then(prod => {
+            setName(prod.name);
+            setDescription(prod.description);
+            setPrice(prod.price);
+            setCategory(prod.category);
+            setStatus(prod.available ? 'Available' : 'Maintenance');
+            setConditionNotes(prod.conditionNotes || '');
+            if (prod.productImageUrl) setPreviewUrl(prod.productImageUrl);
+          })
+          .catch(console.error);
+      }
+    }, [editing, productId]);
 
-  // Handle file input change
+    
   const handleImageChange = (event) => {
-    if (event.target.files && event.target.files[0]) {
-        setImageFile(event.target.files[0]);
-        // Optionally display a preview of the selected file
-        const reader = new FileReader();
-        reader.onloadend = () => {
-             // You could set this to state to show a preview, e.g., setPreviewUrl(reader.result);
-        }
-        reader.readAsDataURL(event.target.files[0]);
-        setImageUrl(''); // Clear existing image URL preview if new file is selected
-    } else {
-        setImageFile(null);
+    const file = event.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  // Handle form submission
   const handleSubmit = async (event) => {
     event.preventDefault();
+    // if admin typed a brand‑new category, use that
+      const finalCategory = addingNewCat && newCategory
+        ? newCategory.trim()
+        : category;
+
     setError('');
-    setLoadingSubmit(true); // Start saving loading state
-
-    // Use FormData especially if uploading files
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('description', description);
-    formData.append('price', price);
-    formData.append('status', status);
-    formData.append('conditionNotes', conditionNotes);
-    // Only append image if a *new* file was selected
-    if (imageFile) { 
-      formData.append('image', imageFile); // Backend must be configured to handle file upload named 'image'
-    } 
-    // If editing and no new file, backend should handle keeping the old image
-
+    setLoadingSubmit(true);
+  
     try {
-      if (isEditing) {
-        // Ensure this service function exists and works
-        await updateAdminProduct(productId, formData); 
-        alert('Product updated successfully!');
-      } else {
-        // Ensure this service function exists and works
-        await createAdminProduct(formData); 
-        alert('Product added successfully!');
+      const formData = new FormData();
+      formData.append('category', finalCategory);
+      formData.append('name', name);
+      formData.append('description', description);
+      formData.append('price', price);
+      formData.append('category', category);
+      formData.append('status', status);
+      formData.append('conditionNotes', conditionNotes);
+      if (imageFile) {
+        formData.append('image', imageFile);
       }
-      navigate('/admin/products'); // Navigate back to list after success
+  
+      let productResult;
+       if (editing) {
+         productResult = await updateProduct(productId, formData);
+       } else {
+         productResult = await createProduct(formData);
+      }
+
+      console.log("Product added successfully:", productResult);
+  
+      alert(editing ? 'המוצר עודכן בהצלחה!' : 'המוצר נוסף בהצלחה!');
+      
+      navigate('/admin/products');
     } catch (err) {
-      // Provide more specific error if possible from backend response
-      setError(`Failed to save product: ${err.message || 'Please check console.'}`);
-      console.error('Save Error:', err);
+      console.error("Save Error:", err);
+          setError(
+              editing
+                ? 'שגיאה בעדכון מוצר. בדוק את הקונסול.'
+                : 'שגיאה בהוספת מוצר. בדוק את הקונסול.'
+            );
     } finally {
-      setLoadingSubmit(false); // End saving loading state
+      setLoadingSubmit(false);
     }
   };
 
-  // Show loading state while fetching for edit mode
-  if (loadingFetch) return <p>Loading product details...</p>;
-
   return (
-    // Add a CSS class for styling the form container
-    <form onSubmit={handleSubmit} className="product-form"> 
+    <form onSubmit={handleSubmit} className="product-form">
       <h2>{isEditing ? 'עריכת מוצר' : 'הוספת מוצר חדש'}</h2>
 
-<div className="form-group">
-  <label htmlFor="name">שם:</label>
-  <input type="text" id="name" value={name} onChange={e => setName(e.target.value)} required />
-</div>
+      <div className="form-group">
+        <label htmlFor="name">שם:</label>
+        <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} required />
+      </div>
 
-<div className="form-group">
-  <label htmlFor="description">תיאור:</label>
-  <textarea id="description" value={description} onChange={e => setDescription(e.target.value)} />
-</div>
+      <div className="form-group">
+        <label htmlFor="description">תיאור:</label>
+        <textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} />
+      </div>
 
-<div className="form-group">
-  <label htmlFor="price">מחיר (₪):</label>
-  <input type="number" id="price" value={price} onChange={e => setPrice(e.target.value)} required min="0" step="0.01" />
-</div>
+      <div className="form-group">
+        <label htmlFor="price">מחיר (₪):</label>
+        <input type="number" id="price" value={price} onChange={(e) => setPrice(e.target.value)} required min="0" step="0.01" />
+      </div>
 
-<div className="form-group">
-  <label htmlFor="status">סטטוס:</label>
-  <select id="status" value={status} onChange={e => setStatus(e.target.value)}>
-    <option value="Available">זמין</option>
-    <option value="Rented">בהשאלה</option>
-    <option value="Maintenance">בתיקון</option>
-  </select>
-</div>
+      <div className="form-group">
+        <label htmlFor="category">קטגוריה:</label>
+           {!addingNewCat ? (
+            <select
+              id="category"
+              value={category}
+              onChange={e => {
+                if (e.target.value === "__new__") {
+                  setAddingNewCat(true);
+                  setCategory("");
+                } else {
+                  setCategory(e.target.value);
+                }
+              }}
+              required
+            >      <option value="" disabled>בחר קטגוריה…</option>
+              {categoriesList.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+              <option value="__new__">+ הוסף קטגוריה חדשה</option>
+            </select>
+          ) : (
+            <input
+              type="text"
+              id="newCategory"
+              value={newCategory}
+              onChange={e => setNewCategory(e.target.value)}
+              placeholder="הקלד קטגוריה חדשה"
+              required
+            />
+          )}
 
-<div className="form-group">
-  <label htmlFor="conditionNotes">הערות למצב:</label>
-  <textarea id="conditionNotes" value={conditionNotes} onChange={e => setConditionNotes(e.target.value)} />
-</div>
+      </div>
 
-<div className="form-group">
-  <label htmlFor="image">תמונה:</label>
-  {isEditing && imageUrl && !imageFile && (
-    <img src={imageUrl} alt="Current product" style={{ maxWidth: '100px', display: 'block', marginBottom: '10px' }} />
-  )}
-  <input type="file" id="image" onChange={handleImageChange} accept="image/*" />
-  {imageFile && <p>הקובץ שנבחר: {imageFile.name}</p>}
-</div>
+      <div className="form-group">
+        <label htmlFor="status">סטטוס:</label>
+        <select id="status" value={status} onChange={(e) => setStatus(e.target.value)}>
+          <option value="Available">זמין</option>
+          <option value="Rented">בהשאלה</option>
+          <option value="Maintenance">בתיקון</option>
+        </select>
+      </div>
 
-{error && <p className="error-message" style={{ color: 'red' }}>{error}</p>}
+      <div className="form-group">
+        <label htmlFor="conditionNotes">הערות למצב:</label>
+        <textarea id="conditionNotes" value={conditionNotes} onChange={(e) => setConditionNotes(e.target.value)} />
+      </div>
 
-<div className="form-buttons">
-  <button type="submit" disabled={loadingSubmit || loadingFetch} className="admin-button submit-button">
-    {loadingSubmit ? 'שומר...' : isEditing ? 'עדכן מוצר' : 'הוסף מוצר'}
-  </button>
-  <button type="button" onClick={() => navigate('/admin/products')} className="admin-button cancel-button" disabled={loadingSubmit}>
-    ביטול
-  </button>
-</div>
+      <div className="form-group">
+        <label htmlFor="image">תמונה:</label>
+        <input
+          type="file"
+          id="image"
+          accept="image/*"
+          onChange={handleImageChange}
+        />
+        {previewUrl && (
+          <div style={{ marginTop: "10px" }}>
+            <img
+              src={previewUrl}
+              alt="תצוגת תמונה"
+              style={{ maxWidth: "100%", maxHeight: "200px", borderRadius: "8px" }}
+            />
+          </div>
+        )}
+      </div>
 
+      {error && <p className="error-message">{error}</p>}
+
+      <div className="form-buttons">
+       <button
+         type="submit"
+         disabled={loadingSubmit}
+        className="admin-button submit-button"
+        >
+         {loadingSubmit
+           ? (editing ? 'שומר שינויים...' : 'שומר...')
+             : (editing ? 'עדכן מוצר'        : 'הוסף מוצר')}
+        </button>
+        <button
+          type="button"
+          onClick={() => navigate('/admin/products')}
+          className="admin-button cancel-button"
+          disabled={loadingSubmit}
+        >
+          ביטול
+        </button>
+      </div>
     </form>
   );
 };
+
+
 
 export default ProductForm;

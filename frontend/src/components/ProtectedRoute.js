@@ -4,13 +4,13 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'; // Ensure path is correct
 
 const ProtectedRoute = () => {
-  const { isAuthenticated } = useAuth(); // Get auth status from context
+  const { user } = useAuth(); // Get auth status from context
   const location = useLocation(); // Get current location
 
-  console.log("ProtectedRoute: isAuthenticated =", isAuthenticated); // Debug log
+  console.log("ProtectedRoute: isAuthenticated =", user); // Debug log
 
   // Check if user is authenticated
-  if (!isAuthenticated) {
+  if (!user) {
     // If not authenticated, redirect to the login page
     // Save the location they were trying to access using 'state.from'
     // So login page can redirect back after successful login

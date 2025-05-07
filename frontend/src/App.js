@@ -5,10 +5,10 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { getProducts } from "./services/productService";
 
 // --- Context Provider Imports ---
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 
-// --- Component Imports (Public Facing & Shared) ---
+// --- Component Imports ---
 import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
 import ProductGrid from "./components/ProductGrid";
@@ -16,95 +16,84 @@ import ProductDetails from "./components/ProductDetails";
 import CartPage from "./components/CartPage";
 import FAQs from "./components/FAQs";
 import About from "./components/About";
-import ProtectedRoute from './components/ProtectedRoute';
-import ProductForm from './components/ProductForm';
-import Footer from './components/Footer'; // --- IMPORT FOOTER ---
+import ProtectedRoute from "./components/ProtectedRoute";
+import ProductForm from "./components/ProductForm";
+import Footer from "./components/Footer";
 
-// --- Page Imports (Top Level Views) ---
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage'
-import AdminDashboard from './pages/AdminDashboard';
+// --- Page Imports ---
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
+import AdminDashboard from "./pages/AdminDashboard";
 import ManageProducts from "./pages/ManageProducts";
 import AdminSettings from "./pages/AdminSettings";
 // import ManageRentals from "./pages/ManageRentals";
 
 // --- CSS Imports ---
-import "./App.css"; // Keep this for global component styles
+import "./App.css";
 
 function App() {
-    const [products, setProducts] = useState([]);
+  return (
+    <Router>
+      <AuthProvider>
+        <CartProvider>
+          <AppContent />
+        </CartProvider>
+      </AuthProvider>
+    </Router>
+  );
+}
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await getProducts();
-                console.log("Fetched products:", data);
-                setProducts(data);
-            } catch (error) {
-                console.error("Failed to fetch products:", error);
-            }
-        };
-        fetchData();
-    }, []);
+function AppContent() {
+  const { user } = useAuth();  // ✅ Now safe to call here (inside AuthProvider)
+  const [products, setProducts] = useState([]);
 
-    return (
-        <Router>
-            <AuthProvider>
-                <CartProvider>
-                    {/* Navbar is outside main container for full width */}
-                    <Navbar />
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getProducts();
+        console.log("Fetched products:", data);
+        setProducts(data);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      }
+    };
+    fetchData();
+  }, []);
 
-                    {/* Main content area where routes render */}
-                    {/* Apply main-content-container INSIDE specific pages/routes OR use logic here */}
-                    {/* For simplicity, assuming main-content-container is applied within each page component except Hero */}
-                    <Routes>
-                        {/* === Public Routes === */}
-                        {/* Hero route might render outside main-content-container */}
-                        <Route path="/" element={<HeroSection />} />
+  return (
+    <>
+      <Navbar />
 
-                        {/* Other routes render within main-content-container (applied inside the component) */}
-                        <Route path="/products" element={<ProductGrid products={products} />} />
-                        <Route path="/cart-page" element={<CartPage />} />
-                        <Route path="/products/:productId" element={<ProductDetails />} />
-                        <Route path="/faqs" element={<FAQs />} />
-                        <Route path="/about" element={<About />} />
+      <Routes>
+        {/* === Public Routes === */}
+        <Route path="/" element={<HeroSection />} />
+        <Route path="/products" element={<ProductGrid products={products} />} />
+        <Route path="/cart-page" element={<CartPage />} />
+        <Route path="/products/:productId" element={<ProductDetails />} />
+        <Route path="/faqs" element={<FAQs />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
 
-                        {/* === Authentication Route === */}
-                        <Route path="/login" element={<LoginPage />} />
-                        <Route path="/signup" element={<SignupPage />} />
+        {/* === Protected Admin Routes === */}
+        {user?.role === "staff" && (
+          <Route element={<ProtectedRoute />}>
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/manage-products-page" element={<ManageProducts />} />
+            <Route path="/admin/products/new" element={<ProductForm isEditing={false} />} />
+            <Route path="/admin/products/edit/:productId" element={<ProductForm isEditing={true} />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
+            <Route path="/admin/products/edit" element={<ManageProducts />} />
+          </Route>
+        )}
 
+        {/* Optional: Add a 404 Not Found */}
+        {/* <Route path="*" element={<NotFoundPage />} /> */}
+      </Routes>
 
-
-                        <Route path="/admin" element={<AdminDashboard />} />
-                        <Route path="/admin/products" element={<ManageProducts />} />
-                        <Route path="/admin/products/new" element={<ProductForm isEditing={false} />} />
-                        <Route path="/admin/products/edit/:productId" element={<ProductForm isEditing={true} />} />
-                        <Route path="/admin/settings" element={<AdminSettings />} />
-                        <Route path="/admin/products/edit" element={<ManageProducts/>} />
-
-
-
-
-                        {/* === Protected Admin Routes === */}
-                        <Route element={<ProtectedRoute />}>
-                            {/* These components should also ideally wrap their content in .main-content-container */}
-                            
-
-                            
-                            {/* <Route path="/admin/rentals" element={<ManageRentals />} /> */}
-                        </Route>
-
-                         {/* Optional: Add a 404 Not Found Route */}
-                         {/* <Route path="*" element={<NotFoundPage />} /> */}
-                    </Routes>
-
-                    {/* Footer is outside main content container for full width */}
-                    <Footer /> {/* --- RENDER FOOTER --- */}
-
-                </CartProvider>
-            </AuthProvider>
-        </Router>
-    );
+      <Footer />
+    </>
+  );
 }
 
 export default App;
