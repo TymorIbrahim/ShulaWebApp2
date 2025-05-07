@@ -17,7 +17,6 @@ const storage = multer.diskStorage({
 // Initialize upload middleware
 const upload = multer({ storage });
 
-const Product = require("../models/Product");
 const authorize = require("../middleware/auth"); //  <-- ADD THIS LINE
 
 
