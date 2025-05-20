@@ -75,7 +75,7 @@ const ProductForm = ({ isEditing = false }) => {
   
     try {
       const formData = new FormData();
-      formData.append('category', finalCategory);
+      // formData.append('category', finalCategory);
       formData.append('name', name);
       formData.append('description', description);
       formData.append('price', price);
