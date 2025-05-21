@@ -1,204 +1,190 @@
+// src/components/Navbar.js
 import React, { useState } from "react";
- import { Link, useNavigate } from "react-router-dom";
- import { useAuth } from "../context/AuthContext";
- import "./Navbar.css";
- import logoImage from "../assets/new-logo.png";
- 
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // Assuming this is your v5 or v4 context
+import "./Navbar.css"; // Ensure this path is correct
+import logoImage from "../assets/new-logo.png"; // Ensure this path is correct
 
- const Navbar = () => {
+const Navbar = () => {
+  // Use the isAdmin flag from your centralized useAuth hook
+  // This assumes your AuthContext.js (v5 or v4) correctly provides isAdmin
   const { user, logoutUser } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const navigate = useNavigate();
- 
+
+ // Function to determine if the user has admin-level access
+  const isAdmin = user && user.role && user.role.includes('staff');
 
   const toggleMobileMenu = () => {
-  setMenuOpen(!menuOpen);
+    setMenuOpen(!menuOpen);
   };
- 
 
   const toggleProfileMenu = () => {
-  setProfileMenuOpen(!profileMenuOpen);
+    setProfileMenuOpen(!profileMenuOpen);
   };
- 
 
   const handleLogoutClick = () => {
-  logoutUser();
-  setProfileMenuOpen(false);
-  navigate("/");
+    logoutUser();
+    setProfileMenuOpen(false);
+    navigate("/"); // After logout, always go to the public homepage
   };
- 
 
-  // Function to determine if the user has admin-level access
-  const isAdmin = user && user.role && user.role.includes('staff');
- 
+  // Determine the correct "home" path based on admin status
+  const homePath = isAdmin ? "/admin" : "/";
+
+  // --- DEBUGGING LOG for Navbar ---
+  // console.log("[NAVBAR_DEBUG] Rendering Navbar. User:", JSON.stringify(user, null, 2) , "isAdmin:", isAdmin, "Calculated homePath:", homePath);
+  // --- END DEBUGGING LOG ---
 
   return (
-  <nav className="navbar">
-  <div className="navbar-container">
-  <Link to="/" className="navbar-logo">
-  <img src={logoImage} alt="שולה לוגו" />
-  </Link>
-  <ul className="navbar-links">
-  {/* --- Public links (always visible) --- */}
-  <li>
-  <Link to="/">דף הבית</Link>
-  </li>
+    <nav className="navbar">
+      <div className="navbar-container">
+        {/* Logo link now conditional */}
+        <Link to={homePath} className="navbar-logo" onClick={() => setMenuOpen(false)}>
+          <img src={logoImage} alt="שולה לוגו" />
+        </Link>
 
-  {!isAdmin && (
-  <>
-  <li>
-  <Link to="/products">מוצרים</Link>
-  </li>
-  <li>
-  <Link to="/about">אודות</Link>
-  </li>
-  <li>
-  <Link to="/faqs">שאלות ותשובות</Link>
-  </li>
-  </>
-  )}
- 
+        <ul className="navbar-links">
+          {/* Home link now conditional */}
+          <li>
+            <Link to={homePath} onClick={() => setMenuOpen(false)}>דף הבית</Link>
+          </li>
 
-  {/* --- Conditional Admin Links --- */}
-  {isAdmin && (
-  <>
-  <li>
-  <Link to="/admin/products">ניהול מוצרים</Link>
-  </li>
-  <li>
-  <Link to="/admin/users">ניהול משתמשים</Link>
-  </li>
-  <li>
-  <Link to="/admin/analytics">נתונים</Link>
-  </li>
-  <li>
-  <Link to="/admin/settings">הגדרות</Link>
-  </li>
-  </>
-  )}
- 
+          {/* --- Customer-specific links (shown if NOT admin) --- */}
+          {!isAdmin && (
+            <>
+              <li>
+                <Link to="/products" onClick={() => setMenuOpen(false)}>מוצרים</Link>
+              </li>
+              <li>
+                <Link to="/about" onClick={() => setMenuOpen(false)}>אודות</Link>
+              </li>
+              <li>
+                <Link to="/faqs" onClick={() => setMenuOpen(false)}>שאלות ותשובות</Link>
+              </li>
+            </>
+          )}
 
-  {/* --- Conditional Cart Link (Customer) --- */}
-  {!isAdmin && user && (
-  <li>
-  <Link to="/cart-page">העגלה שלי</Link>
-  </li>
-  )}
-  {/* --- End Conditional Cart Link --- */}
- 
+          {/* --- Admin-specific links (shown IF admin) --- */}
+          {isAdmin && (
+            <>
+              <li>
+                <Link to="/admin/products" onClick={() => setMenuOpen(false)}>ניהול מוצרים</Link>
+              </li>
+              <li>
+                <Link to="/admin/rentals" onClick={() => setMenuOpen(false)}>ניהול השכרות</Link> 
+              </li>
+              <li>
+                <Link to="/admin/users" onClick={() => setMenuOpen(false)}>ניהול משתמשים</Link>
+              </li>
+              <li>
+                <Link to="/admin/analytics" onClick={() => setMenuOpen(false)}>נתונים</Link>
+              </li>
+              <li>
+                <Link to="/admin/settings" onClick={() => setMenuOpen(false)}>הגדרות</Link>
+              </li>
+            </>
+          )}
 
-  {/* --- Profile/Login Section --- */}
-  {user ? (
-  <li className="navbar-profile">
-  <button className="profile-btn" onClick={toggleProfileMenu}>
-  <span className="avatar">
-  {user.firstName
-  ? user.firstName.charAt(0).toUpperCase()
-  : "U"}
-  </span>
-  <span className="user-name">{user.firstName}</span>
-  </button>
-  {profileMenuOpen && (
-  <div className="profile-dropdown">
-  <Link to="/profile" onClick={() => setProfileMenuOpen(false)}>
-  פרופיל
-  </Link>
-  <Link to="/orders" onClick={() => setProfileMenuOpen(false)}>
-  הזמנות קודמות
-  </Link>
-  <button onClick={handleLogoutClick}>התנתק</button>
-  </div>
-  )}
-  </li>
-  ) : (
-  <li>
-  <Link to="/login">התחבר</Link>
-  </li>
-  )}
-  </ul>
-  <button
-  className={`menu-button ${menuOpen ? "active" : ""}`}
-  onClick={toggleMobileMenu}
-  >
-  ☰
-  </button>
-  </div>
- 
+          {/* --- Conditional Cart Link (Customer, logged in) --- */}
+          {!isAdmin && user && (
+            <li>
+              <Link to="/cart-page" onClick={() => setMenuOpen(false)}>העגלה שלי</Link>
+            </li>
+          )}
 
-  {/* --- Mobile Menu --- */}
-  <div className={`mobile-menu ${menuOpen ? "open" : ""}`}>
-  {/* Public links */}
-  <Link to="/" onClick={() => setMenuOpen(false)}>
-  דף הבית
-  </Link>
-  <Link to="/products" onClick={() => setMenuOpen(false)}>
-  מוצרים
-  </Link>
-  <Link to="/about" onClick={() => setMenuOpen(false)}>
-  אודות
-  </Link>
-  <Link to="/faqs" onClick={() => setMenuOpen(false)}>
-  שאלות ותשובות
-  </Link>
- 
+          {/* --- Profile/Login Section --- */}
+          {user ? (
+            <li className="navbar-profile">
+              <button className="profile-btn" onClick={toggleProfileMenu}>
+                <span className="avatar">
+                  {user.firstName ? user.firstName.charAt(0).toUpperCase() : "U"}
+                </span>
+                <span className="user-name">{user.firstName}</span>
+              </button>
+              {profileMenuOpen && (
+                <div className="profile-dropdown">
+                  {/* Profile link could also be conditional if admins have a different profile page */}
+                  <Link to="/profile" onClick={() => { setProfileMenuOpen(false); setMenuOpen(false); }}>
+                    פרופיל
+                  </Link>
+                  {/* Order history is typically for customers */}
+                  {!isAdmin && (
+                    <Link to="/order-history" onClick={() => { setProfileMenuOpen(false); setMenuOpen(false); }}>
+                      הזמנות קודמות
+                    </Link>
+                  )}
+                  <button onClick={() => { handleLogoutClick(); setMenuOpen(false); }}>התנתק</button>
+                </div>
+              )}
+            </li>
+          ) : (
+            <li>
+              <Link to="/login" onClick={() => setMenuOpen(false)}>התחבר</Link>
+            </li>
+          )}
+        </ul>
+        <button
+          className={`menu-button ${menuOpen ? "active" : ""}`}
+          onClick={toggleMobileMenu}
+          aria-label="Toggle menu"
+          aria-expanded={menuOpen}
+        >
+          ☰
+        </button>
+      </div>
 
-  {/* --- Conditional Admin Links (Mobile) --- */}
-  {isAdmin && (
-  <>
-  <Link to="/admin/products" onClick={() => setMenuOpen(false)}>
-  ניהול מוצרים
-  </Link>
-  <Link to="/admin/users" onClick={() => setMenuOpen(false)}>
-  ניהול משתמשים
-  </Link>
-  <Link to="/admin/analytics" onClick={() => setMenuOpen(false)}>
-  נתונים
-  </Link>
-  <Link to="/admin/settings" onClick={() => setMenuOpen(false)}>
-  הגדרות
-  </Link>
-  </>
-  )}
- 
+      {/* --- Mobile Menu --- */}
+      <div className={`mobile-menu ${menuOpen ? "open" : ""}`}>
+        <Link to={homePath} onClick={() => setMenuOpen(false)}>
+          דף הבית
+        </Link>
 
-  {/* --- Conditional Cart Link (Mobile) --- */}
-  {!isAdmin && user && (
-  <Link to="/cart-page" onClick={() => setMenuOpen(false)}>
-  העגלה שלי
-  </Link>
-  )}
-  {/* --- End Conditional Cart Link --- */}
- 
+        {!isAdmin && (
+          <>
+            <Link to="/products" onClick={() => setMenuOpen(false)}>מוצרים</Link>
+            <Link to="/about" onClick={() => setMenuOpen(false)}>אודות</Link>
+            <Link to="/faqs" onClick={() => setMenuOpen(false)}>שאלות ותשובות</Link>
+          </>
+        )}
 
-  {/* --- Conditional Profile/Login/Logout (Mobile) --- */}
-  {user ? (
-  <>
-  <Link to="/profile" onClick={() => setMenuOpen(false)}>
-  פרופיל
-  </Link>
-  <Link to="/orders" onClick={() => setMenuOpen(false)}>
-  הזמנות קודמות
-  </Link>
-  <button
-  className="mobile-logout-btn"
-  onClick={() => {
-  handleLogoutClick();
-  setMenuOpen(false);
-  }}
-  >
-  התנתק
-  </button>
-  </>
-  ) : (
-  <Link to="/login" onClick={() => setMenuOpen(false)}>
-  התחבר
-  </Link>
-  )}
-  </div>
-  </nav>
+        {isAdmin && (
+          <>
+            <Link to="/admin/products" onClick={() => setMenuOpen(false)}>ניהול מוצרים</Link>
+            <Link to="/admin/rentals" onClick={() => setMenuOpen(false)}>ניהול השכרות</Link>
+            <Link to="/admin/users" onClick={() => setMenuOpen(false)}>ניהול משתמשים</Link>
+            <Link to="/admin/analytics" onClick={() => setMenuOpen(false)}>נתונים</Link>
+            <Link to="/admin/settings" onClick={() => setMenuOpen(false)}>הגדרות</Link>
+          </>
+        )}
+
+        {!isAdmin && user && (
+          <Link to="/cart-page" onClick={() => setMenuOpen(false)}>העגלה שלי</Link>
+        )}
+
+        {user ? (
+          <>
+            <Link to="/profile" onClick={() => setMenuOpen(false)}>פרופיל</Link>
+            {!isAdmin && (
+              <Link to="/order-history" onClick={() => setMenuOpen(false)}>הזמנות קודמות</Link>
+            )}
+            <button
+              className="mobile-logout-btn"
+              onClick={() => { handleLogoutClick(); setMenuOpen(false); }}
+            >
+              התנתק
+            </button>
+          </>
+        ) : (
+          <Link to="/login" onClick={() => setMenuOpen(false)}>התחבר</Link>
+        )}
+      </div>
+    </nav>
   );
- };
- 
+};
 
- export default Navbar;
+export default Navbar;
+
+
+

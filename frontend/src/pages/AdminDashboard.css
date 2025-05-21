@@ -1,111 +1,428 @@
-/* src/pages/AdminSettings.css */
+/* src/pages/AdminDashboard.css */
 
-.admin-settings-container {
-    /* Padding handled by main-content-container */
-    max-width: 850px; /* Limit width of settings content */
-    margin: 0 auto; /* Center */
-  }
-  
-  .admin-settings-container h1 {
-    font-size: 2.5rem;
-    margin-bottom: var(--spacing-xl);
-    text-align: center;
-    color: var(--primary-dark-brown);
-  }
-  
-  .admin-settings-form {
+/* --- Ultra Premium Admin Dashboard Variables --- */
+:root {
+    --admin-font-family: 'Rubik', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    
+    /* Core Palette - Sophisticated & Modern */
+    --admin-bg-sidebar: #1e293b; /* Deep Slate Blue/Charcoal */
+    --admin-bg-main: #f1f5f9;    /* Very Light Cool Gray */
+    --admin-card-bg: #ffffff;
+    --admin-border-color: #e2e8f0; /* Lighter border for subtle separation */
+
+    /* Text Colors */
+    --admin-text-light-primary: #f8fafc; /* For dark backgrounds (sidebar) */
+    --admin-text-light-secondary: #cbd5e1; /* Softer light text */
+    --admin-text-dark-primary: #0f172a;  /* Very Dark Blue/Black (main content headers) */
+    --admin-text-dark-secondary: #475569; /* Slate Gray (body text) */
+    --admin-text-accent: #3b82f6; /* Vibrant Blue for accents, links */
+
+    /* Sidebar Specifics */
+    --admin-sidebar-width: 270px;
+    --admin-sidebar-logo-color: var(--admin-text-light-primary);
+    --admin-sidebar-link-color: var(--admin-text-light-secondary);
+    --admin-sidebar-link-hover-bg: #334155; /* Slightly Lighter Slate */
+    --admin-sidebar-link-hover-color: var(--admin-text-light-primary);
+    --admin-sidebar-link-active-bg: var(--admin-text-accent);
+    --admin-sidebar-link-active-color: var(--admin-text-light-primary);
+    --admin-sidebar-active-indicator: #60a5fa; /* Brighter blue for active border */
+
+    /* Shadows - More subtle and layered */
+    --admin-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    --admin-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    --admin-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.07);
+    --admin-shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+
+
+    /* Borders & Radius */
+    --admin-border-radius-sm: 0.25rem; /* 4px */
+    --admin-border-radius-md: 0.5rem;  /* 8px */
+    --admin-border-radius-lg: 0.75rem; /* 12px */
+
+    /* Spacing */
+    --admin-spacing-xs: 0.25rem;   /* 4px */
+    --admin-spacing-sm: 0.5rem;    /* 8px */
+    --admin-spacing-md: 1rem;      /* 16px */
+    --admin-spacing-lg: 1.5rem;    /* 24px */
+    --admin-spacing-xl: 2rem;      /* 32px */
+    --admin-spacing-xxl: 3rem;     /* 48px */
+
+    /* Stat Card Specific Colors (can be customized per card) */
+    --admin-color-blue-bg: #e0f2fe;   --admin-color-blue-text: #0284c7;
+    --admin-color-green-bg: #dcfce7;  --admin-color-green-text: #16a34a;
+    --admin-color-orange-bg: #fff7ed; --admin-color-orange-text: #f97316;
+    --admin-color-purple-bg: #f3e8ff; --admin-color-purple-text: #8b5cf6;
+    
+    --admin-transition-fast: 0.2s ease-in-out;
+    --admin-transition-smooth: 0.3s ease-in-out;
+}
+
+/* Global body direction is already RTL from index.css */
+
+.admin-dashboard-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 1.6rem;
+    color: var(--admin-text-dark-secondary);
+    font-family: var(--admin-font-family);
+    background-color: var(--admin-bg-main);
+}
+
+.admin-dashboard-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--admin-bg-main);
+    font-family: var(--admin-font-family);
+}
+
+/* --- Sidebar Styles --- */
+.admin-sidebar {
+    width: var(--admin-sidebar-width);
+    background-color: var(--admin-bg-sidebar);
+    color: var(--admin-sidebar-link-color);
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xl);
-  }
-  
-  .settings-card {
-    background-color: var(--background-white);
-    padding: var(--spacing-lg);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-light);
-    border: 1px solid var(--border-light); /* Optional subtle border */
-  }
-  
-  .settings-section-title {
-    font-size: 1.5rem;
-    margin-bottom: var(--spacing-lg);
-    color: var(--primary-dark-brown);
-    padding-bottom: var(--spacing-sm);
-    border-bottom: 1px solid var(--border-light);
-  }
-  
-  .settings-input,
-  .admin-settings-form select /* Target select specifically */ {
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-size: 1rem;
-    margin-bottom: var(--spacing-md);
-    border: 1px solid var(--border-light);
-    border-radius: var(--border-radius);
-    width: 100%;
-    background-color: var(--background-white);
-    font-family: var(--font-primary); /* Inherit */
-    color: var(--text-dark-secondary);
-    transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
-  }
-  
-  /* Focus style for inputs and selects */
-  .settings-input:focus-visible,
-  .admin-settings-form select:focus-visible {
-    border-color: var(--primary-medium-brown);
-    box-shadow: 0 0 0 3px rgba(160, 133, 110, 0.2);
-    outline: none;
-  }
-  
-  
-  .settings-button {
-    /* Use global button classes like .button, .delete-button */
-    /* Add specific margin overrides if needed */
-    margin-top: var(--spacing-xs);
-    margin-left: var(--spacing-xs); /* Check RTL impact */
-  }
-  
-  /* Example: Style for the main save button if not using global classes */
-  .settings-button.save {
-    /* Inherits from .button */
-    background-color: #3498db; /* Example specific color - consider adding var(--button-save-bg) */
-    border-color: #3498db;     /* Example specific color - consider adding var(--button-save-border) */
-    color: var(--text-light);
-    font-weight: bold;
-    font-size: 1.1rem;
-    width: 100%; /* Make save button full width */
-    max-width: 300px; /* Limit width */
-    margin: var(--spacing-lg) auto 0; /* Center button */
-    display: block;
-  }
-  .settings-button.save:hover,
-  .settings-button.save:focus-visible {
-    background-color: #2980b9; /* Darker */
-    border-color: #2980b9;
-    outline: none;
-  }
-  
-  
-  .settings-button-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-sm);
-    margin-top: var(--spacing-md);
-  }
-  
-  .settings-checkbox-label {
+    position: fixed;
+    top: 0;
+    right: 0; 
+    bottom: 0;
+    transition: width var(--admin-transition-smooth);
+    z-index: 1000;
+    box-shadow: var(--admin-shadow-lg); 
+}
+
+.sidebar-header {
+    padding: var(--admin-spacing-lg) var(--admin-spacing-md);
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* More subtle border */
+}
+
+.sidebar-logo-link {
+    text-decoration: none;
+    display: inline-block; /* Allows transform */
+    transition: transform var(--admin-transition-fast);
+}
+.sidebar-logo-link:hover {
+    transform: scale(1.05);
+}
+
+.sidebar-logo {
+    font-size: 1.9rem; /* Slightly larger */
+    font-weight: 700;
+    color: var(--admin-sidebar-logo-color);
+    letter-spacing: 0.5px;
+}
+
+.sidebar-nav {
+    flex-grow: 1;
+    padding-top: var(--admin-spacing-md);
+}
+
+.nav-item {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    font-size: 1rem;
-    margin-bottom: var(--spacing-md);
+    justify-content: space-between; 
+    padding: 15px var(--admin-spacing-lg); /* Increased padding for a more spacious feel */
+    color: var(--admin-sidebar-link-color);
+    text-decoration: none;
+    font-size: 1rem; 
+    font-weight: 500; /* Slightly bolder nav links */
+    transition: background-color var(--admin-transition-fast), color var(--admin-transition-fast), border-color var(--admin-transition-fast);
+    border-right: 4px solid transparent; 
+    margin: var(--admin-spacing-xs) var(--admin-spacing-sm) var(--admin-spacing-xs) 0; /* Add some margin */
+    border-radius: var(--admin-border-radius-md) 0 0 var(--admin-border-radius-md); /* Rounded on the inside edge */
+}
+
+.nav-item svg {
+    opacity: 0.8;
+    transition: opacity var(--admin-transition-fast), transform var(--admin-transition-fast);
+    order: 1; 
+    width: 22px; /* Slightly larger icons */
+    height: 22px;
+}
+.nav-item span {
+    order: 2; 
+    flex-grow: 1; 
+    text-align: right; 
+    margin-right: var(--admin-spacing-md); 
+}
+
+.nav-item:hover {
+    background-color: var(--admin-sidebar-link-hover-bg);
+    color: var(--admin-sidebar-link-hover-color);
+    border-right-color: var(--admin-sidebar-active-indicator); /* Subtle indicator on hover */
+}
+.nav-item:hover svg {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.nav-item.active {
+    background-color: var(--admin-sidebar-link-active-bg);
+    color: var(--admin-sidebar-link-active-color);
+    font-weight: 600; 
+    border-right-color: var(--admin-sidebar-link-active-color); /* Thicker or different color active indicator */
+    box-shadow: inset 3px 0 0 0 var(--admin-sidebar-link-active-color); /* Inner shadow effect */
+}
+.nav-item.active svg {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.sidebar-footer {
+    padding: var(--admin-spacing-md) var(--admin-spacing-sm);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.logout-button {
+    background: none;
+    border: none;
+    color: var(--admin-sidebar-link-color);
+    width: 100%;
+    text-align: right; 
     cursor: pointer;
-    color: var(--text-dark-secondary);
-  }
-  
-  .settings-checkbox-label input[type="checkbox"] {
-    margin-left: var(--spacing-sm); /* Space between checkbox and label text (RTL) */
-    width: 16px;
-    height: 16px;
-    accent-color: var(--primary-medium-brown); /* Style checkbox color */
-  }
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: var(--admin-border-radius-md) 0 0 var(--admin-border-radius-md);
+}
+.logout-button:hover {
+    background-color: var(--admin-sidebar-link-hover-bg);
+    color: var(--admin-sidebar-link-hover-color);
+}
+.logout-button svg { 
+    margin-left: 0; 
+}
+.logout-button span {
+    margin-right: var(--admin-spacing-md);
+}
+
+/* --- Main Content Styles --- */
+.admin-main-content {
+    flex-grow: 1;
+    margin-right: var(--admin-sidebar-width); 
+    margin-left: 0; 
+    padding: var(--admin-spacing-xl) var(--admin-spacing-xxl); /* More horizontal padding */
+    overflow-y: auto;
+}
+
+.main-content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--admin-spacing-xl);
+    padding-bottom: var(--admin-spacing-lg);
+    border-bottom: 1px solid var(--admin-border-color);
+}
+
+.main-content-header h1 {
+    font-size: 2.5rem; 
+    color: var(--admin-text-dark-primary);
+    font-weight: 700;
+}
+
+.header-user-info {
+    font-size: 1.05rem;
+    color: var(--admin-text-dark-secondary);
+    font-weight: 500;
+}
+
+/* --- Stat Cards --- */
+.stat-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+    gap: var(--admin-spacing-lg);
+    margin-bottom: var(--admin-spacing-xxl);
+}
+
+.stat-card, .stat-card-linkable { 
+    background-color: var(--admin-card-bg);
+    padding: var(--admin-spacing-lg);
+    border-radius: var(--admin-border-radius-lg); /* More rounded cards */
+    box-shadow: var(--admin-shadow-md);
+    display: flex;
+    align-items: center;
+    transition: transform var(--admin-transition-smooth), box-shadow var(--admin-transition-smooth);
+    text-decoration: none; 
+    color: inherit; 
+    border: 1px solid var(--admin-border-color); /* Subtle border */
+}
+.stat-card:hover, .stat-card-linkable:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--admin-shadow-lg);
+}
+
+.stat-card-icon {
+    padding: var(--admin-spacing-md);
+    border-radius: var(--admin-border-radius-md); /* Match card rounding */
+    margin-left: var(--admin-spacing-lg); 
+    margin-right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0; 
+}
+.stat-card-icon svg {
+    width: 32px; 
+    height: 32px;
+}
+
+.stat-card-info {
+    text-align: right; 
+}
+.stat-card-info .stat-card-title {
+    font-size: 1rem;
+    color: var(--admin-text-dark-secondary);
+    margin-bottom: var(--admin-spacing-xs);
+    font-weight: 500;
+}
+.stat-card-info .stat-card-value {
+    font-size: 2.25rem; /* Larger value */
+    font-weight: 700;
+    color: var(--admin-text-dark-primary);
+    line-height: 1.1;
+}
+
+/* Stat card color variants using specific text/bg variables */
+.stat-card-blue .stat-card-icon { background-color: var(--admin-color-blue-bg); color: var(--admin-color-blue-text); }
+.stat-card-green .stat-card-icon { background-color: var(--admin-color-green-bg); color: var(--admin-color-green-text); }
+.stat-card-orange .stat-card-icon { background-color: var(--admin-color-orange-bg); color: var(--admin-color-orange-text); }
+.stat-card-purple .stat-card-icon { background-color: var(--admin-color-purple-bg); color: var(--admin-color-purple-text); }
+
+
+/* --- Dashboard Sections --- */
+.dashboard-section {
+    background-color: var(--admin-card-bg);
+    padding: var(--admin-spacing-xl);
+    border-radius: var(--admin-border-radius-lg);
+    box-shadow: var(--admin-shadow-md);
+    margin-bottom: var(--admin-spacing-xxl);
+    border: 1px solid var(--admin-border-color);
+}
+
+.dashboard-section h2 {
+    font-size: 1.75rem; 
+    color: var(--admin-text-dark-primary);
+    margin-bottom: var(--admin-spacing-lg);
+    padding-bottom: var(--admin-spacing-md);
+    border-bottom: 1px solid var(--admin-border-color);
+    font-weight: 600;
+}
+
+.placeholder-content {
+    color: var(--admin-text-dark-secondary);
+    line-height: 1.75; 
+    font-size: 1.05rem;
+}
+.placeholder-content p {
+    margin-bottom: var(--admin-spacing-md);
+}
+
+/* --- Quick Actions --- */
+.quick-actions-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--admin-spacing-md);
+}
+
+.quick-action-button {
+    background-color: var(--admin-text-accent);
+    color: var(--admin-text-light-primary);
+    padding: var(--admin-spacing-md) var(--admin-spacing-lg); /* Larger buttons */
+    border-radius: var(--admin-border-radius-md);
+    text-decoration: none;
+    font-size: 1rem; 
+    transition: background-color var(--admin-transition-fast), transform var(--admin-transition-fast), box-shadow var(--admin-transition-fast);
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: var(--admin-shadow-sm);
+}
+
+.quick-action-button:hover {
+    background-color: #2563eb; /* Slightly darker accent blue */
+    transform: translateY(-3px);
+    box-shadow: var(--admin-shadow-md);
+}
+
+
+/* --- Responsive adjustments --- */
+@media (max-width: 992px) { 
+    .admin-sidebar {
+        width: var(--admin-sidebar-width); /* Keep fixed width longer if desired */
+    }
+    .admin-main-content {
+        margin-right: var(--admin-sidebar-width);
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-sidebar {
+        width: 100%;
+        height: auto; 
+        position: relative; 
+        box-shadow: var(--admin-shadow-md); /* Keep some shadow */
+        border-bottom: 1px solid var(--admin-border-color); 
+    }
+    .admin-main-content {
+        margin-right: 0;
+        padding: var(--admin-spacing-lg);
+    }
+    .sidebar-nav {
+        display: flex;
+        flex-direction: row; 
+        overflow-x: auto;
+        padding-top: 0;
+        border-bottom: none; /* Remove extra border */
+        padding-bottom: var(--admin-spacing-sm); /* Add some padding */
+    }
+    .nav-item {
+        padding: var(--admin-spacing-md);
+        border-right: none; 
+        border-bottom: 4px solid transparent; 
+        margin: 0 var(--admin-spacing-xs); /* Adjust margin for horizontal layout */
+        border-radius: var(--admin-border-radius-sm); /* Smaller radius for tabs */
+        flex-shrink: 0; 
+    }
+    .nav-item:hover, .nav-item.active {
+        border-right: none;
+        border-bottom-color: var(--admin-sidebar-link-active-bg);
+    }
+    .sidebar-header, .sidebar-footer {
+        display: none; 
+    }
+    .main-content-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--admin-spacing-md);
+    }
+    .main-content-header h1 {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 576px) { /* Extra small screens */
+    .stat-cards-grid {
+        grid-template-columns: 1fr; 
+    }
+    .main-content-header h1 {
+        font-size: 1.75rem;
+    }
+    .quick-actions-grid {
+        flex-direction: column;
+    }
+    .quick-action-button {
+        width: 100%;
+        text-align: center;
+    }
+    .admin-main-content {
+        padding: var(--admin-spacing-md);
+    }
+    .dashboard-section {
+        padding: var(--admin-spacing-md);
+    }
+    .dashboard-section h2 {
+        font-size: 1.5rem;
+    }
+}
