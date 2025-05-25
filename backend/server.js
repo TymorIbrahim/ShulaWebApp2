@@ -58,7 +58,7 @@ const corsOptions = {
     const allowedOrigins = process.env.NODE_ENV === 'production' 
       ? [
           process.env.FRONTEND_URL, 
-          'https://shula-webapp-bx2ytekfj-tymoribrahims-projects.vercel.app',
+          'https://shula-webapp-aqkan10fr-tymoribrahims-projects.vercel.app',
           'https://shula-rent-project-production.up.railway.app'
         ] 
       : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'];
