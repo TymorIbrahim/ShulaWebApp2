@@ -54,13 +54,26 @@ const checkoutLimiter = rateLimit({
 
 // CORS configuration for production
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? [
-        process.env.FRONTEND_URL, 
-        'https://shula-webapp-bx2ytekfj-tymoribrahims-projects.vercel.app',
-        'https://shula-rent-project-production.up.railway.app'
-      ] 
-    : ['http://localhost:3000', 'http://localhost:3001'],
+  origin: function (origin, callback) {
+    const allowedOrigins = process.env.NODE_ENV === 'production' 
+      ? [
+          process.env.FRONTEND_URL, 
+          'https://shula-webapp-bx2ytekfj-tymoribrahims-projects.vercel.app',
+          'https://shula-rent-project-production.up.railway.app'
+        ] 
+      : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'];
+    
+    // Allow requests with no origin (like mobile apps or Postman)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log(`❌ CORS blocked origin: ${origin}`);
+      console.log(`✅ Allowed origins: ${allowedOrigins.join(', ')}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
