@@ -61,6 +61,8 @@ const corsOptions = {
           'https://shula-webapp-aqkan10fr-tymoribrahims-projects.vercel.app',
           'https://shula-webapp-nhe8my04r-tymoribrahims-projects.vercel.app',
           'https://shula-webapp-dppi61gn7-tymoribrahims-projects.vercel.app',
+          'https://shula-webapp-p5wxumce3-tymoribrahims-projects.vercel.app',
+          'https://shula-webapp-axj1uf7jy-tymoribrahims-projects.vercel.app',
           'https://shula-rent-project-production.up.railway.app',
           'https://shula-webapp-production.vercel.app',
           'https://shula-webapp.vercel.app'
@@ -70,14 +72,25 @@ const corsOptions = {
     // Allow requests with no origin (like mobile apps or Postman)
     if (!origin) return callback(null, true);
     
+    // Check if origin matches allowed origins exactly
     if (allowedOrigins.includes(origin)) {
       console.log(`✅ CORS allowed origin: ${origin}`);
       callback(null, true);
-    } else {
-      console.log(`❌ CORS blocked origin: ${origin}`);
-      console.log(`✅ Allowed origins: ${allowedOrigins.join(', ')}`);
-      callback(new Error('Not allowed by CORS'));
+      return;
     }
+    
+    // For production, also allow any Vercel deployment from tymoribrahims-projects
+    if (process.env.NODE_ENV === 'production' && origin && 
+        (origin.includes('tymoribrahims-projects.vercel.app') || 
+         origin.includes('shula-webapp') && origin.includes('.vercel.app'))) {
+      console.log(`✅ CORS allowed Vercel deployment: ${origin}`);
+      callback(null, true);
+      return;
+    }
+    
+    console.log(`❌ CORS blocked origin: ${origin}`);
+    console.log(`✅ Allowed origins: ${allowedOrigins.join(', ')}`);
+    callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   optionsSuccessStatus: 200,
