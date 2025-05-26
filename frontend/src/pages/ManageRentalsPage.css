@@ -1843,4 +1843,248 @@ body {
   .membership-action-hint {
     margin-left: 0;
   }
+}
+
+/* Enhanced Admin Order Details */
+.customer-info-detailed,
+.contract-status-admin,
+.id-upload-status-admin,
+.pickup-return-admin {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #0066cc;
+}
+
+.section-subtitle {
+  margin: 0 0 0.75rem 0;
+  color: #333;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.customer-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.detail-item-admin {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  transition: all 0.2s ease;
+}
+
+.detail-item-admin:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.detail-item-admin.id-number {
+  border-left: 4px solid #007bff;
+}
+
+.detail-item-admin .label {
+  font-weight: 600;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.detail-item-admin .value {
+  color: #333;
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-align: right;
+}
+
+.pending-verification {
+  color: #f39c12;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.id-number-value {
+  color: #2c3e50;
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  background: #ecf0f1;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+/* Contract and ID Upload Status Cards */
+.contract-status-card,
+.id-upload-status-card {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  overflow: hidden;
+}
+
+.status-item-admin {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.status-item-admin.verified {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border-left: 4px solid #28a745;
+}
+
+.status-item-admin.pending {
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+  border-left: 4px solid #ffc107;
+}
+
+.status-item-admin.missing {
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  border-left: 4px solid #dc3545;
+}
+
+.status-item-admin .status-icon {
+  font-size: 1.5rem;
+  margin-top: 0.25rem;
+}
+
+.status-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.status-details .status-text {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.status-details .status-date,
+.status-details .status-note,
+.status-details .contract-version,
+.status-details .file-info {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.view-signature-btn,
+.view-id-btn {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.view-signature-btn:hover,
+.view-id-btn:hover {
+  background: #0056b3;
+}
+
+/* Pickup/Return Grid for Admin */
+.pickup-return-grid-admin {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.pickup-details-admin,
+.return-details-admin {
+  padding: 1rem;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.pickup-details-admin h7,
+.return-details-admin h7 {
+  margin: 0 0 0.75rem 0;
+  color: #007bff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pickup-info p,
+.return-info p {
+  margin: 0.5rem 0;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.pickup-info strong,
+.return-info strong {
+  color: #333;
+}
+
+.special-instructions {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #fff3cd;
+  border-radius: 6px;
+  border: 1px solid #ffeaa7;
+}
+
+.special-instructions strong {
+  color: #856404;
+  font-size: 0.9rem;
+}
+
+.special-instructions p {
+  margin: 0.5rem 0 0 0;
+  color: #856404;
+  font-size: 0.85rem;
+}
+
+/* Mobile responsiveness for admin details */
+@media (max-width: 768px) {
+  .customer-details-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .pickup-return-grid-admin {
+    grid-template-columns: 1fr;
+  }
+  
+  .detail-item-admin {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .detail-item-admin .value {
+    text-align: left;
+  }
+  
+  .status-item-admin {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .status-item-admin .status-icon {
+    align-self: flex-start;
+  }
 } 

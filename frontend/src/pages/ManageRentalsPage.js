@@ -688,12 +688,14 @@ const OrderCard = ({
             {isExpanded && (
                 <div className="expanded-content-modern">
                     <div className="content-sections">
-                        {/* Customer Details Section */}
+                        {/* Customer Details Section - Enhanced */}
                         <div className="section-modern customer-details">
                             <h5 className="section-title-modern">
                                 <ContactIcon />
-                                פרטי התקשרות
+                                פרטי לקוח מפורטים
                             </h5>
+                            
+                            {/* Basic Contact Info */}
                             <div className="contact-grid-modern">
                                 <div className="contact-item-modern">
                                     <EmailIcon />
@@ -704,6 +706,167 @@ const OrderCard = ({
                                     <span>{normalizedOrder.user?.phone || 'לא זמין'}</span>
                                 </div>
                             </div>
+
+                            {/* Enhanced Customer Information */}
+                            {normalizedOrder.customerInfo && (
+                                <div className="customer-info-detailed">
+                                    <h6 className="section-subtitle">
+                                        📋 פרטים אישיים מההזמנה
+                                    </h6>
+                                    <div className="customer-details-grid">
+                                        <div className="detail-item-admin">
+                                            <span className="label">שם מלא:</span>
+                                            <span className="value">{normalizedOrder.customerInfo.firstName} {normalizedOrder.customerInfo.lastName}</span>
+                                        </div>
+                                        <div className="detail-item-admin">
+                                            <span className="label">אימייל:</span>
+                                            <span className="value">{normalizedOrder.customerInfo.email}</span>
+                                        </div>
+                                        <div className="detail-item-admin">
+                                            <span className="label">טלפון:</span>
+                                            <span className="value">{normalizedOrder.customerInfo.phone}</span>
+                                        </div>
+                                        <div className="detail-item-admin id-number">
+                                            <span className="label">תעודת זהות:</span>
+                                            <span className="value">
+                                                {normalizedOrder.customerInfo.idNumber === "PENDING-IN-PERSON" || 
+                                                 normalizedOrder.customerInfo.idNumber === "WILL_VERIFY_IN_PERSON" ? 
+                                                  <span className="pending-verification">יאומת בעת איסוף 🏢</span> : 
+                                                  <span className="id-number-value">{normalizedOrder.customerInfo.idNumber || "לא זמין"}</span>
+                                                }
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Contract Status */}
+                            {normalizedOrder.contract && (
+                                <div className="contract-status-admin">
+                                    <h6 className="section-subtitle">
+                                        ✍️ סטטוס הסכם השכירות
+                                    </h6>
+                                    <div className="contract-status-card">
+                                        {normalizedOrder.contract.signed ? (
+                                            <div className="status-item-admin verified">
+                                                <span className="status-icon">✅</span>
+                                                <div className="status-details">
+                                                    <span className="status-text">הסכם נחתם דיגיטלית</span>
+                                                    <span className="status-date">נחתם ב: {formatDate(normalizedOrder.contract.signedAt)}</span>
+                                                    <span className="contract-version">גרסת הסכם: {normalizedOrder.contract.agreementVersion}</span>
+                                                    {normalizedOrder.contract.signatureData && (
+                                                        <button 
+                                                            className="view-signature-btn"
+                                                            onClick={() => {
+                                                                const newWindow = window.open();
+                                                                newWindow.document.write(`<img src="${normalizedOrder.contract.signatureData}" alt="חתימה דיגיטלית" style="max-width:100%;"/>`);
+                                                            }}
+                                                        >
+                                                            🖊️ צפה בחתימה
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ) : normalizedOrder.metadata?.onboardingChoice === "in-person" ? (
+                                            <div className="status-item-admin pending">
+                                                <span className="status-icon">🏢</span>
+                                                <div className="status-details">
+                                                    <span className="status-text">הסכם יחתם בעת איסוף הציוד</span>
+                                                    <span className="status-note">הלקוח בחר בתהליך אישי</span>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="status-item-admin missing">
+                                                <span className="status-icon">❌</span>
+                                                <div className="status-details">
+                                                    <span className="status-text">הסכם לא נחתם</span>
+                                                    <span className="status-note">דורש טיפול</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* ID Upload Status */}
+                            {normalizedOrder.idUpload && (
+                                <div className="id-upload-status-admin">
+                                    <h6 className="section-subtitle">
+                                        📄 סטטוס תעודת זהות
+                                    </h6>
+                                    <div className="id-upload-status-card">
+                                        {normalizedOrder.idUpload.uploaded ? (
+                                            <div className="status-item-admin verified">
+                                                <span className="status-icon">✅</span>
+                                                <div className="status-details">
+                                                    <span className="status-text">תעודת זהות הועלתה</span>
+                                                    <span className="file-info">קובץ: {normalizedOrder.idUpload.fileName}</span>
+                                                    {normalizedOrder.idUpload.fileUrl && (
+                                                        <button 
+                                                            className="view-id-btn"
+                                                            onClick={() => {
+                                                                // In real implementation, this would open the actual file
+                                                                alert(`פתיחת קובץ: ${normalizedOrder.idUpload.fileName}`);
+                                                            }}
+                                                        >
+                                                            👁️ צפה בתעודת זהות
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ) : normalizedOrder.metadata?.onboardingChoice === "in-person" ? (
+                                            <div className="status-item-admin pending">
+                                                <span className="status-icon">🏢</span>
+                                                <div className="status-details">
+                                                    <span className="status-text">תעודת זהות תאומת בעת איסוף הציוד</span>
+                                                    <span className="status-note">הלקוח בחר בתהליך אישי</span>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="status-item-admin missing">
+                                                <span className="status-icon">❌</span>
+                                                <div className="status-details">
+                                                    <span className="status-text">תעודת זהות לא הועלתה</span>
+                                                    <span className="status-note">דורש טיפול</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Pickup/Return Information */}
+                            {normalizedOrder.pickupReturn && (
+                                <div className="pickup-return-admin">
+                                    <h6 className="section-subtitle">
+                                        📍 פרטי איסוף והחזרה
+                                    </h6>
+                                    <div className="pickup-return-grid-admin">
+                                        <div className="pickup-details-admin">
+                                            <h7>🚚 איסוף</h7>
+                                            <div className="pickup-info">
+                                                <p><strong>תאריך:</strong> {formatDate(normalizedOrder.pickupReturn.pickupDate)}</p>
+                                                <p><strong>שעה:</strong> {normalizedOrder.pickupReturn.pickupTime}</p>
+                                                <p><strong>כתובת:</strong> {normalizedOrder.pickupReturn.pickupAddress}</p>
+                                            </div>
+                                        </div>
+                                        <div className="return-details-admin">
+                                            <h7>🔄 החזרה</h7>
+                                            <div className="return-info">
+                                                <p><strong>תאריך:</strong> {formatDate(normalizedOrder.pickupReturn.returnDate)}</p>
+                                                <p><strong>שעה:</strong> {normalizedOrder.pickupReturn.returnTime}</p>
+                                                <p><strong>כתובת:</strong> {normalizedOrder.pickupReturn.returnAddress}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {normalizedOrder.pickupReturn.specialInstructions && (
+                                        <div className="special-instructions">
+                                            <strong>הוראות מיוחדות:</strong>
+                                            <p>{normalizedOrder.pickupReturn.specialInstructions}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                             
                             {/* Membership Status */}
                             <div className="membership-status-section">

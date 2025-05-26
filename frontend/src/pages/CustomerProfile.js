@@ -315,6 +315,108 @@ const CustomerProfile = () => {
                           {getStatusText(order.status)}
                         </div>
                       </div>
+
+                      {/* Enhanced Customer Information Section */}
+                      {order.customerInfo && (
+                        <div className="customer-info-section">
+                          <h4>📋 פרטים אישיים</h4>
+                          <div className="customer-details">
+                            <div className="detail-item">
+                              <span className="label">שם מלא:</span>
+                              <span>{order.customerInfo.firstName} {order.customerInfo.lastName}</span>
+                            </div>
+                            <div className="detail-item">
+                              <span className="label">אימייל:</span>
+                              <span>{order.customerInfo.email}</span>
+                            </div>
+                            <div className="detail-item">
+                              <span className="label">טלפון:</span>
+                              <span>{order.customerInfo.phone}</span>
+                            </div>
+                            <div className="detail-item">
+                              <span className="label">תעודת זהות:</span>
+                              <span>
+                                {order.customerInfo.idNumber === "PENDING-IN-PERSON" || 
+                                 order.customerInfo.idNumber === "WILL_VERIFY_IN_PERSON" ? 
+                                  "יאומת בעת איסוף" : 
+                                  order.customerInfo.idNumber || "לא זמין"
+                                }
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Contract Status Section */}
+                      {order.contract && (
+                        <div className="contract-status-section">
+                          <h4>✍️ סטטוס הסכם</h4>
+                          <div className="contract-details">
+                            {order.contract.signed ? (
+                              <div className="status-item verified">
+                                <span className="status-icon">✅</span>
+                                <span>הסכם נחתם דיגיטלית ב-{formatDate(order.contract.signedAt)}</span>
+                              </div>
+                            ) : order.metadata?.onboardingChoice === "in-person" ? (
+                              <div className="status-item pending">
+                                <span className="status-icon">🏢</span>
+                                <span>הסכם יחתם בעת איסוף הציוד</span>
+                              </div>
+                            ) : (
+                              <div className="status-item pending">
+                                <span className="status-icon">⏳</span>
+                                <span>הסכם לא נחתם</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* ID Upload Status Section */}
+                      {order.idUpload && (
+                        <div className="id-upload-section">
+                          <h4>📄 סטטוס תעודת זהות</h4>
+                          <div className="id-upload-details">
+                            {order.idUpload.uploaded ? (
+                              <div className="status-item verified">
+                                <span className="status-icon">✅</span>
+                                <span>תעודת זהות הועלתה ({order.idUpload.fileName})</span>
+                              </div>
+                            ) : order.metadata?.onboardingChoice === "in-person" ? (
+                              <div className="status-item pending">
+                                <span className="status-icon">🏢</span>
+                                <span>תעודת זהות תאומת בעת איסוף הציוד</span>
+                              </div>
+                            ) : (
+                              <div className="status-item pending">
+                                <span className="status-icon">⏳</span>
+                                <span>תעודת זהות לא הועלתה</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Pickup/Return Information */}
+                      {order.pickupReturn && (
+                        <div className="pickup-return-section">
+                          <h4>📍 פרטי איסוף והחזרה</h4>
+                          <div className="pickup-return-details">
+                            <div className="pickup-details">
+                              <h5>🚚 איסוף</h5>
+                              <p><strong>תאריך:</strong> {formatDate(order.pickupReturn.pickupDate)}</p>
+                              <p><strong>שעה:</strong> {order.pickupReturn.pickupTime}</p>
+                              <p><strong>כתובת:</strong> {order.pickupReturn.pickupAddress}</p>
+                            </div>
+                            <div className="return-details">
+                              <h5>🔄 החזרה</h5>
+                              <p><strong>תאריך:</strong> {formatDate(order.pickupReturn.returnDate)}</p>
+                              <p><strong>שעה:</strong> {order.pickupReturn.returnTime}</p>
+                              <p><strong>כתובת:</strong> {order.pickupReturn.returnAddress}</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                       
                       {/* Membership Notice for In-Person Orders */}
                       {order.metadata?.onboardingChoice === 'in-person' && order.status === 'Pending' && (
