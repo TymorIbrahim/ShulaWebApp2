@@ -59,14 +59,19 @@ const corsOptions = {
       ? [
           process.env.FRONTEND_URL, 
           'https://shula-webapp-aqkan10fr-tymoribrahims-projects.vercel.app',
-          'https://shula-rent-project-production.up.railway.app'
-        ] 
+          'https://shula-webapp-nhe8my04r-tymoribrahims-projects.vercel.app',
+          'https://shula-webapp-dppi61gn7-tymoribrahims-projects.vercel.app',
+          'https://shula-rent-project-production.up.railway.app',
+          'https://shula-webapp-production.vercel.app',
+          'https://shula-webapp.vercel.app'
+        ].filter(Boolean) // Remove any undefined values
       : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'];
     
     // Allow requests with no origin (like mobile apps or Postman)
     if (!origin) return callback(null, true);
     
     if (allowedOrigins.includes(origin)) {
+      console.log(`✅ CORS allowed origin: ${origin}`);
       callback(null, true);
     } else {
       console.log(`❌ CORS blocked origin: ${origin}`);

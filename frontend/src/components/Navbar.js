@@ -109,12 +109,6 @@ const Navbar = () => {
                   <Link to="/profile" onClick={() => { setProfileMenuOpen(false); setMenuOpen(false); }}>
                     פרופיל
                   </Link>
-                  {/* Order history is typically for customers */}
-                  {!isAdmin && (
-                    <Link to="/order-history" onClick={() => { setProfileMenuOpen(false); setMenuOpen(false); }}>
-                      הזמנות קודמות
-                    </Link>
-                  )}
                   <button onClick={() => { handleLogoutClick(); setMenuOpen(false); }}>התנתק</button>
                 </div>
               )}
@@ -166,9 +160,6 @@ const Navbar = () => {
         {user ? (
           <>
             <Link to="/profile" onClick={() => setMenuOpen(false)}>פרופיל</Link>
-            {!isAdmin && (
-              <Link to="/order-history" onClick={() => setMenuOpen(false)}>הזמנות קודמות</Link>
-            )}
             <button
               className="mobile-logout-btn"
               onClick={() => { handleLogoutClick(); setMenuOpen(false); }}

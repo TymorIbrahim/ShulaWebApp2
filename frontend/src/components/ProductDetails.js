@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getProduct } from "../services/productService";
-import { getBookedDates } from "../services/orderService";
+import { getBookedDates, getProductAvailability, validateBooking } from "../services/orderService";
 import RentalDatePickerModal from "./RentalDatePickerModal";
 import { addToCart } from "../services/cartService";
 import ChoiceModal from "./ChoiceModal";  // Import the modal component
@@ -11,19 +11,20 @@ import "./ProductDetails.css";
 
 const ProductDetails = () => {
   const { productId } = useParams();
-  const { user } = useAuth();
+  const { user, authReady } = useAuth();
   const [product, setProduct] = useState(null);
   const [bookedDates, setBookedDates] = useState([]);
+  const [availabilityData, setAvailabilityData] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [choiceModalOpen, setChoiceModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Redirect to login if no user (using AuthContext)
+  // Redirect to login if no user (using AuthContext) - but wait for authReady
   useEffect(() => {
-    if (!user) {
+    if (authReady && !user) {
       navigate("/login");
     }
-  }, [user, navigate]);
+  }, [user, authReady, navigate]);
 
   useEffect(() => {
     // Fetch product details
@@ -36,19 +37,23 @@ const ProductDetails = () => {
       }
     };
 
-    const fetchBookedDates = async () => {
+    const fetchAvailabilityData = async () => {
       try {
-        const dates = await getBookedDates(productId); // dates is now ['YYYY-MM-DD', ...]
-        // Keep the dates as strings in the state
+        // Get enhanced availability data
+        const availData = await getProductAvailability(productId, user?.token);
+        setAvailabilityData(availData);
+        
+        // Keep backward compatibility for date picker
+        const dates = await getBookedDates(productId, user?.token);
         setBookedDates(dates); 
       } catch (error) {
-        console.error("Error fetching booked dates:", error);
+        console.error("Error fetching availability data:", error);
       }
     };
 
     fetchProduct();
-    fetchBookedDates();
-  }, [productId]);
+    fetchAvailabilityData();
+  }, [productId, user?.token]);
 
   const handleAddToCart = () => {
     setModalIsOpen(true);
@@ -65,15 +70,30 @@ const ProductDetails = () => {
       navigate("/login");
       return;
     }
+    
     try {
+      // First, validate that the booking is still available
+      console.log("Validating booking before adding to cart...");
+      const validation = await validateBooking(product._id, startDate, endDate, user.token);
+      
+      if (!validation.isAvailable) {
+        alert(`לא ניתן להוסיף לעגלה: ${validation.message}`);
+        return;
+      }
+      
+      // If validation passes, proceed with adding to cart
       const cartItemData = {
         user: user._id,
         product: product._id,
         rentalPeriod: { startDate, endDate },
       };
+      
       console.log("Sending cart item data:", cartItemData);
-      const response = await addToCart(cartItemData);
+      console.log(`Booking validated: ${validation.availableUnits} units available out of ${validation.totalUnits}`);
+      
+      const response = await addToCart(cartItemData, user.token); // Pass user token
       console.log("Item added to cart:", response);
+      
       // Open the choice modal to decide on next actions
       setChoiceModalOpen(true);
     } catch (error) {
@@ -92,6 +112,10 @@ const ProductDetails = () => {
     navigate("/products");
   };
 
+  if (!authReady) {
+    return <div style={{ textAlign: 'center', padding: '50px', fontSize: '1.2em' }}>טוען...</div>;
+  }
+
   if (!product) return <div>טוען פרטי מוצר...</div>;
 
   return (
@@ -108,7 +132,34 @@ const ProductDetails = () => {
           // Use dangerouslySetInnerHTML if product.description is HTML
           dangerouslySetInnerHTML={{ __html: product.description || 'No description available.' }} 
         />
-        <div className="product-price">₪{product.price ?? 'N/A'}</div> 
+        <div className="product-price">₪{product.price ?? 'N/A'}</div>
+        
+        {/* Inventory Information */}
+        {availabilityData && (
+          <div className="inventory-info">
+            <h4>מידע זמינות:</h4>
+            <p>
+              <strong>יחידות זמינות:</strong> {availabilityData.totalInventoryUnits} יחידות סה"כ
+            </p>
+            {availabilityData.availabilityByDate.length > 0 && (
+              <div className="current-rentals">
+                <p><strong>השכרות פעילות:</strong></p>
+                <ul style={{ fontSize: '0.9em', color: '#666' }}>
+                  {availabilityData.availabilityByDate.slice(0, 5).map(dateInfo => (
+                    <li key={dateInfo.date}>
+                      {dateInfo.date}: {dateInfo.rentedUnits} יחידות מושכרות, {dateInfo.availableUnits} זמינות
+                    </li>
+                  ))}
+                  {availabilityData.availabilityByDate.length > 5 && (
+                    <li style={{ fontStyle: 'italic' }}>
+                      ועוד {availabilityData.availabilityByDate.length - 5} תאריכים...
+                    </li>
+                  )}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
                 
         <button className="buy-button" onClick={handleAddToCart}>
           הוסף לסל
@@ -128,6 +179,7 @@ const ProductDetails = () => {
         onRequestClose={handleModalClose}
         onConfirm={handleConfirmRental}
         bookedDates={bookedDates}
+        availabilityData={availabilityData}
         productPrice = {product.price}
       />
 

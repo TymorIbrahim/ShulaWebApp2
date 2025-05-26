@@ -2,64 +2,547 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user.model');
-const authorize = require('../middleware/auth'); //  Import the authorization middleware
+const Order = require('../models/order.model');
+const bcrypt = require('bcryptjs');
+const authorize = require('../middleware/auth');
 
-// GET /api/users - Get all users (Admin only)
+// GET /api/users - Enhanced with pagination, search, filtering, and statistics
 router.get('/', authorize(['staff']), async (req, res) => {
   try {
-    const users = await User.find().select('-password'); //  Exclude passwords for security
-    res.json(users);
+    const {
+      page = 1,
+      limit = 12,
+      search = '',
+      role = '',
+      signUpMethod = '',
+      sortBy = 'createdAt',
+      sortOrder = 'desc'
+    } = req.query;
+
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Build query
+    let query = {};
+
+    // Search functionality
+    if (search) {
+      query.$or = [
+        { firstName: { $regex: search, $options: 'i' } },
+        { lastName: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+        { phone: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    // Filter by role
+    if (role) {
+      query.role = role;
+    }
+
+    // Filter by signup method
+    if (signUpMethod) {
+      query.signUpMethod = signUpMethod;
+    }
+
+    // Build sort object
+    const sortObj = {};
+    sortObj[sortBy] = sortOrder === 'desc' ? -1 : 1;
+
+    // Execute query with pagination
+    const users = await User.find(query)
+      .select('-password')
+      .sort(sortObj)
+      .skip(skip)
+      .limit(limitNum);
+
+    // Get total count for pagination
+    const totalUsers = await User.countDocuments(query);
+    const totalPages = Math.ceil(totalUsers / limitNum);
+
+    // Calculate statistics
+    const statistics = await calculateUserStatistics();
+
+    // Get available filter options
+    const filters = await getFilterOptions();
+
+    res.json({
+      users,
+      pagination: {
+        currentPage: pageNum,
+        totalPages,
+        totalUsers,
+        limit: limitNum,
+        hasNext: pageNum < totalPages,
+        hasPrev: pageNum > 1
+      },
+      statistics,
+      filters
+    });
+
   } catch (err) {
     console.error('Error fetching users:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// GET /api/users/:userId - Get a single user by ID (Admin or Manager)
-router.get('/:userId', authorize(['staff']), async (req, res) => {
+// Helper function to calculate user statistics
+async function calculateUserStatistics() {
   try {
-    const user = await User.findById(req.params.userId).select('-password');
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-    res.json(user);
-  } catch (err) {
-    console.error('Error fetching user:', err);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
+    const totalUsers = await User.countDocuments();
+    const customerCount = await User.countDocuments({ role: 'customer' });
+    const staffCount = await User.countDocuments({ role: 'staff' });
+    const localSignups = await User.countDocuments({ signUpMethod: 'local' });
+    const googleSignups = await User.countDocuments({ signUpMethod: 'google' });
+    
+    // Get recent signups (last 30 days)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const recentSignups = await User.countDocuments({ 
+      createdAt: { $gte: thirtyDaysAgo } 
+    });
 
-// PUT /api/users/:userId - Update a user (Admin only - for roles, etc.)
-router.put('/:userId', authorize(['staff']), async (req, res) => {
+    return {
+      total: totalUsers,
+      customers: customerCount,
+      staff: staffCount,
+      localSignups,
+      googleSignups,
+      recentSignups
+    };
+  } catch (err) {
+    console.error('Error calculating user statistics:', err);
+    return {
+      total: 0,
+      customers: 0,
+      staff: 0,
+      localSignups: 0,
+      googleSignups: 0,
+      recentSignups: 0
+    };
+  }
+}
+
+// Helper function to get available filter options
+async function getFilterOptions() {
   try {
-    const { roles, ...updateData } = req.body; //  Separate roles from other updates
+    const roles = await User.distinct('role');
+    const signUpMethods = await User.distinct('signUpMethod');
+    
+    return {
+      roles: roles.filter(Boolean),
+      signUpMethods: signUpMethods.filter(Boolean)
+    };
+  } catch (err) {
+    console.error('Error getting filter options:', err);
+    return {
+      roles: [],
+      signUpMethods: []
+    };
+  }
+}
+
+// PUT /api/users/profile - Update user profile (Customer) - MOVED BEFORE /:id route
+router.put('/profile', authorize(['customer', 'staff']), async (req, res) => {
+  try {
+    const { firstName, lastName, email, phone, profilePic } = req.body;
+    const userId = req.user._id;
+
+    // Validate inputs
+    if (!firstName || !lastName || !email || !phone) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: 'Please enter a valid email address' });
+    }
+
+    // Check if email is already used by another user
+    const existingUser = await User.findOne({ 
+      email: email.toLowerCase(), 
+      _id: { $ne: userId } 
+    });
+    
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email already in use by another account' });
+    }
+
+    // Update user
     const updatedUser = await User.findByIdAndUpdate(
-      req.params.userId,
-      { ...updateData, roles: roles }, //  Update both data and roles
-      { new: true }
+      userId,
+      { 
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.toLowerCase().trim(),
+        phone: phone.trim(),
+        profilePic: profilePic || null
+      },
+      { new: true, runValidators: true }
     ).select('-password');
 
     if (!updatedUser) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.json(updatedUser);
+    res.json({ 
+      message: 'Profile updated successfully', 
+      user: updatedUser 
+    });
+  } catch (err) {
+    console.error('Error updating profile:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// PUT /api/users/change-password - Change user password (Customer) - MOVED BEFORE /:id route
+router.put('/change-password', authorize(['customer', 'staff']), async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user._id;
+
+    // Validate inputs
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: 'Current password and new password are required' });
+    }
+
+    // Validate new password strength
+    if (newPassword.length < 6) {
+      return res.status(400).json({ 
+        message: 'New password must be at least 6 characters long' 
+      });
+    }
+
+    if (!/^(?=.*[A-Za-z])(?=.*\d)/.test(newPassword)) {
+      return res.status(400).json({ 
+        message: 'New password must contain at least one letter and one number' 
+      });
+    }
+
+    // Get user with password
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Verify current password
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isCurrentPasswordValid) {
+      return res.status(400).json({ message: 'Current password is incorrect' });
+    }
+
+    // Check if new password is different from current
+    const isSamePassword = await bcrypt.compare(newPassword, user.password);
+    if (isSamePassword) {
+      return res.status(400).json({ message: 'New password must be different from current password' });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(12);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update password
+    await User.findByIdAndUpdate(userId, { password: hashedPassword });
+
+    res.json({ message: 'Password changed successfully' });
+  } catch (err) {
+    console.error('Error changing password:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// GET /api/users/:id - Get user by ID with order history
+router.get('/:id', authorize(['staff']), async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Get user's order history
+    const orders = await Order.find({ user: req.params.id })
+      .populate('items.product', 'name price')
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    res.json({
+      user,
+      orderHistory: orders
+    });
+  } catch (err) {
+    console.error('Error fetching user details:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// PUT /api/users/:id - Update user
+router.put('/:id', authorize(['staff']), async (req, res) => {
+  try {
+    const { firstName, lastName, email, phone, role } = req.body;
+    
+    // Validate inputs
+    if (!firstName || !lastName || !email) {
+      return res.status(400).json({ message: 'Required fields missing' });
+    }
+
+    // Check if email is already used by another user
+    const existingUser = await User.findOne({ 
+      email, 
+      _id: { $ne: req.params.id } 
+    });
+    
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email already in use' });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      { firstName, lastName, email, phone, role },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({ 
+      message: 'User updated successfully', 
+      user: updatedUser 
+    });
   } catch (err) {
     console.error('Error updating user:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// DELETE /api/users/:userId - Delete a user (Admin only)
-router.delete('/:userId', authorize(['staff']), async (req, res) => {
+// DELETE /api/users/:id - Delete user
+router.delete('/:id', authorize(['staff']), async (req, res) => {
   try {
-    const deletedUser = await User.findByIdAndDelete(req.params.userId);
-    if (!deletedUser) {
+    const user = await User.findById(req.params.id);
+    if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    res.json({ message: 'User deleted' });
+
+    // Prevent deletion of last admin
+    if (user.role === 'staff') {
+      const staffCount = await User.countDocuments({ role: 'staff' });
+      if (staffCount <= 1) {
+        return res.status(400).json({ 
+          message: 'Cannot delete the last staff member' 
+        });
+      }
+    }
+
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ message: 'User deleted successfully' });
   } catch (err) {
     console.error('Error deleting user:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// PUT /api/users/membership/process-checkout - Process membership from checkout
+router.put('/membership/process-checkout', authorize(['customer', 'staff']), async (req, res) => {
+  try {
+    const { contract, idUpload } = req.body;
+    const userId = req.user._id;
+
+    // Validate required data
+    if (!contract || !contract.signed || !contract.signatureData) {
+      return res.status(400).json({ message: 'Valid contract signature is required' });
+    }
+
+    if (!idUpload || !idUpload.uploaded || !idUpload.fileUrl) {
+      return res.status(400).json({ message: 'Valid ID upload is required' });
+    }
+
+    // Update user membership
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          'membership.isMember': true,
+          'membership.membershipType': 'online',
+          'membership.membershipDate': new Date(),
+          'membership.contract': {
+            signed: true,
+            signatureData: contract.signatureData,
+            agreementVersion: contract.agreementVersion || '1.0',
+            signedAt: new Date(),
+            signedOnline: true
+          },
+          'membership.idVerification': {
+            verified: false, // Needs admin verification
+            fileName: idUpload.fileName,
+            fileUrl: idUpload.fileUrl,
+            uploadedAt: new Date()
+          }
+        }
+      },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      message: 'Membership processed successfully. ID verification pending admin approval.',
+      membership: updatedUser.membership
+    });
+
+  } catch (err) {
+    console.error('Error processing membership from checkout:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// PUT /api/users/membership/admin-process - Admin manually process membership
+router.put('/membership/admin-process', authorize(['staff']), async (req, res) => {
+  try {
+    const { 
+      userId, 
+      contract, 
+      idVerification, 
+      inPersonDetails 
+    } = req.body;
+    const staffId = req.user._id;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+
+    // Build update object
+    const updateObj = {
+      'membership.isMember': true,
+      'membership.membershipType': 'in_person',
+      'membership.membershipDate': new Date(),
+      'membership.inPersonDetails': {
+        processedBy: staffId,
+        processedAt: new Date(),
+        location: inPersonDetails?.location || 'Office',
+        notes: inPersonDetails?.notes || ''
+      }
+    };
+
+    // Handle contract
+    if (contract) {
+      updateObj['membership.contract'] = {
+        signed: true,
+        signatureData: contract.signatureData || '',
+        agreementVersion: contract.agreementVersion || '1.0',
+        signedAt: new Date(),
+        signedOnline: false
+      };
+    }
+
+    // Handle ID verification
+    if (idVerification) {
+      updateObj['membership.idVerification'] = {
+        verified: true,
+        fileName: idVerification.fileName || 'Manual_Entry',
+        fileUrl: idVerification.fileUrl || '',
+        uploadedAt: new Date(),
+        verifiedBy: staffId,
+        verifiedAt: new Date(),
+        notes: idVerification.notes || 'Processed in person'
+      };
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: updateObj },
+      { new: true }
+    ).populate('membership.idVerification.verifiedBy', 'firstName lastName')
+     .populate('membership.inPersonDetails.processedBy', 'firstName lastName');
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      message: 'Membership processed successfully by admin',
+      user: updatedUser
+    });
+
+  } catch (err) {
+    console.error('Error processing membership by admin:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// PUT /api/users/membership/verify-id - Admin verify uploaded ID
+router.put('/membership/verify-id', authorize(['staff']), async (req, res) => {
+  try {
+    const { userId, verified, notes } = req.body;
+    const staffId = req.user._id;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required' });
+    }
+
+    const updateObj = {
+      'membership.idVerification.verified': verified,
+      'membership.idVerification.verifiedBy': staffId,
+      'membership.idVerification.verifiedAt': new Date(),
+      'membership.idVerification.notes': notes || ''
+    };
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $set: updateObj },
+      { new: true }
+    ).populate('membership.idVerification.verifiedBy', 'firstName lastName');
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      message: `ID verification ${verified ? 'approved' : 'rejected'} successfully`,
+      user: updatedUser
+    });
+
+  } catch (err) {
+    console.error('Error verifying ID:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// GET /api/users/membership/:userId - Get user membership details
+router.get('/membership/:userId', authorize(['customer', 'staff']), async (req, res) => {
+  try {
+    const requestedUserId = req.params.userId;
+    const currentUserId = req.user._id.toString();
+    
+    // Users can only access their own membership, staff can access any
+    if (req.user.role !== 'staff' && requestedUserId !== currentUserId) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    const user = await User.findById(requestedUserId)
+      .populate('membership.idVerification.verifiedBy', 'firstName lastName')
+      .populate('membership.inPersonDetails.processedBy', 'firstName lastName')
+      .select('firstName lastName email membership');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      user: {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        membership: user.membership
+      }
+    });
+
+  } catch (err) {
+    console.error('Error fetching user membership:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./SignupPage.css";
-import { signUp, login } from "../services/authService"; // Import both signUp and login functions
-import { useAuth } from "../context/AuthContext"; // Import useAuth to update global auth state
+import { signUp, login } from "../services/authService";
+import { useAuth } from "../context/AuthContext";
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
@@ -14,9 +14,9 @@ const SignupPage = () => {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false); // Option to show success message
+  const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
-  const { loginUser } = useAuth(); // Get loginUser from AuthContext to update global user state
+  const { loginUser } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,29 +35,43 @@ const SignupPage = () => {
       return;
     }
 
-    // You can add further validation here (email format, password strength, etc.)
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("אנא הכנס/י כתובת אימייל תקינה");
+      return;
+    }
+
+    // Password validation
+    if (formData.password.length < 6) {
+      setError("הסיסמה חייבת להכיל לפחות 6 תווים");
+      return;
+    }
 
     setLoading(true);
     try {
-      // Call the backend signUp API with formData
-      const signUpResult = await signUp(formData);
-      console.log("User signed up successfully:", signUpResult);
+      // Register user
+      await signUp(formData);
       
       // Automatically log the user in using their credentials
-      const loginResponse = await login({ email: formData.email, password: formData.password });
-      console.log("User logged in successfully:", loginResponse);
+      const loginResponse = await login({ 
+        email: formData.email, 
+        password: formData.password 
+      });
 
       // Update the global authentication context
-      loginUser(loginResponse.user);
-
-      // Optionally, you can continue to store the login data for persistence if needed
-      localStorage.setItem("user", JSON.stringify(loginResponse.user));
-
-      // Navigate to the home page ("/") for a logged in user.
-      navigate("/");
+      if (loginResponse.user) {
+        let userDataForContext = { ...loginResponse.user };
+        if (loginResponse.token) {
+          userDataForContext.token = loginResponse.token;
+        }
+        
+        loginUser(userDataForContext);
+        navigate("/");
+      }
       
     } catch (err) {
-      console.error("Signup or Login Error:", err);
+      console.error("Signup error:", err.message);
       if (err.response && err.response.data && err.response.data.message) {
         setError(err.response.data.message);
       } else {
@@ -73,7 +87,6 @@ const SignupPage = () => {
     setError("");
     setSuccess(false);
     setLoading(true);
-    console.log("Initiating Google Sign-Up (Placeholder)...");
     // TODO: Implement the actual Google Sign-Up flow.
     alert("Google Sign-Up not implemented yet.");
     setLoading(false);

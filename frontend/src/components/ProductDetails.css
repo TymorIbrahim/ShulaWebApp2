@@ -88,3 +88,111 @@
        max-width: 50%; 
     }
   }
+
+  /* Inventory Information Styles */
+  .inventory-info {
+    background-color: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+  }
+
+  .inventory-info h4 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+    font-weight: bold;
+  }
+
+  .inventory-info p {
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    color: #495057;
+  }
+
+  .current-rentals {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #dee2e6;
+  }
+
+  .current-rentals p {
+    font-weight: bold;
+    color: #6c757d;
+    margin-bottom: 10px;
+  }
+
+  .current-rentals ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+  }
+
+  .current-rentals li {
+    background-color: #fff;
+    padding: 8px 12px;
+    margin: 5px 0;
+    border-radius: 4px;
+    border-left: 4px solid #007bff;
+    font-family: 'Courier New', monospace;
+  }
+
+  .current-rentals li:hover {
+    background-color: #f1f3f4;
+  }
+
+  .buy-button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin: 10px 0;
+  }
+
+  .buy-button:hover {
+    background-color: #2980b9;
+  }
+
+  .back-button {
+    background-color: #95a5a6;
+    margin-top: 10px;
+  }
+
+  .back-button:hover {
+    background-color: #7f8c8d;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .product-details-container {
+      flex-direction: column;
+      margin: 10px;
+      padding: 15px;
+    }
+
+    .product-details-image {
+      max-width: 100%;
+    }
+
+    .product-info-section h2 {
+      font-size: 2em;
+    }
+
+    .product-price {
+      font-size: 1.5em;
+    }
+    
+    .inventory-info {
+      padding: 15px;
+    }
+    
+    .current-rentals li {
+      padding: 6px 10px;
+      font-size: 0.85em;
+    }
+  }
