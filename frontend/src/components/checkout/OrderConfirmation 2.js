@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "./OrderConfirmation.css";
 
 const OrderConfirmation = ({ 
@@ -7,14 +7,8 @@ const OrderConfirmation = ({
   total, 
   onFinish, 
   onboardingChoice, 
-  isFirstTimeCustomer,
-  isFastCheckout,
-  processOrder
+  isFirstTimeCustomer 
 }) => {
-  const [orderProcessed, setOrderProcessed] = useState(false);
-  const [processing, setProcessing] = useState(false);
-  const [processingError, setProcessingError] = useState("");
-
   const formatDate = (date) => {
     if (!date) return "";
     return new Date(date).toLocaleDateString('he-IL', {
@@ -59,71 +53,6 @@ const OrderConfirmation = ({
   };
 
   const successInfo = getSuccessMessage();
-
-  // For fast checkout, process the order when component mounts
-  useEffect(() => {
-    const processOrderForFastCheckout = async () => {
-      if (isFastCheckout && !orderProcessed && processOrder) {
-        try {
-          setProcessing(true);
-          setProcessingError("");
-          
-          console.log("🚀 Processing fast checkout order...");
-          await processOrder();
-          console.log("✅ Fast checkout order processed successfully");
-          
-          setOrderProcessed(true);
-          
-          // Scroll to top after processing
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        } catch (error) {
-          console.error("❌ Error processing fast checkout order:", error);
-          setProcessingError("שגיאה ביצירת ההזמנה. אנא נסה שוב.");
-        } finally {
-          setProcessing(false);
-        }
-      } else if (!isFastCheckout) {
-        // For non-fast checkout, order is already processed
-        setOrderProcessed(true);
-      }
-    };
-
-    processOrderForFastCheckout();
-  }, [isFastCheckout, orderProcessed, processOrder]);
-
-  // Show loading while processing for fast checkout
-  if (isFastCheckout && processing) {
-    return (
-      <div className="order-confirmation-step">
-        <div className="confirmation-header">
-          <div className="loading-spinner"></div>
-          <h2>🚀 מעבד הזמנה...</h2>
-          <p className="confirmation-subtitle">אנא המתן, ההזמנה בתהליך עיבוד</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show error if processing failed
-  if (isFastCheckout && processingError) {
-    return (
-      <div className="order-confirmation-step">
-        <div className="confirmation-header">
-          <div className="error-icon">❌</div>
-          <h2>שגיאה בעיבוד ההזמנה</h2>
-          <p className="confirmation-subtitle">{processingError}</p>
-        </div>
-        <div className="confirmation-actions">
-          <button 
-            className="btn-secondary"
-            onClick={() => window.location.reload()}
-          >
-            נסה שוב
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="order-confirmation-step">

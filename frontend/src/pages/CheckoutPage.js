@@ -644,6 +644,8 @@ const CheckoutPage = () => {
               onFinish={() => navigate("/profile")}
               onboardingChoice={onboardingChoice}
               isFirstTimeCustomer={isFirstTimeCustomer}
+              isFastCheckout={isFastCheckout}
+              processOrder={processOrder}
             />
           );
         default:
@@ -714,6 +716,8 @@ const CheckoutPage = () => {
             onFinish={() => navigate("/profile")}
             onboardingChoice={onboardingChoice}
             isFirstTimeCustomer={isFirstTimeCustomer}
+            isFastCheckout={isFastCheckout}
+            processOrder={processOrder}
           />
         );
       default:

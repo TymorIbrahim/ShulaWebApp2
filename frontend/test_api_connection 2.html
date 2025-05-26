@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shula API Connection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            direction: rtl;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background-color: #0056b3; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Shula API Connection Test</h1>
+    
+    <div class="test-section info">
+        <h3>📡 API Configuration</h3>
+        <p><strong>Frontend URL:</strong> https://shula-webapp-bx2ytekfj-tymoribrahims-projects.vercel.app</p>
+        <p><strong>Backend API:</strong> https://shula-rent-project-production.up.railway.app</p>
+    </div>
+
+    <div class="test-section">
+        <h3>🔧 API Tests</h3>
+        <button onclick="testProducts()">Test Products API</button>
+        <button onclick="testLoginAPI()">Test Login API (CORS)</button>
+        <button onclick="testHealth()">Test Health Check</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        const API_URL = 'https://shula-rent-project-production.up.railway.app';
+        
+        function addResult(title, content, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            const resultSection = document.createElement('div');
+            resultSection.className = `test-section ${type}`;
+            resultSection.innerHTML = `
+                <h4>${title}</h4>
+                <pre>${content}</pre>
+                <small>Time: ${new Date().toLocaleString()}</small>
+            `;
+            resultsDiv.appendChild(resultSection);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testProducts() {
+            try {
+                const response = await fetch(`${API_URL}/api/products`);
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult('✅ Products API Test', 
+                        `Status: ${response.status}\nProducts Count: ${data.length}\nFirst Product: ${JSON.stringify(data[0], null, 2)}`, 
+                        'success');
+                } else {
+                    addResult('❌ Products API Test', 
+                        `Status: ${response.status}\nError: ${response.statusText}`, 
+                        'error');
+                }
+            } catch (error) {
+                addResult('❌ Products API Test', 
+                    `Network Error: ${error.message}`, 
+                    'error');
+            }
+        }
+
+        async function testLoginAPI() {
+            try {
+                // This will trigger a CORS preflight request
+                const response = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        password: 'invalid'
+                    })
+                });
+                
+                // We expect this to fail (invalid credentials), but if CORS works, we'll get a proper response
+                const data = await response.json();
+                addResult('✅ Login CORS Test', 
+                    `Status: ${response.status}\nCORS Working: ${response.status === 400 || response.status === 401 ? 'YES' : 'UNKNOWN'}\nResponse: ${JSON.stringify(data, null, 2)}`, 
+                    response.status === 400 || response.status === 401 ? 'success' : 'info');
+                    
+            } catch (error) {
+                if (error.message.includes('CORS')) {
+                    addResult('❌ Login CORS Test', 
+                        `CORS Error: ${error.message}`, 
+                        'error');
+                } else {
+                    addResult('⚠️ Login CORS Test', 
+                        `Other Error: ${error.message}`, 
+                        'info');
+                }
+            }
+        }
+
+        async function testHealth() {
+            try {
+                const response = await fetch(`${API_URL}/api/products`);
+                addResult('🏥 Health Check', 
+                    `API Status: ${response.ok ? 'HEALTHY' : 'UNHEALTHY'}\nStatus Code: ${response.status}\nResponse Headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2)}`, 
+                    response.ok ? 'success' : 'error');
+            } catch (error) {
+                addResult('🏥 Health Check', 
+                    `API Status: UNREACHABLE\nError: ${error.message}`, 
+                    'error');
+            }
+        }
+
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            addResult('🚀 Starting Automatic Tests', 'Running initial connectivity tests...', 'info');
+            setTimeout(testHealth, 1000);
+            setTimeout(testProducts, 2000);
+            setTimeout(testLoginAPI, 3000);
+        });
+    </script>
+</body>
+</html> 

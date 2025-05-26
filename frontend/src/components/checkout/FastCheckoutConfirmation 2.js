@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./FastCheckoutConfirmation.css";
 
 const FastCheckoutConfirmation = ({ 
@@ -7,8 +7,12 @@ const FastCheckoutConfirmation = ({
   total, 
   onNext, 
   onPrev, 
-  calculateItemPrice
+  calculateItemPrice,
+  processOrder
 }) => {
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState("");
+
   const formatDate = (date) => {
     if (!date) return "";
     return new Date(date).toLocaleDateString('he-IL', {
@@ -28,15 +32,27 @@ const FastCheckoutConfirmation = ({
 
   const totalWithTax = total * 1.17;
 
-  const handleFastConfirm = () => {
-    // This step should only confirm details and move to the final step
-    // The actual order processing should happen in the final step
-    
-    // Scroll to top of page
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    // Move to next step (final order processing step)
-    onNext();
+  const handleFastConfirm = async () => {
+    try {
+      setProcessing(true);
+      setError("");
+      
+      // Process the order
+      if (processOrder) {
+        await processOrder();
+      }
+      
+      // Scroll to top of page
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Move to next step (order confirmation)
+      onNext();
+    } catch (err) {
+      console.error("Error processing order:", err);
+      setError("שגיאה בעיבוד ההזמנה. אנא נסה שוב.");
+    } finally {
+      setProcessing(false);
+    }
   };
 
   return (
@@ -45,6 +61,13 @@ const FastCheckoutConfirmation = ({
         <h2>⚡ אישור מהיר</h2>
         <p>כל הפרטים שלך כבר קיימים במערכת - פשוט אשר והזמן!</p>
       </div>
+
+      {error && (
+        <div className="error-message">
+          <span className="error-icon">❌</span>
+          <span>{error}</span>
+        </div>
+      )}
 
       <div className="fast-checkout-content">
         <div className="welcome-back-section">
@@ -182,10 +205,10 @@ const FastCheckoutConfirmation = ({
         <div className="fast-checkout-notice">
           <div className="notice-icon">🚀</div>
           <div className="notice-content">
-            <h4>אישור פרטים</h4>
+            <h4>תהליך מהיר!</h4>
             <p>
               כל הפרטים שלך כבר קיימים במערכת מהזמנות קודמות. 
-              אשר את הפרטים ועבור לשלב האחרון להשלמת ההזמנה.
+              לחץ "אשר הזמנה" כדי לסיים את התהליך.
             </p>
           </div>
         </div>
@@ -194,16 +217,25 @@ const FastCheckoutConfirmation = ({
       <div className="step-actions">
         <button 
           type="button"
-          className="btn-primary fast-confirm-btn"
+          className={`btn-primary fast-confirm-btn ${processing ? 'processing' : ''}`}
           onClick={handleFastConfirm}
+          disabled={processing}
         >
-          המשך להשלמת הזמנה →
+          {processing ? (
+            <>
+              <span className="loading-spinner"></span>
+              מעבד הזמנה...
+            </>
+          ) : (
+            "🚀 אשר הזמנה מהיר →"
+          )}
         </button>
         
         <button 
           type="button"
           className="btn-secondary"
           onClick={onPrev}
+          disabled={processing}
         >
           ← חזור לסיכום
         </button>
