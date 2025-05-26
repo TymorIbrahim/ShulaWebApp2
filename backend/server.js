@@ -119,21 +119,26 @@ app.use('/api/admin/orders', adminOrderRoutes);
 // Static folder for images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Serve static files from the React app in production
-if (process.env.NODE_ENV === "production") {
-  // Serve the React build files
-  app.use(express.static(path.join(__dirname, "../frontend/build")));
-  
-  // Handle React routing, return all requests to React app
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend/build", "index.html"));
+// Health check endpoint - works in all environments
+app.get("/", (req, res) => {
+  res.json({ 
+    message: "✅ Shula API is running successfully",
+    status: "healthy",
+    environment: process.env.NODE_ENV || 'development',
+    timestamp: new Date().toISOString(),
+    version: "2.0"
   });
-} else {
-  // Default route for development testing
-  app.get("/", (req, res) => {
-    res.send("✅ Shula API is running...");
+});
+
+app.get("/api/health", (req, res) => {
+  res.json({ 
+    message: "✅ Shula API is healthy",
+    status: "ok",
+    environment: process.env.NODE_ENV || 'development',
+    timestamp: new Date().toISOString(),
+    database: mongoose.connection.readyState === 1 ? "connected" : "disconnected"
   });
-}
+});
 
 // Test endpoint for rate limiting
 app.get("/api/test-rate-limit", (req, res) => {
