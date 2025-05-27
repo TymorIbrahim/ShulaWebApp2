@@ -297,7 +297,11 @@ const AdminSettings = () => {
   if (!isAuthenticated || !user?.role?.includes('staff')) {
     return (
       <div className="settings-loading">
-        <div className="loading-spinner">⏳</div>
+        <div className="loading-spinner">
+          <svg className="loading-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z" />
+          </svg>
+        </div>
         <p>טוען...</p>
       </div>
     );
@@ -345,7 +349,12 @@ const AdminSettings = () => {
       {/* Unsaved Changes Warning */}
       {unsavedChanges && (
         <div className="settings-warning">
-          <span>⚠️ יש לך שינויים שלא נשמרו</span>
+          <span>
+            <svg className="warning-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+            </svg>
+            יש לך שינויים שלא נשמרו
+          </span>
         </div>
       )}
 

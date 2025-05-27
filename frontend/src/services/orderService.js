@@ -176,7 +176,7 @@ export const getAllOrdersAsAdmin = async (token) => {
 };
 
 // --- Admin function to update order status ---
-export const updateOrderStatusAsAdmin = async (orderId, status, token) => {
+export const updateOrderStatusAsAdmin = async (orderId, status, token, changedBy = 'Unknown Staff', notes = '') => {
   try {
     const config = {
       headers: {
@@ -184,12 +184,82 @@ export const updateOrderStatusAsAdmin = async (orderId, status, token) => {
         'Authorization': `Bearer ${token}`,
       },
     };
-    const body = JSON.stringify({ status });
+    const body = JSON.stringify({ status, changedBy, notes });
     // PUT to the /api/admin/orders/:id endpoint (matches our backend route)
     const response = await axios.put(`${ADMIN_API_BASE_URL}/${orderId}`, body, config);
     return response.data;
   } catch (error) {
     console.error(`Error updating order status for order ${orderId} in orderService:`, error.response ? error.response.data : error.message);
     throw error.response ? error.response.data : new Error("Server error occurred while updating order status.");
+  }
+};
+
+// --- NEW: Admin function to confirm order pickup ---
+export const confirmOrderPickup = async (orderId, pickupData, token) => {
+  try {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    };
+    
+    const response = await axios.post(`${ADMIN_API_BASE_URL}/${orderId}/confirm-pickup`, pickupData, config);
+    return response.data;
+  } catch (error) {
+    console.error(`Error confirming pickup for order ${orderId}:`, error.response ? error.response.data : error.message);
+    throw error.response ? error.response.data : new Error("Server error occurred while confirming pickup.");
+  }
+};
+
+// --- NEW: Admin function to confirm order return with summary report ---
+export const confirmOrderReturn = async (orderId, returnData, token) => {
+  try {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    };
+    
+    const response = await axios.post(`${ADMIN_API_BASE_URL}/${orderId}/confirm-return`, returnData, config);
+    return response.data;
+  } catch (error) {
+    console.error(`Error confirming return for order ${orderId}:`, error.response ? error.response.data : error.message);
+    throw error.response ? error.response.data : new Error("Server error occurred while confirming return.");
+  }
+};
+
+// --- NEW: Admin function to get order summary report ---
+export const getOrderSummaryReport = async (orderId, token) => {
+  try {
+    const config = {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    };
+    
+    const response = await axios.get(`${ADMIN_API_BASE_URL}/${orderId}/summary-report`, config);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching summary report for order ${orderId}:`, error.response ? error.response.data : error.message);
+    throw error.response ? error.response.data : new Error("Server error occurred while fetching summary report.");
+  }
+};
+
+// --- NEW: Admin function to get single order with full details ---
+export const getOrderById = async (orderId, token) => {
+  try {
+    const config = {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    };
+    
+    const response = await axios.get(`${ADMIN_API_BASE_URL}/${orderId}`, config);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching order ${orderId}:`, error.response ? error.response.data : error.message);
+    throw error.response ? error.response.data : new Error("Server error occurred while fetching order.");
   }
 };

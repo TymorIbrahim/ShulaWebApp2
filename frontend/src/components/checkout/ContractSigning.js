@@ -116,7 +116,12 @@ const ContractSigning = ({ data, customerInfo, onUpdate, onNext, onPrev, canProc
   return (
     <div className="contract-signing-step">
       <div className="step-header">
-        <h2>✍️ חתימה על הסכם השכירות</h2>
+        <h2>
+          <svg className="contract-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+          </svg>
+          חתימה על הסכם השכירות
+        </h2>
         <p>אנא קרא בעיון את ההסכם וחתום לאישור</p>
       </div>
 
@@ -170,25 +175,37 @@ const ContractSigning = ({ data, customerInfo, onUpdate, onNext, onPrev, canProc
 
           {agreed && !signature && (
             <div className="signature-reminder">
-              <span className="reminder-icon">⚠️</span>
+              <span className="reminder-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+                </svg>
+              </span>
               <span>נדרש לחתום בתיבת החתימה למעלה</span>
             </div>
           )}
 
           {agreed && signature && (
             <div className="signature-confirmed">
-              <span className="confirmed-icon">✅</span>
+              <span className="confirmed-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
+                </svg>
+              </span>
               <span>החתימה נקלטה בהצלחה</span>
             </div>
           )}
         </div>
 
         <div className="legal-notice">
-          <h4>🔒 הערה משפטית</h4>
+          <h4>
+            <svg className="legal-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10V11H16V16H8V11H9.2V10C9.2,8.6 10.6,7 12,7M10.2,10C10.2,9.2 10.6,8 12,8C13.4,8 13.8,9.2 13.8,10V11H10.2V10Z"/>
+            </svg>
+            הערה משפטית
+          </h4>
           <p>
-            חתימה דיגיטלית זו מהווה הסכמה משפטית מחייבת. 
-            ההסכם נשמר במערכת שלנו ויישלח אליך בדוא"ל לאחר השלמת ההזמנה.
-            במקרה של שאלות, ניתן ליצור קשר בכל עת.
+            חתימתך הדיגיטלית על הסכם זה מהווה התחייבות משפטית מחייבת.
+            אנא קרא את כל התנאים בעיון לפני החתימה.
           </p>
         </div>
       </div>

@@ -8,7 +8,9 @@ const API_URL = `${API_BASE_URL}/api/users`;
 const getAuthHeaders = () => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const token = user.token || user.accessToken;
-    return token ? { Authorization: `Bearer ${token}` } : {};
+    return {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+    };
 };
 
 // Enhanced getUsers with pagination, search, filtering, and sorting
@@ -24,27 +26,27 @@ export const getUsers = async (params = {}) => {
     });
 
     const url = queryParams.toString() ? `${API_URL}?${queryParams.toString()}` : API_URL;
-    console.log('👥 [UserService] Fetching users with URL:', url);
+    console.log('[UserService] Fetching users with URL:', url);
     
-    const headers = getAuthHeaders();
-    console.log('👥 [UserService] Using headers:', headers);
+    const config = getAuthHeaders();
+    console.log('[UserService] Using config:', config);
     
-    const response = await axios.get(url, { headers });
-    console.log('👥 [UserService] API Response received:', response.data);
+    const response = await axios.get(url, config);
+    console.log('[UserService] API Response received:', response.data);
     
     return response.data;
   } catch (error) {
-    console.error('❌ [UserService] Error fetching users:', error);
-    console.error('❌ [UserService] Error response:', error.response?.data);
-    console.error('❌ [UserService] Error status:', error.response?.status);
+    console.error('[UserService] Error fetching users:', error);
+    console.error('[UserService] Error response:', error.response?.data);
+    console.error('[UserService] Error status:', error.response?.status);
     throw error;
   }
 };
 
 export const getUser = async (userId) => {
   try {
-    const headers = getAuthHeaders();
-    const response = await axios.get(`${API_URL}/${userId}`, { headers });
+    const config = getAuthHeaders();
+    const response = await axios.get(`${API_URL}/${userId}`, config);
     return response.data;
   } catch (error) {
     console.error('Error fetching user:', error);
@@ -54,8 +56,8 @@ export const getUser = async (userId) => {
 
 export const updateUser = async (userId, userData) => {
   try {
-    const headers = getAuthHeaders();
-    const response = await axios.put(`${API_URL}/${userId}`, userData, { headers });
+    const config = getAuthHeaders();
+    const response = await axios.put(`${API_URL}/${userId}`, userData, config);
     return response.data;
   } catch (error) {
     console.error('Error updating user:', error);
@@ -65,8 +67,8 @@ export const updateUser = async (userId, userData) => {
 
 export const deleteUser = async (userId) => {
   try {
-    const headers = getAuthHeaders();
-    const response = await axios.delete(`${API_URL}/${userId}`, { headers });
+    const config = getAuthHeaders();
+    const response = await axios.delete(`${API_URL}/${userId}`, config);
     return response.data;
   } catch (error) {
     console.error('Error deleting user:', error);
@@ -81,22 +83,19 @@ export const getRoleBadge = (role) => {
       return { 
         label: 'צוות', 
         color: '#3b82f6',
-        bgColor: '#dbeafe',
-        icon: '👑'
+        bgColor: '#dbeafe'
       };
     case 'customer':
       return { 
         label: 'לקוח', 
         color: '#059669',
-        bgColor: '#d1fae5',
-        icon: '👤'
+        bgColor: '#d1fae5'
       };
     default:
       return { 
         label: 'לא מוגדר', 
         color: '#6b7280',
-        bgColor: '#f3f4f6',
-        icon: '❓'
+        bgColor: '#f3f4f6'
       };
   }
 };
@@ -106,20 +105,17 @@ export const getSignUpMethodBadge = (method) => {
     case 'local':
       return {
         label: 'רישום רגיל',
-        color: '#059669',
-        icon: '📧'
+        color: '#059669'
       };
     case 'google':
       return {
         label: 'Google',
-        color: '#dc2626',
-        icon: '🔍'
+        color: '#dc2626'
       };
     default:
       return {
         label: 'לא ידוע',
-        color: '#6b7280',
-        icon: '❓'
+        color: '#6b7280'
       };
   }
 };
@@ -133,22 +129,19 @@ export const getUserStatusBadge = (user) => {
     return {
       label: 'חדש',
       color: '#7c3aed',
-      bgColor: '#f3e8ff',
-      icon: '🌟'
+      bgColor: '#f3e8ff'
     };
   } else if (user.orderCount > 0) {
     return {
       label: 'פעיל',
       color: '#059669',
-      bgColor: '#d1fae5',
-      icon: '✅'
+      bgColor: '#d1fae5'
     };
   } else {
     return {
       label: 'לא פעיל',
       color: '#f59e0b',
-      bgColor: '#fef3c7',
-      icon: '⏸️'
+      bgColor: '#fef3c7'
     };
   }
 };

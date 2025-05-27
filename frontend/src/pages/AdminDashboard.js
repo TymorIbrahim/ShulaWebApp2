@@ -1,11 +1,14 @@
 // src/pages/AdminDashboard.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getProductStatistics } from '../services/productService';
+
+// Service imports
 import { getUsers } from '../services/userService';
-import { getOrdersAsAdmin } from '../services/orderService';
+import { getProductStatistics } from '../services/productService';
 import { getTotalRevenue, getRecentOrders } from '../services/analyticsService';
+import { getOrdersAsAdmin } from '../services/orderService';
+
 import './AdminDashboard.css';
 
 // --- Enhanced SVG Icons ---
@@ -103,10 +106,46 @@ const StatCard = ({ title, value, change, icon, color, trend, loading, link }) =
 // Quick Actions Component
 const QuickActions = () => {
     const quickActions = [
-        { title: 'הוסף מוצר חדש', icon: '📦', link: '/admin/products/new', color: 'blue' },
-        { title: 'נהל הזמנות', icon: '📋', link: '/admin/rentals', color: 'green' },
-        { title: 'חפש לקוח', icon: '👤', link: '/admin/users', color: 'purple' },
-        { title: 'צפה בדוחות', icon: '📊', link: '/admin/analytics', color: 'orange' },
+        { 
+            title: 'הוסף מוצר חדש', 
+            icon: (
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12,2A3,3 0 0,1 15,5V7H18A1,1 0 0,1 19,8V19A3,3 0 0,1 16,22H8A3,3 0 0,1 5,19V8A1,1 0 0,1 6,7H9V5A3,3 0 0,1 12,2M12,4A1,1 0 0,0 11,5V7H13V5A1,1 0 0,0 12,4Z" />
+                </svg>
+            ), 
+            link: '/admin/products/new', 
+            color: 'blue' 
+        },
+        { 
+            title: 'נהל הזמנות', 
+            icon: (
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V5H19V19Z"/>
+                </svg>
+            ), 
+            link: '/admin/rentals', 
+            color: 'green' 
+        },
+        { 
+            title: 'חפש לקוח', 
+            icon: (
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12,5.5A3.5,3.5 0 0,1 15.5,9A3.5,3.5 0 0,1 12,12.5A3.5,3.5 0 0,1 8.5,9A3.5,3.5 0 0,1 12,5.5M5,8C5.56,8 6.08,8.15 6.53,8.42C6.38,9.85 6.8,11.27 7.66,12.38C7.16,13.34 6.16,14 5,14A3,3 0 0,1 2,11A3,3 0 0,1 5,8M19,8A3,3 0 0,1 22,11A3,3 0 0,1 19,14C17.84,14 16.84,13.34 16.34,12.38C17.2,11.27 17.62,9.85 17.47,8.42C17.92,8.15 18.44,8 19,8M5.5,18.25C5.5,16.18 8.41,14.5 12,14.5C15.59,14.5 18.5,16.18 18.5,18.25V20H5.5V18.25M0,20V18.5C0,17.11 1.89,15.94 4.45,15.6C3.86,16.28 3.5,17.22 3.5,18.25V20H0M24,20H20.5V18.25C20.5,17.22 20.14,16.28 19.55,15.6C22.11,15.94 24,17.11 24,18.5V20Z" />
+                </svg>
+            ), 
+            link: '/admin/users', 
+            color: 'purple' 
+        },
+        { 
+            title: 'צפה בדוחות', 
+            icon: (
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M22,21H2V3H4V19H6V17H10V19H12V16H16V19H18V17H22V21Z" />
+                </svg>
+            ), 
+            link: '/admin/analytics', 
+            color: 'orange' 
+        },
     ];
 
     return (
@@ -197,7 +236,11 @@ const RecentActivity = ({ recentOrders, loading }) => {
                     })
                 ) : (
                     <div className="no-activity">
-                        <div className="no-activity-icon">📋</div>
+                        <div className="no-activity-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V5H19V19Z"/>
+                            </svg>
+                        </div>
                         <p>אין פעילות אחרונה</p>
                     </div>
                 )}
@@ -229,7 +272,12 @@ const WelcomeSection = ({ user, onRefresh, lastUpdated }) => {
             <div className="welcome-content">
                 <div className="welcome-text">
                     <h1 className="welcome-title">
-                        {getCurrentTimeGreeting()}, {user?.firstName || 'מנהל'}! 👋
+                        {getCurrentTimeGreeting()}, {user?.firstName || 'מנהל'}!
+                        <span className="welcome-wave">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7,4V2A1,1 0 0,1 8,1A1,1 0 0,1 9,2V4.1L10.5,4.05C10.81,4.04 11.08,4.19 11.28,4.4L21.6,14.71C22.37,15.5 22.37,16.74 21.6,17.53C20.81,18.3 19.58,18.3 18.79,17.53L9.5,8.2L9,8.15V22A1,1 0 0,1 8,23A1,1 0 0,1 7,22V8.15L6.5,8.2L2.21,12.5C1.42,13.29 0.18,13.29 -0.6,12.5C-1.39,11.71 -1.39,10.47 -0.6,9.68L3.72,5.4C3.92,5.19 4.19,5.04 4.5,5.05L7,4.1V4Z"/>
+                            </svg>
+                        </span>
                     </h1>
                     <p className="welcome-subtitle">
                         ברוך הבא ללוח הבקרה הראשי. כאן תוכל לנהל את המערכת ולצפות בסטטיסטיקות חשובות.
@@ -267,11 +315,12 @@ const AdminDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [lastUpdated, setLastUpdated] = useState(null);
+    const [rateLimitWarning, setRateLimitWarning] = useState(false);
 
     // Security check
     const isAdmin = user?.role?.includes('staff');
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (user && !isAdmin) {
             navigate('/');
         } else if (!user) {
@@ -279,51 +328,186 @@ const AdminDashboard = () => {
         }
     }, [user, isAdmin, navigate]);
 
-    // Fetch dashboard data
-    const fetchDashboardData = async () => {
+    // Fetch dashboard data with rate limiting protection
+    const fetchDashboardData = useCallback(async () => {
+        setLoading(true);
+        setError('');
+        setRateLimitWarning(false);
+        let rateLimitHit = false;
+        
         try {
-            setLoading(true);
-            setError(null);
+            // Add delays between requests to prevent rate limiting
+            const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+            
+            // Fetch data sequentially with delays to avoid rate limiting
+            // console.log('Fetching dashboard data...');
+            
+            // Fetch users count first
+            try {
+                const usersData = await getUsers({ limit: 1 });
+                setDashboardData(prev => ({ 
+                    ...prev, 
+                    userStats: {
+                        totalUsers: usersData.totalUsers || usersData.pagination?.totalProducts || 0,
+                        newUsers: 0,
+                        activeUsers: 0
+                    }
+                }));
+                await delay(300); // Increased delay
+            } catch (error) {
+                if (error.response?.status === 429) {
+                    // console.warn('Rate limited on users endpoint, using cached data');
+                    setDashboardData(prev => ({ ...prev, userStats: { totalUsers: 0, newUsers: 0, activeUsers: 0 } }));
+                    rateLimitHit = true;
+                } else {
+                    console.error('Error fetching users:', error);
+                    setDashboardData(prev => ({ ...prev, userStats: { totalUsers: 0, newUsers: 0, activeUsers: 0 } }));
+                }
+            }
 
-            const [productStats, userResponse, orderResponse, revenue, recentOrders] = await Promise.allSettled([
-                getProductStatistics(),
-                getUsers({ limit: 1 }), // Just to get statistics
-                getOrdersAsAdmin({ limit: 1 }), // Just to get statistics  
-                getTotalRevenue().catch(() => 0),
-                getRecentOrders().catch(() => [])
-            ]);
+            // Fetch product statistics
+            try {
+                const productStats = await getProductStatistics();
+                setDashboardData(prev => ({ 
+                    ...prev, 
+                    productStats: {
+                        totalProducts: productStats.totalProducts || 0,
+                        activeProducts: productStats.activeProducts || 0,
+                        lowStockProducts: productStats.lowStockProducts || 0
+                    }
+                }));
+                await delay(300);
+            } catch (error) {
+                if (error.response?.status === 429) {
+                    // console.warn('Rate limited on products endpoint, using cached data');
+                    setDashboardData(prev => ({ 
+                        ...prev, 
+                        productStats: {
+                            totalProducts: 0,
+                            activeProducts: 0,
+                            lowStockProducts: 0
+                        }
+                    }));
+                    rateLimitHit = true;
+                } else {
+                    console.error('Error fetching product statistics:', error);
+                    setDashboardData(prev => ({ 
+                        ...prev, 
+                        productStats: {
+                            totalProducts: 0,
+                            activeProducts: 0,
+                            lowStockProducts: 0
+                        }
+                    }));
+                }
+            }
 
-            setDashboardData({
-                productStats: productStats.status === 'fulfilled' ? productStats.value : null,
-                userStats: userResponse.status === 'fulfilled' ? userResponse.value?.statistics : null,
-                orderStats: orderResponse.status === 'fulfilled' ? orderResponse.value?.statistics : null,
-                revenue: revenue.status === 'fulfilled' ? revenue.value : 0,
-                recentOrders: recentOrders.status === 'fulfilled' ? recentOrders.value : []
-            });
+            // Fetch analytics data (handle 404s gracefully)
+            try {
+                await delay(300);
+                const [revenueData, recentOrdersData] = await Promise.allSettled([
+                    getTotalRevenue().catch(error => {
+                        // Handle 404 or other analytics endpoint errors
+                        if (error.response?.status === 404) {
+                            // console.warn('Analytics revenue endpoint not available');
+                            return { totalRevenue: 0 };
+                        }
+                        throw error;
+                    }),
+                    getRecentOrders().catch(error => {
+                        // Handle 404 or other analytics endpoint errors  
+                        if (error.response?.status === 404) {
+                            // console.warn('Analytics recent orders endpoint not available');
+                            return { orders: [] };
+                        }
+                        throw error;
+                    })
+                ]);
+                
+                if (revenueData.status === 'fulfilled') {
+                    setDashboardData(prev => ({ ...prev, revenue: revenueData.value.totalRevenue || 0 }));
+                } else if (revenueData.reason?.response?.status === 429) {
+                    // console.warn('Rate limited on revenue endpoint');
+                    setDashboardData(prev => ({ ...prev, revenue: 0 }));
+                    rateLimitHit = true;
+                } else {
+                    // console.warn('Revenue endpoint unavailable, using default');
+                    setDashboardData(prev => ({ ...prev, revenue: 0 }));
+                }
+                
+                if (recentOrdersData.status === 'fulfilled') {
+                    setDashboardData(prev => ({ ...prev, recentOrders: recentOrdersData.value.orders || [] }));
+                } else if (recentOrdersData.reason?.response?.status === 429) {
+                    // console.warn('Rate limited on recent orders endpoint');
+                    setDashboardData(prev => ({ ...prev, recentOrders: [] }));
+                    rateLimitHit = true;
+                } else {
+                    // console.warn('Recent orders endpoint unavailable, using default');
+                    setDashboardData(prev => ({ ...prev, recentOrders: [] }));
+                }
+                
+                await delay(300);
+            } catch (error) {
+                console.error('Error fetching analytics:', error);
+                // Set defaults if analytics completely fails
+                setDashboardData(prev => ({ 
+                    ...prev, 
+                    revenue: 0,
+                    recentOrders: []
+                }));
+            }
+
+            // Fetch orders data (handle 404s gracefully)
+            try {
+                const ordersResponse = await getOrdersAsAdmin();
+                setDashboardData(prev => ({ ...prev, orderStats: ordersResponse.statistics }));
+            } catch (error) {
+                if (error.response?.status === 429) {
+                    // console.warn('Rate limited on orders endpoint, using cached data');
+                    setDashboardData(prev => ({ ...prev, orderStats: { global: { pending: 0, accepted: 0, completed: 0, total: 0 } } }));
+                    rateLimitHit = true;
+                } else if (error.response?.status === 404) {
+                    // console.warn('Orders admin endpoint not available, using defaults');
+                    setDashboardData(prev => ({ ...prev, orderStats: { global: { pending: 0, accepted: 0, completed: 0, total: 0 } } }));
+                } else {
+                    console.error('Error fetching orders:', error);
+                    setDashboardData(prev => ({ ...prev, orderStats: { global: { pending: 0, accepted: 0, completed: 0, total: 0 } } }));
+                }
+            }
+
+            // Set rate limit warning if any endpoint was rate limited
+            if (rateLimitHit) {
+                setRateLimitWarning(true);
+            }
 
             setLastUpdated(new Date());
-        } catch (err) {
-            console.error('Error fetching dashboard data:', err);
-            setError('שגיאה בטעינת נתוני הדשבורד');
+        } catch (error) {
+            console.error('Dashboard data fetch error:', error);
+            if (error.response?.status === 429) {
+                setError('Server is busy. Please wait 15 minutes before refreshing.');
+                setRateLimitWarning(true);
+            } else {
+                setError('Failed to load dashboard data. Please try refreshing the page.');
+            }
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
-        if (user && isAdmin) {
-            fetchDashboardData();
-            
-            // Auto refresh every 5 minutes
-            const interval = setInterval(fetchDashboardData, 5 * 60 * 1000);
-            return () => clearInterval(interval);
-        }
-    }, [user, isAdmin]);
+        fetchDashboardData();
+        const interval = setInterval(fetchDashboardData, 300000); // Refresh every 5 minutes
+        return () => clearInterval(interval);
+    }, [fetchDashboardData]);
 
     if (!user || !isAdmin) {
         return (
             <div className="dashboard-loading">
-                <div className="loading-spinner">⏳</div>
+                <div className="loading-spinner">
+                    <svg className="spin" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z" />
+                    </svg>
+                </div>
                 <p>טוען...</p>
             </div>
         );
@@ -332,7 +516,11 @@ const AdminDashboard = () => {
     if (error) {
         return (
             <div className="dashboard-error">
-                <div className="error-icon">❌</div>
+                <div className="error-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                    </svg>
+                </div>
                 <h3>שגיאה בטעינת הדשבורד</h3>
                 <p>{error}</p>
                 <button onClick={fetchDashboardData} className="retry-btn">
@@ -346,7 +534,7 @@ const AdminDashboard = () => {
     const statsData = [
         {
             title: 'סה"כ מוצרים',
-            value: dashboardData.productStats?.total || 0,
+            value: dashboardData.productStats?.totalProducts || 0,
             change: '+12',
             icon: <ProductsIcon />,
             color: 'blue',
@@ -355,7 +543,7 @@ const AdminDashboard = () => {
         },
         {
             title: 'משתמשים רשומים',
-            value: dashboardData.userStats?.total || 0,
+            value: dashboardData.userStats?.totalUsers || 0,
             change: '+5',
             icon: <UsersIcon />,
             color: 'green',
@@ -389,6 +577,30 @@ const AdminDashboard = () => {
                 onRefresh={fetchDashboardData}
                 lastUpdated={lastUpdated}
             />
+
+            {/* Rate Limit Warning Banner */}
+            {rateLimitWarning && (
+                <div className="rate-limit-warning">
+                    <div className="warning-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+                        </svg>
+                    </div>
+                    <div className="warning-content">
+                        <strong>Limited Data Available</strong>
+                        <p>Some data may be incomplete due to server load. This will automatically resolve in a few minutes.</p>
+                    </div>
+                    <button 
+                        onClick={() => setRateLimitWarning(false)} 
+                        className="warning-close"
+                        title="Dismiss warning"
+                    >
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                        </svg>
+                    </button>
+                </div>
+            )}
 
             <div className="dashboard-grid">
                 {/* Statistics Cards */}

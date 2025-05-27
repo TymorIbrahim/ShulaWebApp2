@@ -200,8 +200,12 @@ const CustomerProfile = () => {
           className={`tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
           onClick={() => setActiveTab('profile')}
         >
-          <i className="icon-user"></i>
-          פרטים אישיים
+          <h4>
+            <svg className="section-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19M5,6V5H19V6H5Z"/>
+            </svg>
+            פרטים אישיים
+          </h4>
         </button>
         <button 
           className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`}
@@ -319,7 +323,12 @@ const CustomerProfile = () => {
                       {/* Enhanced Customer Information Section */}
                       {order.customerInfo && (
                         <div className="customer-info-section">
-                          <h4>📋 פרטים אישיים</h4>
+                          <h4>
+                            <svg className="section-icon" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19M5,6V5H19V6H5Z"/>
+                            </svg>
+                            פרטים אישיים
+                          </h4>
                           <div className="customer-details">
                             <div className="detail-item">
                               <span className="label">שם מלא:</span>
@@ -350,21 +359,38 @@ const CustomerProfile = () => {
                       {/* Contract Status Section */}
                       {order.contract && (
                         <div className="contract-status-section">
-                          <h4>✍️ סטטוס הסכם</h4>
+                          <h4>
+                            <svg className="section-icon" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M14.6,16.6L19.2,12L14.6,7.4L16,6L22,12L16,18L14.6,16.6M9.4,16.6L4.8,12L9.4,7.4L8,6L2,12L8,18L9.4,16.6Z"/>
+                            </svg>
+                            סטטוס הסכם
+                          </h4>
                           <div className="contract-details">
                             {order.contract.signed ? (
                               <div className="status-item verified">
-                                <span className="status-icon">✅</span>
+                                <span className="status-icon">
+                                  <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
+                                  </svg>
+                                </span>
                                 <span>הסכם נחתם דיגיטלית ב-{formatDate(order.contract.signedAt)}</span>
                               </div>
                             ) : order.metadata?.onboardingChoice === "in-person" ? (
                               <div className="status-item pending">
-                                <span className="status-icon">🏢</span>
+                                <span className="status-icon">
+                                  <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12,7V3H2V21H22V7H12M6,19H4V17H6V19M6,15H4V13H6V15M6,11H4V9H6V11M6,7H4V5H6V7M10,19H8V17H10V19M10,15H8V13H10V15M10,11H8V9H10V11M10,7H8V5H10V7M20,19H12V17H14V15H12V13H14V11H12V9H20V19M18,11H16V13H18V11M18,15H16V17H18V15Z"/>
+                                  </svg>
+                                </span>
                                 <span>הסכם יחתם בעת איסוף הציוד</span>
                               </div>
                             ) : (
                               <div className="status-item pending">
-                                <span className="status-icon">⏳</span>
+                                <span className="status-icon">
+                                  <svg className="spin" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z" />
+                                  </svg>
+                                </span>
                                 <span>הסכם לא נחתם</span>
                               </div>
                             )}
@@ -375,21 +401,38 @@ const CustomerProfile = () => {
                       {/* ID Upload Status Section */}
                       {order.idUpload && (
                         <div className="id-upload-section">
-                          <h4>📄 סטטוס תעודת זהות</h4>
+                          <h4>
+                            <svg className="section-icon" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                            </svg>
+                            סטטוס תעודת זהות
+                          </h4>
                           <div className="id-upload-details">
                             {order.idUpload.uploaded ? (
                               <div className="status-item verified">
-                                <span className="status-icon">✅</span>
+                                <span className="status-icon">
+                                  <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
+                                  </svg>
+                                </span>
                                 <span>תעודת זהות הועלתה ({order.idUpload.fileName})</span>
                               </div>
                             ) : order.metadata?.onboardingChoice === "in-person" ? (
                               <div className="status-item pending">
-                                <span className="status-icon">🏢</span>
+                                <span className="status-icon">
+                                  <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12,7V3H2V21H22V7H12M6,19H4V17H6V19M6,15H4V13H6V15M6,11H4V9H6V11M6,7H4V5H6V7M10,19H8V17H10V19M10,15H8V13H10V15M10,11H8V9H10V11M10,7H8V5H10V7M20,19H12V17H14V15H12V13H14V11H12V9H20V19M18,11H16V13H18V11M18,15H16V17H18V15Z"/>
+                                  </svg>
+                                </span>
                                 <span>תעודת זהות תאומת בעת איסוף הציוד</span>
                               </div>
                             ) : (
                               <div className="status-item pending">
-                                <span className="status-icon">⏳</span>
+                                <span className="status-icon">
+                                  <svg className="spin" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z" />
+                                  </svg>
+                                </span>
                                 <span>תעודת זהות לא הועלתה</span>
                               </div>
                             )}
@@ -400,16 +443,31 @@ const CustomerProfile = () => {
                       {/* Pickup/Return Information */}
                       {order.pickupReturn && (
                         <div className="pickup-return-section">
-                          <h4>📍 פרטי איסוף והחזרה</h4>
+                          <h4>
+                            <svg className="section-icon" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22S19,14.25 19,9A7,7 0 0,0 12,2Z"/>
+                            </svg>
+                            פרטי איסוף והחזרה
+                          </h4>
                           <div className="pickup-return-details">
                             <div className="pickup-details">
-                              <h5>🚚 איסוף</h5>
+                              <h5>
+                                <svg className="section-icon" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M19,8V5A2,2 0 0,0 17,3H7A2,2 0 0,0 5,5V8A3,3 0 0,0 2,11V15A2,2 0 0,0 4,17H5V19A1,1 0 0,0 6,20H8A1,1 0 0,0 9,19V17H15V19A1,1 0 0,0 16,20H18A1,1 0 0,0 19,19V17H20A2,2 0 0,0 22,15V11A3,3 0 0,0 19,8M7,5H17V8H7V5M4,15V11A1,1 0 0,1 5,10H19A1,1 0 0,1 20,11V15H4Z"/>
+                                </svg>
+                                איסוף
+                              </h5>
                               <p><strong>תאריך:</strong> {formatDate(order.pickupReturn.pickupDate)}</p>
                               <p><strong>שעה:</strong> {order.pickupReturn.pickupTime}</p>
                               <p><strong>כתובת:</strong> {order.pickupReturn.pickupAddress}</p>
                             </div>
                             <div className="return-details">
-                              <h5>🔄 החזרה</h5>
+                              <h5>
+                                <svg className="section-icon" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M12,4V1L8,5L12,9V6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12H4A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z"/>
+                                </svg>
+                                החזרה
+                              </h5>
                               <p><strong>תאריך:</strong> {formatDate(order.pickupReturn.returnDate)}</p>
                               <p><strong>שעה:</strong> {order.pickupReturn.returnTime}</p>
                               <p><strong>כתובת:</strong> {order.pickupReturn.returnAddress}</p>
@@ -421,7 +479,11 @@ const CustomerProfile = () => {
                       {/* Membership Notice for In-Person Orders */}
                       {order.metadata?.onboardingChoice === 'in-person' && order.status === 'Pending' && (
                         <div className="membership-notice">
-                          <div className="notice-icon">🏢</div>
+                          <div className="notice-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12,7V3H2V21H22V7H12M6,19H4V17H6V19M6,15H4V13H6V15M6,11H4V9H6V11M6,7H4V5H6V7M10,19H8V17H10V19M10,15H8V13H10V15M10,11H8V9H10V11M10,7H8V5H10V7M20,19H12V17H14V15H12V13H14V11H12V9H20V19M18,11H16V13H18V11M18,15H16V17H18V15Z"/>
+                            </svg>
+                          </div>
                           <div className="notice-content">
                             <strong>הזמנה דורשת השלמת חברות במקום</strong>
                             <p>נא להביא תעודת זהות ולחתום על הסכם החברות בעת איסוף הציוד</p>

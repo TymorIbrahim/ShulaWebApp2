@@ -146,7 +146,12 @@ const PickupReturnDetails = ({ data, cartItems, onUpdate, onNext, onPrev, canPro
   return (
     <div className="pickup-return-step">
       <div className="step-header">
-        <h2>📍 פרטי איסוף והחזרה</h2>
+        <h2>
+          <svg className="location-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z"/>
+          </svg>
+          פרטי איסוף והחזרה
+        </h2>
         <p>בחר מיקומים ותאריכים לאיסוף והחזרת הפריטים</p>
       </div>
 
@@ -165,12 +170,19 @@ const PickupReturnDetails = ({ data, cartItems, onUpdate, onNext, onPrev, canPro
           <div className="form-sections">
             {/* Pickup Section */}
             <div className="form-section pickup-section">
-              <h3>🚚 איסוף</h3>
+              <h3>
+                <svg className="truck-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18,18.5A1.5,1.5 0 0,1 16.5,17A1.5,1.5 0 0,1 18,15.5A1.5,1.5 0 0,1 19.5,17A1.5,1.5 0 0,1 18,18.5M19.5,9.5L21.46,12H17V9.5M6,18.5A1.5,1.5 0 0,1 4.5,17A1.5,1.5 0 0,1 6,15.5A1.5,1.5 0 0,1 7.5,17A1.5,1.5 0 0,1 6,18.5M20,8H17V4H3C1.89,4 1,4.89 1,6V17H3A3,3 0 0,0 6,20A3,3 0 0,0 9,17H15A3,3 0 0,0 18,20A3,3 0 0,0 21,17H23V12L20,8Z"/>
+                </svg>
+                איסוף
+              </h3>
               
               <div className="form-group">
                 <label htmlFor="pickupAddress">
                   מיקום איסוף *
-                  <span className="field-icon">📍</span>
+                  <svg className="field-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z"/>
+                  </svg>
                 </label>
                 <select
                   id="pickupAddress"
@@ -205,7 +217,9 @@ const PickupReturnDetails = ({ data, cartItems, onUpdate, onNext, onPrev, canPro
                 <div className="form-group">
                   <label>
                     תאריך איסוף *
-                    <span className="field-icon">📅</span>
+                    <svg className="field-icon" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M19,3H18V1H16V3H8V1H6V3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19Z"/>
+                    </svg>
                   </label>
                   <DatePicker
                     selected={formData.pickupDate}
@@ -226,7 +240,9 @@ const PickupReturnDetails = ({ data, cartItems, onUpdate, onNext, onPrev, canPro
                 <div className="form-group">
                   <label htmlFor="pickupTime">
                     שעת איסוף *
-                    <span className="field-icon">🕐</span>
+                    <svg className="field-icon" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
+                    </svg>
                   </label>
                   <select
                     id="pickupTime"
@@ -250,12 +266,19 @@ const PickupReturnDetails = ({ data, cartItems, onUpdate, onNext, onPrev, canPro
 
             {/* Return Section */}
             <div className="form-section return-section">
-              <h3>🔄 החזרה</h3>
+              <h3>
+                <svg className="return-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z"/>
+                </svg>
+                החזרה
+              </h3>
               
               <div className="form-group">
                 <label htmlFor="returnAddress">
                   מיקום החזרה *
-                  <span className="field-icon">📍</span>
+                  <svg className="field-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z"/>
+                  </svg>
                 </label>
                 <select
                   id="returnAddress"
@@ -290,7 +313,9 @@ const PickupReturnDetails = ({ data, cartItems, onUpdate, onNext, onPrev, canPro
                 <div className="form-group">
                   <label>
                     תאריך החזרה *
-                    <span className="field-icon">📅</span>
+                    <svg className="field-icon" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M19,3H18V1H16V3H8V1H6V3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19Z"/>
+                    </svg>
                   </label>
                   <DatePicker
                     selected={formData.returnDate}
@@ -310,7 +335,9 @@ const PickupReturnDetails = ({ data, cartItems, onUpdate, onNext, onPrev, canPro
                 <div className="form-group">
                   <label htmlFor="returnTime">
                     שעת החזרה *
-                    <span className="field-icon">🕐</span>
+                    <svg className="field-icon" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
+                    </svg>
                   </label>
                   <select
                     id="returnTime"
@@ -337,7 +364,9 @@ const PickupReturnDetails = ({ data, cartItems, onUpdate, onNext, onPrev, canPro
           <div className="form-group full-width">
             <label htmlFor="specialInstructions">
               הוראות מיוחדות (אופציונלי)
-              <span className="field-icon">📝</span>
+              <svg className="field-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+              </svg>
             </label>
             <textarea
               id="specialInstructions"
@@ -348,13 +377,18 @@ const PickupReturnDetails = ({ data, cartItems, onUpdate, onNext, onPrev, canPro
             />
           </div>
 
-          <div className="important-notice">
-            <h4>🔔 הערות חשובות</h4>
+          <div className="important-notes">
+            <h4>
+              <svg className="notice-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10,20H14V22H10V20M12,2A6,6 0 0,1 18,8C18,10.22 16.79,12.16 15,13.2V15A1,1 0 0,1 14,16H10A1,1 0 0,1 9,15V13.2C7.21,12.16 6,10.22 6,8A6,6 0 0,1 12,2M16,8A4,4 0 0,0 8,8C8,9.54 9.0,10.89 10.5,11.5V14H13.5V11.5C15,10.89 16,9.54 16,8Z"/>
+              </svg>
+              הערות חשובות
+            </h4>
             <ul>
-              <li>איסוף והחזרה מתבצעים רק בימים: ראשון, שלישי וחמישי</li>
-              <li>יש להביא תעודת זהות בעת האיסוף</li>
-              <li>החזרה מאוחרת עלולה לגרור עלויות נוספות</li>
-              <li>במקרה של שינוי בלוח הזמנים, נא ליצור קשר מראש</li>
+              <li>אנא הגע במועד הנקוב לאיסוף הציוד</li>
+              <li>העלאת תעודת זהות נדרשת לאימות</li>
+              <li>ציוד שלא יוחזר בזמן יחויב בעמלת איחור</li>
+              <li>במקרה של נזק לציוד, יחול תשלום נוסף לפי מחירון</li>
             </ul>
           </div>
         </form>

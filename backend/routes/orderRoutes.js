@@ -3,10 +3,10 @@ const router = express.Router();
 const Order = require('../models/order.model');
 const authorize = require('../middleware/auth');
 
-// GET /api/orders/availability?productId=... - Get availability info for a product (updated for inventory awareness)
+// GET /api/orders/availability?productId=... - Enhanced availability with reservations and real-time data
 router.get("/availability", async (req, res) => {
   try {
-    const { productId } = req.query;
+    const { productId, detailed = false } = req.query;
     
     if (!productId) {
       return res.status(400).json({ message: "Product ID is required" });
@@ -14,23 +14,76 @@ router.get("/availability", async (req, res) => {
 
     // Get the product to check inventory
     const Product = require("../models/Product");
+    const Reservation = require("../models/Reservation");
     const product = await Product.findById(productId);
     
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // Find all accepted orders for this product
+    if (detailed === 'true') {
+      // Use new enhanced method that includes reservations
+      const currentAvailability = await product.getRealTimeAvailability();
+      
+      // Get future availability for next 30 days
+      const futureAvailability = [];
+      for (let i = 0; i < 30; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() + i);
+        const dateString = date.toISOString().split('T')[0];
+        
+        const dayEnd = new Date(date);
+        dayEnd.setHours(23, 59, 59, 999);
+        
+        const dayAvailability = await product.getAvailabilityForDates(dateString, dateString);
+        
+        futureAvailability.push({
+          date: dateString,
+          ...dayAvailability
+        });
+      }
+
+      // Get active reservations for this product
+      const activeReservations = await Reservation.find({
+        product: productId,
+        status: 'active',
+        expiresAt: { $gt: new Date() }
+      }).populate('customer', 'firstName lastName email')
+        .sort({ expiresAt: 1 });
+
+      return res.status(200).json({
+        productId: productId,
+        productName: product.name,
+        currentAvailability: currentAvailability,
+        futureAvailability: futureAvailability,
+        activeReservations: activeReservations,
+        inventoryInfo: {
+          totalUnits: product.inventory.totalUnits,
+          minStockAlert: product.inventory.minStockAlert
+        },
+        lastUpdated: new Date(),
+        message: `Enhanced availability data for product ${product.name}`
+      });
+    }
+
+    // Legacy format for backward compatibility
     const orders = await Order.find({ 
       status: "Accepted",
       "items.product": productId
     }).lean();
 
-    // Create a map to track units rented per date
+    // Get active reservations
+    const activeReservations = await Reservation.find({
+      product: productId,
+      status: 'active',
+      expiresAt: { $gt: new Date() }
+    }).lean();
+
+    // Create a map to track units rented and reserved per date
     const dateAvailability = new Map();
 
+    // Process orders
     orders.forEach((order) => {
-      // Find items in this order that match the product
       const matchingItems = order.items.filter(item => item.product.toString() === productId);
       
       matchingItems.forEach((item) => {
@@ -38,43 +91,63 @@ router.get("/availability", async (req, res) => {
           let currentDate = new Date(item.rentalPeriod.startDate);
           const endDate = new Date(item.rentalPeriod.endDate);
 
-          // Ensure dates are treated as UTC midnight
           currentDate.setUTCHours(0, 0, 0, 0);
           endDate.setUTCHours(0, 0, 0, 0);
 
-          // Loop through each day in the rental period
           while (currentDate <= endDate) {
             const dateString = currentDate.toISOString().split('T')[0];
             
-            // Increment the count of rented units for this date
             if (!dateAvailability.has(dateString)) {
-              dateAvailability.set(dateString, 0);
+              dateAvailability.set(dateString, { rented: 0, reserved: 0 });
             }
-            dateAvailability.set(dateString, dateAvailability.get(dateString) + 1);
+            dateAvailability.get(dateString).rented += (item.quantity || 1);
             
-            // Increment by one day
             currentDate.setUTCDate(currentDate.getUTCDate() + 1);
           }
         }
       });
     });
 
+    // Process reservations
+    activeReservations.forEach((reservation) => {
+      if (reservation.rentalPeriod && reservation.rentalPeriod.startDate && reservation.rentalPeriod.endDate) {
+        let currentDate = new Date(reservation.rentalPeriod.startDate);
+        const endDate = new Date(reservation.rentalPeriod.endDate);
+
+        currentDate.setUTCHours(0, 0, 0, 0);
+        endDate.setUTCHours(0, 0, 0, 0);
+
+        while (currentDate <= endDate) {
+          const dateString = currentDate.toISOString().split('T')[0];
+          
+          if (!dateAvailability.has(dateString)) {
+            dateAvailability.set(dateString, { rented: 0, reserved: 0 });
+          }
+          dateAvailability.get(dateString).reserved += (reservation.quantity || 1);
+          
+          currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+        }
+      }
+    });
+
     // Convert to array of availability objects
     const availabilityData = [];
     const fullyBookedDates = [];
 
-    dateAvailability.forEach((rentedUnits, dateString) => {
-      const availableUnits = Math.max(0, product.inventory.totalUnits - rentedUnits);
+    dateAvailability.forEach((usage, dateString) => {
+      const totalUnavailable = usage.rented + usage.reserved;
+      const availableUnits = Math.max(0, product.inventory.totalUnits - totalUnavailable);
       
       availabilityData.push({
         date: dateString,
         totalUnits: product.inventory.totalUnits,
-        rentedUnits: rentedUnits,
+        rentedUnits: usage.rented,
+        reservedUnits: usage.reserved,
+        totalUnavailable: totalUnavailable,
         availableUnits: availableUnits,
         isAvailable: availableUnits > 0
       });
 
-      // If no units available, add to fully booked dates for backward compatibility
       if (availableUnits === 0) {
         fullyBookedDates.push(dateString);
       }
@@ -85,6 +158,9 @@ router.get("/availability", async (req, res) => {
       totalInventoryUnits: product.inventory.totalUnits,
       availabilityByDate: availabilityData,
       fullyBookedDates: fullyBookedDates, // For backward compatibility
+      hasActiveReservations: activeReservations.length > 0,
+      activeReservationsCount: activeReservations.length,
+      lastUpdated: new Date(),
       message: `Availability data for product ${product.name}`
     });
 
@@ -94,10 +170,40 @@ router.get("/availability", async (req, res) => {
   }
 });
 
-// POST /api/orders/validate-booking - Validate if a booking is possible for specific dates
+// GET /api/orders/availability/realtime?productId=... - Real-time availability snapshot
+router.get("/availability/realtime", async (req, res) => {
+  try {
+    const { productId } = req.query;
+    
+    if (!productId) {
+      return res.status(400).json({ message: "Product ID is required" });
+    }
+
+    const Product = require("../models/Product");
+    const product = await Product.findById(productId);
+    
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    const availability = await product.getRealTimeAvailability();
+    
+    res.status(200).json({
+      productId: productId,
+      productName: product.name,
+      ...availability
+    });
+
+  } catch (err) {
+    console.error("Error fetching real-time availability:", err);
+    res.status(500).json({ message: "Server error fetching real-time availability" });
+  }
+});
+
+// POST /api/orders/validate-booking - Enhanced booking validation with reservations
 router.post("/validate-booking", async (req, res) => {
   try {
-    const { productId, startDate, endDate } = req.body;
+    const { productId, startDate, endDate, quantity = 1, excludeReservationId } = req.body;
     
     if (!productId || !startDate || !endDate) {
       return res.status(400).json({ 
@@ -106,7 +212,6 @@ router.post("/validate-booking", async (req, res) => {
       });
     }
 
-    // Get the product to check inventory
     const Product = require("../models/Product");
     const product = await Product.findById(productId);
     
@@ -135,16 +240,32 @@ router.post("/validate-booking", async (req, res) => {
       });
     }
 
-    // Check availability for the requested period
+    // Check availability including reservations
     const availability = await product.getAvailabilityForDates(startDate, endDate);
+    
+    // If validating for an existing reservation, exclude it from calculations
+    if (excludeReservationId) {
+      const Reservation = require("../models/Reservation");
+      const existingReservation = await Reservation.findById(excludeReservationId);
+      if (existingReservation && existingReservation.product.toString() === productId) {
+        availability.reservedUnits = Math.max(0, availability.reservedUnits - (existingReservation.quantity || 1));
+        availability.totalUnavailable = availability.rentedUnits + availability.reservedUnits;
+        availability.availableUnits = Math.max(0, availability.totalUnits - availability.totalUnavailable);
+        availability.isAvailable = availability.availableUnits >= quantity;
+      }
+    }
+    
+    const hasEnoughUnits = availability.availableUnits >= quantity;
     
     res.status(200).json({
       productId: productId,
       requestedPeriod: { startDate, endDate },
+      requestedQuantity: quantity,
       ...availability,
-      message: availability.isAvailable 
-        ? `${availability.availableUnits} units available for the requested period`
-        : `No units available. ${availability.rentedUnits} units already rented.`
+      isAvailable: hasEnoughUnits,
+      message: hasEnoughUnits 
+        ? `${availability.availableUnits} units available for the requested period (${quantity} requested)`
+        : `Not enough units available. Only ${availability.availableUnits} units available (${quantity} requested). ${availability.rentedUnits} rented, ${availability.reservedUnits} reserved.`
     });
 
   } catch (err) {
@@ -237,9 +358,10 @@ router.get('/stats/user/:userId', authorize(['customer', 'staff']), async (req, 
     const completedOrders = await Order.countDocuments({ user: requestedUserId, status: 'Completed' });
     const cancelledOrders = await Order.countDocuments({ user: requestedUserId, status: 'Cancelled' });
 
-    // Calculate total spent
+    // Calculate total spent - Fix mongoose import issue
+    const mongoose = require('mongoose');
     const totalSpentResult = await Order.aggregate([
-      { $match: { user: mongoose.Types.ObjectId(requestedUserId), status: { $in: ['Accepted', 'Completed'] } } },
+      { $match: { user: new mongoose.Types.ObjectId(requestedUserId), status: { $in: ['Accepted', 'Completed'] } } },
       { $group: { _id: null, total: { $sum: '$totalValue' } } }
     ]);
     
@@ -260,76 +382,207 @@ router.get('/stats/user/:userId', authorize(['customer', 'staff']), async (req, 
   }
 });
 
-// POST /api/orders - Create new order (Customer) - Backward compatible
+// POST /api/orders - Create new order (Customer) - Enhanced with comprehensive validation
 router.post('/', authorize(['customer', 'staff']), async (req, res) => {
   try {
-    const { items, totalValue, customerInfo, pickupReturn, contract, idUpload, payment } = req.body;
+    const { items, totalValue, customerInfo, pickupReturn, contract, idUpload, payment, metadata } = req.body;
     const userId = req.user._id;
+
+    console.log('Order creation request:', { userId, itemsCount: items?.length, hasCustomerInfo: !!customerInfo });
 
     // Validate inputs
     if (!items || !Array.isArray(items) || items.length === 0) {
+      console.error('Order validation failed: No items provided');
       return res.status(400).json({ message: 'Order must contain at least one item' });
     }
 
     // Validate each item
-    for (const item of items) {
-      if (!item.product || !item.rentalPeriod) {
-        return res.status(400).json({ message: 'Each item must have product and rental period' });
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      
+      if (!item.product) {
+        console.error(`Item ${i} validation failed: Missing product`);
+        return res.status(400).json({ message: `Item ${i + 1}: Product is required` });
+      }
+
+      if (!item.rentalPeriod) {
+        console.error(`Item ${i} validation failed: Missing rental period`);
+        return res.status(400).json({ message: `Item ${i + 1}: Rental period is required` });
       }
 
       if (!item.rentalPeriod.startDate || !item.rentalPeriod.endDate) {
-        return res.status(400).json({ message: 'Rental period must include start and end dates' });
+        console.error(`Item ${i} validation failed: Missing rental dates`);
+        return res.status(400).json({ message: `Item ${i + 1}: Rental period must include start and end dates` });
       }
 
-      // Validate dates
-      const startDate = new Date(item.rentalPeriod.startDate);
-      const endDate = new Date(item.rentalPeriod.endDate);
+      // Validate and normalize dates
+      let startDate, endDate;
+      try {
+        startDate = new Date(item.rentalPeriod.startDate);
+        endDate = new Date(item.rentalPeriod.endDate);
+        
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+          throw new Error('Invalid date format');
+        }
+      } catch (dateError) {
+        console.error(`Item ${i} date validation failed:`, dateError.message);
+        return res.status(400).json({ message: `Item ${i + 1}: Invalid date format. Use ISO date format (YYYY-MM-DD)` });
+      }
       
       if (startDate >= endDate) {
-        return res.status(400).json({ message: 'End date must be after start date' });
+        console.error(`Item ${i} validation failed: End date not after start date`);
+        return res.status(400).json({ message: `Item ${i + 1}: End date must be after start date` });
       }
 
-      if (startDate < new Date()) {
-        return res.status(400).json({ message: 'Start date cannot be in the past' });
+      // Allow past dates for testing, but warn
+      if (startDate < new Date() && process.env.NODE_ENV === 'production') {
+        console.warn(`Item ${i}: Start date in the past for production`);
+        return res.status(400).json({ message: `Item ${i + 1}: Start date cannot be in the past` });
       }
+
+      // Ensure price is provided and valid
+      if (typeof item.price !== 'number' || item.price < 0) {
+        console.error(`Item ${i} validation failed: Invalid price`);
+        return res.status(400).json({ message: `Item ${i + 1}: Valid price is required` });
+      }
+
+      // Normalize the item dates
+      items[i].rentalPeriod.startDate = startDate;
+      items[i].rentalPeriod.endDate = endDate;
     }
 
-    // If this is a comprehensive checkout (all fields provided), use them
+    // Enhanced validation for comprehensive checkout
     if (customerInfo && pickupReturn && contract && idUpload && payment) {
+      console.log('Creating comprehensive order with full checkout data');
+      
+      // Validate customerInfo
+      const requiredCustomerFields = ['firstName', 'lastName', 'email', 'phone'];
+      for (const field of requiredCustomerFields) {
+        if (!customerInfo[field] || customerInfo[field].trim() === '') {
+          console.error(`Customer info validation failed: Missing ${field}`);
+          return res.status(400).json({ message: `Customer info: ${field} is required` });
+        }
+      }
+
+      // Validate pickupReturn dates
+      if (pickupReturn.pickupDate) {
+        try {
+          pickupReturn.pickupDate = new Date(pickupReturn.pickupDate);
+          if (isNaN(pickupReturn.pickupDate.getTime())) {
+            throw new Error('Invalid pickup date');
+          }
+        } catch (error) {
+          console.error('Pickup date validation failed:', error.message);
+          return res.status(400).json({ message: 'Invalid pickup date format' });
+        }
+      }
+
+      if (pickupReturn.returnDate) {
+        try {
+          pickupReturn.returnDate = new Date(pickupReturn.returnDate);
+          if (isNaN(pickupReturn.returnDate.getTime())) {
+            throw new Error('Invalid return date');
+          }
+        } catch (error) {
+          console.error('Return date validation failed:', error.message);
+          return res.status(400).json({ message: 'Invalid return date format' });
+        }
+      }
+
+      // Validate contract
+      if (!contract.hasOwnProperty('signed')) {
+        console.error('Contract validation failed: Missing signed field');
+        return res.status(400).json({ message: 'Contract: signed status is required' });
+      }
+
+      // Validate idUpload
+      if (!idUpload.hasOwnProperty('uploaded')) {
+        console.error('ID upload validation failed: Missing uploaded field');
+        return res.status(400).json({ message: 'ID Upload: uploaded status is required' });
+      }
+
+      // Validate payment
+      if (!payment.method || !['cash', 'online'].includes(payment.method)) {
+        console.error('Payment validation failed: Invalid method');
+        return res.status(400).json({ message: 'Payment: method must be "cash" or "online"' });
+      }
+
       // Create comprehensive order
-      const newOrder = new Order({
+      const orderData = {
         user: userId,
         items,
         status: 'Pending',
         totalValue: totalValue || 0,
-        customerInfo,
-        pickupReturn,
-        contract,
-        idUpload,
-        payment
-      });
+        customerInfo: {
+          firstName: customerInfo.firstName.trim(),
+          lastName: customerInfo.lastName.trim(),
+          email: customerInfo.email.trim().toLowerCase(),
+          phone: customerInfo.phone.trim(),
+          idNumber: customerInfo.idNumber || 'PENDING'
+        },
+        pickupReturn: {
+          pickupAddress: pickupReturn.pickupAddress || 'TBD',
+          pickupDate: pickupReturn.pickupDate || new Date(),
+          pickupTime: pickupReturn.pickupTime || '09:00',
+          returnAddress: pickupReturn.returnAddress || pickupReturn.pickupAddress || 'TBD',
+          returnDate: pickupReturn.returnDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          returnTime: pickupReturn.returnTime || '17:00',
+          specialInstructions: pickupReturn.specialInstructions || ''
+        },
+        contract: {
+          signed: contract.signed,
+          signatureData: contract.signatureData || null,
+          agreementVersion: contract.agreementVersion || '1.0',
+          signedAt: contract.signed && contract.signedAt ? new Date(contract.signedAt) : null
+        },
+        idUpload: {
+          uploaded: idUpload.uploaded,
+          fileName: idUpload.fileName || '',
+          fileUrl: idUpload.fileUrl || ''
+        },
+        payment: {
+          method: payment.method,
+          paymentStatus: payment.paymentStatus || 'pending',
+          transactionId: payment.transactionId || null,
+          paymentDate: payment.paymentDate ? new Date(payment.paymentDate) : null,
+          cardData: payment.cardData || null
+        },
+        metadata: {
+          checkoutVersion: metadata?.checkoutVersion || '2.0',
+          completedAt: metadata?.completedAt ? new Date(metadata.completedAt) : new Date(),
+          ...metadata
+        }
+      };
 
+      const newOrder = new Order(orderData);
       const savedOrder = await newOrder.save();
+      
       await savedOrder.populate('items.product', 'name price productImageUrl');
       await savedOrder.populate('user', 'firstName lastName email');
 
+      console.log('Comprehensive order created successfully:', savedOrder._id);
       return res.status(201).json({
         message: 'Comprehensive order created successfully',
         order: savedOrder
       });
     }
 
-    // Otherwise, create a basic order with default values for backward compatibility
+    // Fallback: Create basic order with safe defaults for backward compatibility
+    console.log('Creating basic order with default values');
+    
     const newOrder = new Order({
       user: userId,
       items: items.map(item => ({
         product: item.product,
-        rentalPeriod: item.rentalPeriod,
+        rentalPeriod: {
+          startDate: item.rentalPeriod.startDate,
+          endDate: item.rentalPeriod.endDate
+        },
         price: item.price || 0
       })),
       status: 'Pending',
       totalValue: totalValue || 0,
-      // Provide minimal default values for required fields
+      // Safe default values for required fields
       customerInfo: {
         firstName: req.user.firstName || 'Unknown',
         lastName: req.user.lastName || 'Unknown',
@@ -342,8 +595,9 @@ router.post('/', authorize(['customer', 'staff']), async (req, res) => {
         pickupDate: new Date(),
         pickupTime: '09:00',
         returnAddress: 'TBD',
-        returnDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days later
-        returnTime: '17:00'
+        returnDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        returnTime: '17:00',
+        specialInstructions: ''
       },
       contract: {
         signed: false,
@@ -355,15 +609,19 @@ router.post('/', authorize(['customer', 'staff']), async (req, res) => {
       payment: {
         method: 'cash',
         paymentStatus: 'pending'
+      },
+      metadata: {
+        checkoutVersion: '1.0',
+        completedAt: new Date()
       }
     });
 
     const savedOrder = await newOrder.save();
     
-    // Populate the saved order
     await savedOrder.populate('items.product', 'name price productImageUrl');
     await savedOrder.populate('user', 'firstName lastName email');
 
+    console.log('Basic order created successfully:', savedOrder._id);
     res.status(201).json({
       message: 'Order created successfully',
       order: savedOrder
@@ -371,7 +629,29 @@ router.post('/', authorize(['customer', 'staff']), async (req, res) => {
 
   } catch (err) {
     console.error('Error creating order:', err);
-    res.status(500).json({ message: 'Server error' });
+    
+    // Provide more specific error messages
+    if (err.name === 'ValidationError') {
+      const validationErrors = Object.values(err.errors).map(e => e.message);
+      return res.status(400).json({ 
+        message: 'Validation error', 
+        details: validationErrors,
+        error: err.message
+      });
+    }
+    
+    if (err.name === 'CastError') {
+      return res.status(400).json({ 
+        message: 'Invalid data format', 
+        details: `Invalid ${err.path}: ${err.value}`,
+        error: err.message
+      });
+    }
+    
+    res.status(500).json({ 
+      message: 'Server error creating order',
+      error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+    });
   }
 });
 

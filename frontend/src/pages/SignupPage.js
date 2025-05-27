@@ -166,7 +166,7 @@ const SignupPage = () => {
           </div>
 
           {error && <p className="error-message signup-error">{error}</p>}
-          {success && <p className="success-message">נרשמת בהצלחה! 🎉</p>}
+          {success && <p className="success-message">נרשמת בהצלחה!</p>}
 
           <button
             type="submit"

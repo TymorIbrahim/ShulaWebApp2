@@ -1,0 +1,430 @@
+/* PickupConfirmationModal.css */
+
+.pickup-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.pickup-modal {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideInUp 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modal Header */
+.pickup-modal .modal-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 24px 32px;
+  position: relative;
+  border-radius: 16px 16px 0 0;
+}
+
+.pickup-modal .modal-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.pickup-modal .modal-header p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+  font-family: monospace;
+}
+
+.pickup-modal .close-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.pickup-modal .close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Alert */
+.pickup-modal .alert {
+  margin: 20px 32px 0 32px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.pickup-modal .alert-error {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+}
+
+/* Modal Content */
+.pickup-modal .modal-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px;
+  direction: rtl;
+}
+
+/* Sections */
+.pickup-modal .section {
+  margin-bottom: 32px;
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.pickup-modal .section:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.pickup-modal .section h3 {
+  margin: 0 0 20px 0;
+  color: #1e293b;
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+/* Customer Info Section */
+.customer-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.customer-details .detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.customer-details .label {
+  font-weight: 600;
+  color: #475569;
+}
+
+.customer-details .value {
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.membership-status {
+  background: white;
+  border: 2px solid;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+.membership-status h4 {
+  margin: 0 0 8px 0;
+  color: #1e293b;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.membership-message {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+/* Verification Section */
+.verification-item {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: all 0.2s ease;
+}
+
+.verification-item:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin-left: 12px;
+  width: 18px;
+  height: 18px;
+  accent-color: #667eea;
+  cursor: pointer;
+}
+
+.checkmark {
+  margin-left: 12px;
+}
+
+.label-text {
+  font-size: 1rem;
+}
+
+.help-text {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.875rem;
+  margin-right: 30px;
+}
+
+/* Items Section */
+.item-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.item-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.item-header {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  padding: 16px 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.item-header h4 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.item-details {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+}
+
+/* Form Groups */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+.condition-select,
+.notes-input,
+.staff-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: white;
+}
+
+.condition-select:focus,
+.notes-input:focus,
+.staff-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.notes-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 100px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.notes-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Modal Footer */
+.pickup-modal .modal-footer {
+  padding: 24px 32px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  min-width: 120px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary.disabled,
+.btn-primary:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-secondary {
+  background: #6b7280;
+  color: white;
+  box-shadow: 0 2px 4px rgba(107, 114, 128, 0.2);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #4b5563;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .pickup-modal {
+    margin: 10px;
+    max-height: 95vh;
+  }
+  
+  .pickup-modal .modal-header {
+    padding: 20px 24px;
+  }
+  
+  .pickup-modal .modal-content {
+    padding: 24px 20px;
+  }
+  
+  .pickup-modal .modal-footer {
+    padding: 20px 24px;
+    flex-direction: column;
+  }
+  
+  .customer-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .item-details {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .pickup-modal .close-btn {
+    top: 16px;
+    left: 16px;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pickup-modal-overlay {
+    padding: 10px;
+  }
+  
+  .pickup-modal {
+    margin: 0;
+  }
+  
+  .pickup-modal .modal-header h2 {
+    font-size: 1.3rem;
+  }
+  
+  .pickup-modal .section {
+    padding: 20px 16px;
+  }
+  
+  .verification-item {
+    padding: 16px;
+  }
+} 

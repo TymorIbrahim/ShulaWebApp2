@@ -109,7 +109,12 @@ const IDUpload = ({ data, onUpdate, onNext, onPrev, canProceed, processOrder }) 
   return (
     <div className="id-upload-step">
       <div className="step-header">
-        <h2>📄 העלאת תעודת זהות</h2>
+        <h2>
+          <svg className="document-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+          </svg>
+          העלאת תעודת זהות
+        </h2>
         <p>העלה תמונה ברורה של תעודת הזהות שלך לאימות זהות</p>
       </div>
 
@@ -142,7 +147,11 @@ const IDUpload = ({ data, onUpdate, onNext, onPrev, canProceed, processOrder }) 
                 </div>
               ) : (
                 <>
-                  <div className="upload-icon">📄</div>
+                  <div className="upload-icon">
+                    <svg className="document-upload-icon" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                    </svg>
+                  </div>
                   <div className="upload-text">
                     <strong>לחץ כאן או גרור קובץ</strong>
                   </div>
@@ -165,7 +174,11 @@ const IDUpload = ({ data, onUpdate, onNext, onPrev, canProceed, processOrder }) 
         ) : (
           <div className="upload-success">
             <div className="success-content">
-              <div className="success-icon">✅</div>
+              <div className="success-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
+                </svg>
+              </div>
               <h3>תעודת זהות הועלתה בהצלחה</h3>
               <div className="file-info">
                 <p><strong>שם קובץ:</strong> {data.fileName}</p>
@@ -195,7 +208,11 @@ const IDUpload = ({ data, onUpdate, onNext, onPrev, canProceed, processOrder }) 
 
         <div className="verification-notice">
           <div className="notice-header">
-            <span className="notice-icon">🔒</span>
+            <span className="notice-icon">
+              <svg className="security-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10V11H16V16H8V11H9.2V10C9.2,8.6 10.6,7 12,7M10.2,10C10.2,9.2 10.6,8 12,8C13.4,8 13.8,9.2 13.8,10V11H10.2V10Z"/>
+              </svg>
+            </span>
             <h4>אבטחת מידע</h4>
           </div>
           <p>

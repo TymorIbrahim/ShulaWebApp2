@@ -7,6 +7,7 @@ import RentalDatePickerModal from "./RentalDatePickerModal";
 import { addToCart } from "../services/cartService";
 import ChoiceModal from "./ChoiceModal";  // Import the modal component
 import { useAuth } from "../context/AuthContext"; // Import AuthContext hook
+import RealTimeAvailability from "./RealTimeAvailability"; // Import the new real-time availability component
 import "./ProductDetails.css";
 
 const ProductDetails = () => {
@@ -61,6 +62,13 @@ const ProductDetails = () => {
 
   const handleModalClose = () => {
     setModalIsOpen(false);
+  };
+
+  // Handle reservation created from RealTimeAvailability component
+  const handleReservationCreated = (reservation) => {
+    console.log("New reservation created:", reservation);
+    // Optionally update UI to show reservation status
+    alert(`הזמנה זמנית נוצרה בהצלחה! פג תוקף בעוד ${Math.ceil((new Date(reservation.expiresAt) - new Date()) / 60000)} דקות.`);
   };
 
   // Confirm rental (add to cart) with the selected dates
@@ -134,32 +142,12 @@ const ProductDetails = () => {
         />
         <div className="product-price">₪{product.price ?? 'N/A'}</div>
         
-        {/* Inventory Information */}
-        {availabilityData && (
-          <div className="inventory-info">
-            <h4>מידע זמינות:</h4>
-            <p>
-              <strong>יחידות זמינות:</strong> {availabilityData.totalInventoryUnits} יחידות סה"כ
-            </p>
-            {availabilityData.availabilityByDate.length > 0 && (
-              <div className="current-rentals">
-                <p><strong>השכרות פעילות:</strong></p>
-                <ul style={{ fontSize: '0.9em', color: '#666' }}>
-                  {availabilityData.availabilityByDate.slice(0, 5).map(dateInfo => (
-                    <li key={dateInfo.date}>
-                      {dateInfo.date}: {dateInfo.rentedUnits} יחידות מושכרות, {dateInfo.availableUnits} זמינות
-                    </li>
-                  ))}
-                  {availabilityData.availabilityByDate.length > 5 && (
-                    <li style={{ fontStyle: 'italic' }}>
-                      ועוד {availabilityData.availabilityByDate.length - 5} תאריכים...
-                    </li>
-                  )}
-                </ul>
-              </div>
-            )}
-          </div>
-        )}
+        {/* NEW: Real-Time Availability Display with WebSocket integration */}
+        <RealTimeAvailability 
+          product={product} 
+          onReservationCreated={handleReservationCreated}
+          showReserveButton={true}
+        />
                 
         <button className="buy-button" onClick={handleAddToCart}>
           הוסף לסל

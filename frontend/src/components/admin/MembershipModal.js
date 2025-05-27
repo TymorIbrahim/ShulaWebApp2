@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import './MembershipModal.css';
 
@@ -23,20 +22,18 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
   const getAuthHeaders = () => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const token = user.token || user.accessToken;
-    return token ? { Authorization: `Bearer ${token}` } : {};
+    return {
+      headers: token ? { Authorization: `Bearer ${token}` } : {}
+    };
   };
 
-  useEffect(() => {
-    fetchMembershipData();
-  }, [customer._id]);
-
-  const fetchMembershipData = async () => {
+  const fetchMembershipData = useCallback(async () => {
     try {
       setLoading(true);
-      const headers = getAuthHeaders();
+      const config = getAuthHeaders();
       const response = await axios.get(
         `${API_URL}/api/users/membership/${customer._id}`,
-        { headers }
+        config
       );
       setMembershipData(response.data.user);
     } catch (err) {
@@ -45,20 +42,20 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [customer._id]);
+
+  useEffect(() => {
+    fetchMembershipData();
+  }, [fetchMembershipData]);
 
   const handleVerifyId = async (verified) => {
     try {
       setSaving(true);
-      const headers = getAuthHeaders();
+      const config = getAuthHeaders();
       await axios.put(
-        `${API_URL}/api/users/membership/verify-id`,
-        {
-          userId: customer._id,
-          verified: verified,
-          notes: inPersonForm.idNotes
-        },
-        { headers }
+        `${API_URL}/api/users/membership/admin-verify-id/${customer._id}`,
+        { verified, idNotes: inPersonForm.idNotes },
+        config
       );
       
       setSuccess(`תעודת הזהות ${verified ? 'אושרה' : 'נדחתה'} בהצלחה`);
@@ -74,7 +71,6 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
   const handleProcessInPerson = async () => {
     try {
       setSaving(true);
-      const headers = getAuthHeaders();
       
       const payload = {
         userId: customer._id,
@@ -97,10 +93,11 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
         };
       }
 
+      const config = getAuthHeaders();
       await axios.put(
         `${API_URL}/api/users/membership/admin-process`,
         payload,
-        { headers }
+        config
       );
       
       setSuccess('חברות עובדה בהצלחה');
@@ -135,6 +132,26 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
     return new Date(dateString).toLocaleDateString('he-IL');
   };
 
+  // Helper function to safely get processed by name
+  const getProcessedByName = (processedBy) => {
+    if (!processedBy) return 'לא ידוע';
+    
+    // If it's a string, return as is
+    if (typeof processedBy === 'string') {
+      return processedBy;
+    }
+    
+    // If it's an object with name properties, extract them
+    if (typeof processedBy === 'object') {
+      const firstName = typeof processedBy.firstName === 'string' ? processedBy.firstName : '';
+      const lastName = typeof processedBy.lastName === 'string' ? processedBy.lastName : '';
+      const fullName = `${firstName} ${lastName}`.trim();
+      return fullName || processedBy.email || processedBy._id || 'לא ידוע';
+    }
+    
+    return 'לא ידוע';
+  };
+
   if (loading) {
     return (
       <div className="modal-overlay">
@@ -152,7 +169,7 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
     <div className="modal-overlay" onClick={onClose}>
       <div className="membership-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>🏛️ ניהול חברות - {customer.firstName} {customer.lastName}</h2>
+          <h2>ניהול חברות - {(typeof customer.firstName === 'string' ? customer.firstName : '')} {(typeof customer.lastName === 'string' ? customer.lastName : '')}</h2>
           <button className="close-btn" onClick={onClose}>✕</button>
         </div>
 
@@ -164,20 +181,20 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
             className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
             onClick={() => setActiveTab('overview')}
           >
-            📊 סקירה
+            סקירה
           </button>
           <button 
             className={`tab-btn ${activeTab === 'documents' ? 'active' : ''}`}
             onClick={() => setActiveTab('documents')}
             disabled={!membershipData?.membership?.isMember}
           >
-            📄 מסמכים
+            מסמכים
           </button>
           <button 
             className={`tab-btn ${activeTab === 'inperson' ? 'active' : ''}`}
             onClick={() => setActiveTab('inperson')}
           >
-            🏢 עיבוד במקום
+            עיבוד במקום
           </button>
         </div>
 
@@ -204,14 +221,14 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
                     {membershipData.membership.contract?.signed && (
                       <div className="detail-row">
                         <span className="label">הסכם נחתם:</span>
-                        <span className="value">✅ {formatDate(membershipData.membership.contract.signedAt)}</span>
+                        <span className="value">נחתם ב- {formatDate(membershipData.membership.contract.signedAt)}</span>
                       </div>
                     )}
                     
                     <div className="detail-row">
                       <span className="label">אימות תעודת זהות:</span>
                       <span className="value">
-                        {membershipData.membership.idVerification?.verified ? '✅ מאומת' : '⏳ ממתין'}
+                        {membershipData.membership.idVerification?.verified ? 'מאומת' : 'ממתין'}
                       </span>
                     </div>
                   </div>
@@ -230,11 +247,11 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
           {activeTab === 'documents' && membershipData?.membership?.isMember && (
             <div className="documents-tab">
               <div className="documents-section">
-                <h3>📋 הסכם חברות</h3>
+                <h3>הסכם חברות</h3>
                 {membershipData.membership.contract?.signed ? (
                   <div className="document-card">
                     <div className="document-info">
-                      <span>✅ הסכם נחתם</span>
+                      <span>הסכם נחתם</span>
                       <span className="date">נחתם: {formatDate(membershipData.membership.contract.signedAt)}</span>
                       <span className="version">גרסה: {membershipData.membership.contract.agreementVersion}</span>
                     </div>
@@ -249,17 +266,17 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
                     )}
                   </div>
                 ) : (
-                  <div className="no-document">❌ הסכם לא נחתם</div>
+                  <div className="no-document">הסכם לא נחתם</div>
                 )}
               </div>
 
               <div className="documents-section">
-                <h3>🆔 תעודת זהות</h3>
+                <h3>תעודת זהות</h3>
                 {membershipData.membership.idVerification ? (
                   <div className="document-card">
                     <div className="document-info">
                       <span>
-                        {membershipData.membership.idVerification.verified ? '✅ מאומת' : '⏳ ממתין לאימות'}
+                        {membershipData.membership.idVerification.verified ? 'מאומת' : 'ממתין לאימות'}
                       </span>
                       <span className="filename">{membershipData.membership.idVerification.fileName}</span>
                       {membershipData.membership.idVerification.uploadedAt && (
@@ -273,7 +290,7 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
                           className="btn-secondary"
                           onClick={() => window.open(membershipData.membership.idVerification.fileUrl, '_blank')}
                         >
-                          📄 הצג תעודת זהות
+                          הצג תעודת זהות
                         </button>
                       </div>
                     )}
@@ -292,14 +309,14 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
                             onClick={() => handleVerifyId(true)}
                             disabled={saving}
                           >
-                            ✅ אמת תעודת זהות
+                            אמת תעודת זהות
                           </button>
                           <button 
                             className="btn-danger"
                             onClick={() => handleVerifyId(false)}
                             disabled={saving}
                           >
-                            ❌ דחה תעודת זהות
+                            דחה תעודת זהות
                           </button>
                         </div>
                       </div>
@@ -312,7 +329,7 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
                     )}
                   </div>
                 ) : (
-                  <div className="no-document">❌ תעודת זהות לא הועלתה</div>
+                  <div className="no-document">תעודת זהות לא הועלתה</div>
                 )}
               </div>
             </div>
@@ -321,14 +338,14 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
           {activeTab === 'inperson' && (
             <div className="inperson-tab">
               <div className="inperson-form-card">
-                <h3>🏢 עיבוד חברות במקום</h3>
+                <h3>עיבוד חברות במקום</h3>
                 
                 {membershipData?.membership?.isMember ? (
                   <div className="already-member-notice">
-                    <p>⚠️ הלקוח כבר חבר במערכת</p>
+                    <p>הלקוח כבר חבר במערכת</p>
                     {membershipData.membership.inPersonDetails && (
                       <div className="existing-details">
-                        <p><strong>עובד על ידי:</strong> {membershipData.membership.inPersonDetails.processedBy || 'לא ידוע'}</p>
+                        <p><strong>עובד על ידי:</strong> {getProcessedByName(membershipData.membership.inPersonDetails.processedBy)}</p>
                         <p><strong>תאריך עיבוד:</strong> {formatDate(membershipData.membership.inPersonDetails.processedAt)}</p>
                         <p><strong>מיקום:</strong> {membershipData.membership.inPersonDetails.location}</p>
                         {membershipData.membership.inPersonDetails.notes && (
@@ -340,7 +357,7 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
                 ) : (
                   <div className="inperson-form">
                     <div className="form-group">
-                      <label>📍 מיקום עיבוד</label>
+                      <label>מיקום עיבוד</label>
                       <input
                         type="text"
                         placeholder="למשל: משרד, אירוע, תערוכה..."
@@ -350,7 +367,7 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
                     </div>
 
                     <div className="form-group">
-                      <label>📝 הערות</label>
+                      <label>הערות</label>
                       <textarea
                         placeholder="הערות נוספות על התהליך..."
                         value={inPersonForm.notes}
@@ -365,7 +382,7 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
                           checked={inPersonForm.contractSigned}
                           onChange={(e) => setInPersonForm(prev => ({...prev, contractSigned: e.target.checked}))}
                         />
-                        ✍️ הסכם נחתם במקום
+                        הסכם נחתם במקום
                       </label>
                     </div>
 
@@ -376,7 +393,7 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
                           checked={inPersonForm.idVerified}
                           onChange={(e) => setInPersonForm(prev => ({...prev, idVerified: e.target.checked}))}
                         />
-                        🆔 תעודת זהות אומתה במקום
+                        תעודת זהות אומתה במקום
                       </label>
                     </div>
 
@@ -396,7 +413,7 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
                       onClick={handleProcessInPerson}
                       disabled={saving || !inPersonForm.location}
                     >
-                      {saving ? '⏳ מעבד...' : '🏢 עבד חברות במקום'}
+                      {saving ? 'מעבד...' : 'עבד חברות במקום'}
                     </button>
                   </div>
                 )}

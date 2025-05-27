@@ -42,80 +42,98 @@ router.get('/', async (req, res) => {
     const limitNum = parseInt(limit);
     const skip = (pageNum - 1) * limitNum;
 
-    // Build query
-    let query = {};
+    // Build aggregation pipeline for better performance
+    const pipeline = [];
+    
+    // Stage 1: Build initial match conditions
+    let matchConditions = {};
 
-    // Search functionality
+    // Search functionality - DATABASE LEVEL
     if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { category: { $regex: search, $options: 'i' } },
-        { brand: { $regex: search, $options: 'i' } },
-        { tags: { $regex: search, $options: 'i' } }
+      const searchRegex = new RegExp(search.split('').join('.*'), 'i'); // Flexible search
+      matchConditions.$or = [
+        { name: searchRegex },
+        { description: searchRegex },
+        { category: searchRegex },
+        { brand: searchRegex },
+        { tags: searchRegex }
       ];
     }
 
     // Category filter
     if (category) {
-      query.category = category;
+      matchConditions.category = category;
     }
 
     // Price range filter
     if (minPrice || maxPrice) {
-      query.price = {};
-      if (minPrice) query.price.$gte = parseFloat(minPrice);
-      if (maxPrice) query.price.$lte = parseFloat(maxPrice);
+      matchConditions.price = {};
+      if (minPrice) matchConditions.price.$gte = parseFloat(minPrice);
+      if (maxPrice) matchConditions.price.$lte = parseFloat(maxPrice);
     }
 
     // Availability filter (legacy)
     if (availability === 'available') {
-      query.available = true;
+      matchConditions.available = true;
     } else if (availability === 'unavailable') {
-      query.available = false;
+      matchConditions.available = false;
     }
 
-    // Stock filter
+    // Stock filter - DATABASE LEVEL
     if (inStock === 'true') {
-      query['inventory.totalUnits'] = { $gt: 0 };
+      matchConditions['inventory.totalUnits'] = { $gt: 0 };
     } else if (inStock === 'false') {
-      query['inventory.totalUnits'] = { $lte: 0 };
+      matchConditions['inventory.totalUnits'] = { $lte: 0 };
     }
 
     // Featured filter
     if (featured === 'true') {
-      query.featured = true;
+      matchConditions.featured = true;
     }
 
     // Condition filter
     if (condition) {
-      query.condition = condition;
+      matchConditions.condition = condition;
     }
 
-    // Build sort object
+    // Stage 1: Initial match
+    if (Object.keys(matchConditions).length > 0) {
+      pipeline.push({ $match: matchConditions });
+    }
+
+    // Stage 2: Count total documents for pagination
+    const countPipeline = [...pipeline, { $count: 'total' }];
+    
+    // Stage 3: Sort
     const sortObj = {};
     if (sortBy === 'inventory') {
       sortObj['inventory.totalUnits'] = sortOrder === 'desc' ? -1 : 1;
     } else {
       sortObj[sortBy] = sortOrder === 'desc' ? -1 : 1;
     }
+    pipeline.push({ $sort: sortObj });
 
-    // Execute query with pagination
-    const products = await Product.find(query)
-      .sort(sortObj)
-      .skip(skip)
-      .limit(limitNum);
+    // Stage 4: Pagination
+    pipeline.push({ $skip: skip });
+    pipeline.push({ $limit: limitNum });
 
-    // Get total count for pagination
-    const totalProducts = await Product.countDocuments(query);
+    // Execute both pipelines in parallel
+    const [productsResult, countResult] = await Promise.all([
+      Product.aggregate(pipeline),
+      Product.aggregate(countPipeline)
+    ]);
+
+    const products = productsResult;
+    const totalProducts = countResult[0]?.total || 0;
     const totalPages = Math.ceil(totalProducts / limitNum);
 
-    // Get available categories and conditions for filtering
-    const categories = await Product.distinct('category');
-    const conditions = await Product.distinct('condition');
-
-    // Calculate statistics
-    const statistics = await calculateProductStatistics();
+    // Get available categories and conditions for filtering (optimized)
+    const [categories, conditions, priceRange, statistics] = await Promise.all([
+      Product.distinct('category'),
+      Product.distinct('condition'),
+      getPriceRange(),
+      calculateProductStatistics()
+    ]);
 
     res.json({
       products,
@@ -132,7 +150,7 @@ router.get('/', async (req, res) => {
       filters: {
         categories: categories.filter(Boolean),
         conditions: conditions.filter(Boolean),
-        priceRange: await getPriceRange()
+        priceRange
       }
     });
 
@@ -165,40 +183,84 @@ async function getPriceRange() {
 // Helper function to calculate product statistics
 async function calculateProductStatistics() {
   try {
-    // Basic counts
-    const total = await Product.countDocuments();
-    const featured = await Product.countDocuments({ featured: true });
-    
-    // Get all products to calculate inventory statistics
-    const products = await Product.find({}, 'inventory condition');
-    
-    let totalInventory = 0;
-    let outOfStock = 0;
-    let lowStock = 0;
-    
-    products.forEach(product => {
-      const units = product.inventory?.totalUnits || 0;
-      const minAlert = product.inventory?.minStockAlert || 1;
-      
-      totalInventory += units;
-      
-      if (units === 0) {
-        outOfStock++;
-      } else if (units <= minAlert) {
-        lowStock++;
+    // Use aggregation pipeline for efficient statistics calculation
+    const statisticsResult = await Product.aggregate([
+      {
+        $facet: {
+          // Basic counts
+          basicCounts: [
+            {
+              $group: {
+                _id: null,
+                total: { $sum: 1 },
+                featured: { $sum: { $cond: [{ $eq: ['$featured', true] }, 1, 0] } }
+              }
+            }
+          ],
+          // Inventory statistics
+          inventoryStats: [
+            {
+              $group: {
+                _id: null,
+                totalInventory: { $sum: '$inventory.totalUnits' },
+                outOfStock: { 
+                  $sum: { 
+                    $cond: [
+                      { $eq: ['$inventory.totalUnits', 0] }, 
+                      1, 
+                      0 
+                    ] 
+                  } 
+                },
+                lowStock: { 
+                  $sum: { 
+                    $cond: [
+                      { 
+                        $and: [
+                          { $gt: ['$inventory.totalUnits', 0] },
+                          { $lte: ['$inventory.totalUnits', '$inventory.minStockAlert'] }
+                        ]
+                      }, 
+                      1, 
+                      0 
+                    ] 
+                  } 
+                }
+              }
+            }
+          ],
+          // Available conditions
+          conditions: [
+            {
+              $group: {
+                _id: '$condition',
+                count: { $sum: 1 }
+              }
+            },
+            {
+              $match: {
+                _id: { $ne: null }
+              }
+            }
+          ]
+        }
       }
-    });
+    ]);
+
+    // Process results
+    const stats = statisticsResult[0];
     
-    // Get available conditions for filtering
-    const conditions = await Product.distinct('condition');
+    const basicStats = stats.basicCounts[0] || { total: 0, featured: 0 };
+    const inventoryStats = stats.inventoryStats[0] || { totalInventory: 0, outOfStock: 0, lowStock: 0 };
+    const conditions = stats.conditions.map(c => c._id).filter(Boolean);
     
     return {
-      total,
-      totalInventory,
-      lowStock,
-      outOfStock,
-      featured,
-      conditions: conditions.filter(Boolean)
+      total: basicStats.total,
+      totalInventory: inventoryStats.totalInventory,
+      lowStock: inventoryStats.lowStock,
+      outOfStock: inventoryStats.outOfStock,
+      featured: basicStats.featured,
+      conditions
     };
   } catch (err) {
     console.error('Error calculating product statistics:', err);
@@ -327,6 +389,320 @@ router.get("/stats/dashboard", async (req, res) => {
   } catch (error) {
     console.error("Error fetching dashboard stats:", error);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+// PUT /api/products/:id/update-stats - Update rental statistics for a product (Admin only)
+router.put('/:id/update-stats', authorize(['staff']), async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    await product.updateRentalStats();
+    
+    res.json({
+      message: 'Product rental statistics updated successfully',
+      product: product
+    });
+  } catch (err) {
+    console.error('Error updating product stats:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// POST /api/products/bulk-update-stats - Update rental statistics for all products (Admin only)
+router.post('/bulk-update-stats', authorize(['staff']), async (req, res) => {
+  try {
+    const products = await Product.find({});
+    let updatedCount = 0;
+    
+    for (const product of products) {
+      try {
+        await product.updateRentalStats();
+        updatedCount++;
+      } catch (err) {
+        console.error(`Error updating stats for product ${product._id}:`, err);
+      }
+    }
+    
+    res.json({
+      message: `Successfully updated statistics for ${updatedCount} products`,
+      updatedCount,
+      totalProducts: products.length
+    });
+  } catch (err) {
+    console.error('Error bulk updating product stats:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// GET /api/products/popular/featured - Get popular products for featured display
+router.get('/popular/featured', async (req, res) => {
+  try {
+    const { limit = 8 } = req.query;
+    
+    // Get products sorted by popularity score and rental count
+    const popularProducts = await Product.find({
+      available: true,
+      'inventory.totalUnits': { $gt: 0 }
+    })
+    .sort({ 
+      'rentalStats.popularityScore': -1, 
+      'rentalStats.totalRentals': -1,
+      featured: -1 
+    })
+    .limit(parseInt(limit))
+    .select('name price category productImageUrl rentalStats inventory featured');
+
+    res.json(popularProducts);
+  } catch (err) {
+    console.error('Error fetching popular products:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// PUT /api/products/:id/inventory - Update product inventory (Admin only)
+router.put('/:id/inventory', authorize(['staff']), async (req, res) => {
+  try {
+    const { totalUnits, minStockAlert, reservedUnits } = req.body;
+    
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    // Update inventory fields
+    if (totalUnits !== undefined) {
+      product.inventory.totalUnits = Math.max(0, parseInt(totalUnits));
+    }
+    if (minStockAlert !== undefined) {
+      product.inventory.minStockAlert = Math.max(0, parseInt(minStockAlert));
+    }
+    if (reservedUnits !== undefined) {
+      product.inventory.reservedUnits = Math.max(0, parseInt(reservedUnits));
+    }
+
+    await product.save();
+
+    res.json({
+      message: 'Product inventory updated successfully',
+      product: product
+    });
+  } catch (err) {
+    console.error('Error updating product inventory:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// GET /api/products/management/overview - Get comprehensive management overview (Admin only)
+router.get('/management/overview', authorize(['staff']), async (req, res) => {
+  try {
+    // Get low stock products
+    const lowStockProducts = await Product.find({
+      $expr: { $lte: ['$inventory.totalUnits', '$inventory.minStockAlert'] }
+    }).sort({ 'inventory.totalUnits': 1 });
+
+    // Get most popular products
+    const popularProducts = await Product.find({})
+      .sort({ 'rentalStats.totalRentals': -1 })
+      .limit(10)
+      .select('name rentalStats.totalRentals rentalStats.popularityScore rentalStats.lastRented');
+
+    // Get products needing maintenance
+    const needingMaintenance = await Product.find({
+      'maintenanceStatus.nextMaintenance': { $lte: new Date() }
+    });
+
+    // Get out of stock products
+    const outOfStock = await Product.find({
+      'inventory.totalUnits': 0
+    });
+
+    // Get recent rentals summary
+    const recentRentals = await Order.find({
+      status: { $in: ['Accepted', 'Completed'] },
+      createdAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } // Last 7 days
+    })
+    .populate('items.product', 'name')
+    .sort({ createdAt: -1 })
+    .limit(20);
+
+    res.json({
+      lowStockProducts,
+      popularProducts,
+      needingMaintenance,
+      outOfStock,
+      recentRentals,
+      summary: {
+        lowStockCount: lowStockProducts.length,
+        outOfStockCount: outOfStock.length,
+        maintenanceNeededCount: needingMaintenance.length,
+        recentRentalsCount: recentRentals.length
+      }
+    });
+  } catch (err) {
+    console.error('Error fetching management overview:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// PUT /api/products/:id/maintenance - Update maintenance status (Admin only)
+router.put('/:id/maintenance', authorize(['staff']), async (req, res) => {
+  try {
+    const { lastMaintenance, nextMaintenance, maintenanceNotes } = req.body;
+    
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    // Update maintenance fields
+    if (lastMaintenance) {
+      product.maintenanceStatus.lastMaintenance = new Date(lastMaintenance);
+    }
+    if (nextMaintenance) {
+      product.maintenanceStatus.nextMaintenance = new Date(nextMaintenance);
+    }
+    if (maintenanceNotes !== undefined) {
+      product.maintenanceStatus.maintenanceNotes = maintenanceNotes;
+    }
+
+    await product.save();
+
+    res.json({
+      message: 'Product maintenance status updated successfully',
+      product: product
+    });
+  } catch (err) {
+    console.error('Error updating maintenance status:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// POST /api/products/:id/validate-availability - Validate product availability for checkout
+router.post('/:id/validate-availability', async (req, res) => {
+  try {
+    const { rentalPeriod, quantity = 1 } = req.body;
+    
+    if (!rentalPeriod || !rentalPeriod.startDate || !rentalPeriod.endDate) {
+      return res.status(400).json({ 
+        isAvailable: false,
+        message: 'תקופת השכירות חובה (תאריך התחלה וסיום)' 
+      });
+    }
+
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ 
+        isAvailable: false,
+        message: 'המוצר לא נמצא' 
+      });
+    }
+
+    // Get real-time availability
+    const availability = await product.getRealTimeAvailability();
+    
+    // Check if product has enough units available
+    if (availability.availableNow < quantity) {
+      return res.status(200).json({
+        isAvailable: false,
+        message: `רק ${availability.availableNow} יחידות זמינות, נדרש ${quantity}`,
+        availableUnits: availability.availableNow,
+        totalUnits: availability.totalUnits,
+        currentlyRented: availability.currentlyRented,
+        currentlyReserved: availability.currentlyReserved
+      });
+    }
+
+    // Check for date conflicts with existing orders
+    const startDate = new Date(rentalPeriod.startDate);
+    const endDate = new Date(rentalPeriod.endDate);
+    
+    // Get availability for specific dates
+    const dateAvailability = await product.getAvailabilityForDates(startDate, endDate);
+    
+    if (dateAvailability.availableUnits < quantity) {
+      return res.status(200).json({
+        isAvailable: false,
+        message: `לא זמין לתאריכים הנבחרים (${dateAvailability.availableUnits} יחידות זמינות מתוך ${quantity} נדרש)`,
+        availableUnits: dateAvailability.availableUnits,
+        totalUnits: availability.totalUnits,
+        conflictingDates: dateAvailability.conflictingOrders || []
+      });
+    }
+
+    // Validation passed
+    return res.status(200).json({
+      isAvailable: true,
+      message: 'המוצר זמין לתאריכים הנבחרים',
+      availableUnits: dateAvailability.availableUnits,
+      totalUnits: availability.totalUnits,
+      realTimeData: availability,
+      validatedAt: new Date()
+    });
+
+  } catch (err) {
+    console.error('Error validating product availability:', err);
+    res.status(500).json({ 
+      isAvailable: false,
+      message: 'שגיאה בבדיקת זמינות המוצר' 
+    });
+  }
+});
+
+// GET /api/products/:id/real-time-availability - Get real-time availability data
+router.get('/:id/real-time-availability', async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    const availability = await product.getRealTimeAvailability();
+    
+    res.json({
+      productId: req.params.id,
+      availability,
+      timestamp: new Date()
+    });
+  } catch (err) {
+    console.error('Error fetching real-time availability:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// POST /api/products/:id/reserve - Create temporary reservation
+router.post('/:id/reserve', async (req, res) => {
+  try {
+    const { rentalPeriod, quantity = 1, customerId } = req.body;
+    
+    if (!rentalPeriod || !customerId) {
+      return res.status(400).json({ message: 'תקופת השכירות ומזהה לקוח חובה' });
+    }
+
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: 'המוצר לא נמצא' });
+    }
+
+    try {
+      const reservation = await product.createReservation(customerId, rentalPeriod, quantity);
+      
+      res.status(201).json({
+        message: 'הזמנה זמנית נוצרה בהצלחה',
+        reservation: reservation,
+        expiresIn: Math.ceil((reservation.expiresAt - new Date()) / 60000) // minutes
+      });
+    } catch (err) {
+      res.status(400).json({ 
+        message: err.message || 'לא ניתן ליצור הזמנה זמנית' 
+      });
+    }
+  } catch (err) {
+    console.error('Error creating reservation:', err);
+    res.status(500).json({ message: 'Server error' });
   }
 });
 

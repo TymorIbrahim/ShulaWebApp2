@@ -23,49 +23,68 @@ router.get('/', authorize(['staff']), async (req, res) => {
     const limitNum = parseInt(limit);
     const skip = (pageNum - 1) * limitNum;
 
-    // Build query
-    let query = {};
+    // Build aggregation pipeline for better performance
+    const pipeline = [];
+    
+    // Stage 1: Build initial match conditions
+    let matchConditions = {};
 
-    // Search functionality
+    // Search functionality - DATABASE LEVEL
     if (search) {
-      query.$or = [
-        { firstName: { $regex: search, $options: 'i' } },
-        { lastName: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-        { phone: { $regex: search, $options: 'i' } }
+      const searchRegex = new RegExp(search.split('').join('.*'), 'i'); // Flexible search
+      matchConditions.$or = [
+        { firstName: searchRegex },
+        { lastName: searchRegex },
+        { email: searchRegex },
+        { phone: searchRegex }
       ];
     }
 
     // Filter by role
     if (role) {
-      query.role = role;
+      matchConditions.role = role;
     }
 
     // Filter by signup method
     if (signUpMethod) {
-      query.signUpMethod = signUpMethod;
+      matchConditions.signUpMethod = signUpMethod;
     }
 
-    // Build sort object
+    // Stage 1: Initial match
+    if (Object.keys(matchConditions).length > 0) {
+      pipeline.push({ $match: matchConditions });
+    }
+
+    // Stage 2: Remove password field
+    pipeline.push({
+      $project: {
+        password: 0
+      }
+    });
+
+    // Stage 3: Count total documents for pagination
+    const countPipeline = [...pipeline, { $count: 'total' }];
+    
+    // Stage 4: Sort
     const sortObj = {};
     sortObj[sortBy] = sortOrder === 'desc' ? -1 : 1;
+    pipeline.push({ $sort: sortObj });
 
-    // Execute query with pagination
-    const users = await User.find(query)
-      .select('-password')
-      .sort(sortObj)
-      .skip(skip)
-      .limit(limitNum);
+    // Stage 5: Pagination
+    pipeline.push({ $skip: skip });
+    pipeline.push({ $limit: limitNum });
 
-    // Get total count for pagination
-    const totalUsers = await User.countDocuments(query);
+    // Execute both pipelines in parallel
+    const [usersResult, countResult, statistics, filters] = await Promise.all([
+      User.aggregate(pipeline),
+      User.aggregate(countPipeline),
+      calculateUserStatistics(),
+      getFilterOptions()
+    ]);
+
+    const users = usersResult;
+    const totalUsers = countResult[0]?.total || 0;
     const totalPages = Math.ceil(totalUsers / limitNum);
-
-    // Calculate statistics
-    const statistics = await calculateUserStatistics();
-
-    // Get available filter options
-    const filters = await getFilterOptions();
 
     res.json({
       users,
@@ -75,7 +94,8 @@ router.get('/', authorize(['staff']), async (req, res) => {
         totalUsers,
         limit: limitNum,
         hasNext: pageNum < totalPages,
-        hasPrev: pageNum > 1
+        hasPrev: pageNum > 1,
+        pageSize: limitNum
       },
       statistics,
       filters
@@ -90,25 +110,84 @@ router.get('/', authorize(['staff']), async (req, res) => {
 // Helper function to calculate user statistics
 async function calculateUserStatistics() {
   try {
-    const totalUsers = await User.countDocuments();
-    const customerCount = await User.countDocuments({ role: 'customer' });
-    const staffCount = await User.countDocuments({ role: 'staff' });
-    const localSignups = await User.countDocuments({ signUpMethod: 'local' });
-    const googleSignups = await User.countDocuments({ signUpMethod: 'google' });
-    
-    // Get recent signups (last 30 days)
+    // Get recent signups date threshold (last 30 days)
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const recentSignups = await User.countDocuments({ 
-      createdAt: { $gte: thirtyDaysAgo } 
+
+    // Use aggregation pipeline for efficient statistics calculation
+    const statisticsResult = await User.aggregate([
+      {
+        $facet: {
+          // Basic counts
+          basicCounts: [
+            {
+              $group: {
+                _id: null,
+                total: { $sum: 1 }
+              }
+            }
+          ],
+          // Role counts
+          roleCounts: [
+            {
+              $group: {
+                _id: '$role',
+                count: { $sum: 1 }
+              }
+            }
+          ],
+          // Sign up method counts
+          signUpMethodCounts: [
+            {
+              $group: {
+                _id: '$signUpMethod',
+                count: { $sum: 1 }
+              }
+            }
+          ],
+          // Recent signups
+          recentSignups: [
+            {
+              $match: {
+                createdAt: { $gte: thirtyDaysAgo }
+              }
+            },
+            {
+              $group: {
+                _id: null,
+                count: { $sum: 1 }
+              }
+            }
+          ]
+        }
+      }
+    ]);
+
+    // Process results
+    const stats = statisticsResult[0];
+    
+    const totalUsers = stats.basicCounts[0]?.total || 0;
+    
+    // Extract role counts
+    const roleMap = {};
+    stats.roleCounts.forEach(item => {
+      roleMap[item._id] = item.count;
     });
+    
+    // Extract signup method counts
+    const signUpMethodMap = {};
+    stats.signUpMethodCounts.forEach(item => {
+      signUpMethodMap[item._id] = item.count;
+    });
+    
+    const recentSignups = stats.recentSignups[0]?.count || 0;
 
     return {
       total: totalUsers,
-      customers: customerCount,
-      staff: staffCount,
-      localSignups,
-      googleSignups,
+      customers: roleMap.customer || 0,
+      staff: roleMap.staff || 0,
+      localSignups: signUpMethodMap.local || 0,
+      googleSignups: signUpMethodMap.google || 0,
       recentSignups
     };
   } catch (err) {
@@ -543,6 +622,77 @@ router.get('/membership/:userId', authorize(['customer', 'staff']), async (req, 
 
   } catch (err) {
     console.error('Error fetching user membership:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// POST /api/users/:userId/process-membership - Process membership after order completion
+router.post('/:userId/process-membership', authorize(['customer', 'staff']), async (req, res) => {
+  try {
+    const requestedUserId = req.params.userId;
+    const currentUserId = req.user._id.toString();
+    
+    // Users can only process their own membership, staff can process any
+    if (req.user.role !== 'staff' && requestedUserId !== currentUserId) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    const user = await User.findById(requestedUserId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check if user is already a member
+    if (user.membership && user.membership.isMember) {
+      return res.json({ 
+        message: 'User is already a member',
+        membership: user.membership 
+      });
+    }
+
+    // Create basic membership after first order
+    const membershipData = {
+      isMember: true,
+      membershipType: 'basic_customer',
+      membershipDate: new Date(),
+      source: 'first_order',
+      contract: {
+        signed: false,
+        signatureData: null,
+        agreementVersion: '1.0',
+        signedAt: null,
+        signedOnline: false
+      },
+      idVerification: {
+        verified: false,
+        fileName: '',
+        fileUrl: '',
+        uploadedAt: null
+      }
+    };
+
+    const updatedUser = await User.findByIdAndUpdate(
+      requestedUserId,
+      { 
+        $set: { 
+          membership: membershipData,
+          'membership.processedAt': new Date()
+        }
+      },
+      { new: true }
+    ).select('-password');
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      message: 'Membership processed successfully after order completion',
+      membership: updatedUser.membership
+    });
+
+  } catch (err) {
+    console.error('Error processing membership after order:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });

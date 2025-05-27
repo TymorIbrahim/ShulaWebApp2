@@ -1,0 +1,375 @@
+/* Professional Icon Styles and Animations */
+
+/* SVG Icon Base Styles */
+.page-icon,
+.status-icon,
+.alert-icon,
+.step-icon,
+.quick-action-icon,
+.section-icon {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  vertical-align: middle;
+}
+
+.page-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+}
+
+/* Icon Animations */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Status Indicators */
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-indicator.connected .status-icon {
+  color: #22c55e;
+}
+
+.status-indicator.disconnected .status-icon {
+  color: #ef4444;
+}
+
+/* Validation Status */
+.validation-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.validation-status.validating .validation-indicator {
+  color: #f59e0b;
+}
+
+.validation-status.valid .validation-indicator {
+  color: #22c55e;
+}
+
+.validation-status.invalid .validation-indicator {
+  color: #ef4444;
+}
+
+.validation-status.pending .validation-indicator {
+  color: #6b7280;
+}
+
+/* Alert Icons */
+.alert-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.alert-badge.urgent {
+  background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+  color: #dc2626;
+  border: 1px solid #f87171;
+}
+
+.alert-badge.ongoing {
+  background: linear-gradient(135deg, #eff6ff 0%, #bfdbfe 100%);
+  color: #2563eb;
+  border: 1px solid #60a5fa;
+}
+
+/* Step Icons */
+.step-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+}
+
+/* Button Icons */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 8px;
+}
+
+.btn-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Welcome Wave Animation */
+.welcome-wave {
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.welcome-wave svg {
+  width: 24px;
+  height: 24px;
+  animation: wave 2s ease-in-out infinite;
+}
+
+@keyframes wave {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(20deg);
+  }
+  75% {
+    transform: rotate(-10deg);
+  }
+}
+
+/* Live Indicator */
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  color: #ef4444;
+  margin-left: 8px;
+}
+
+.live-indicator svg {
+  width: 8px;
+  height: 8px;
+}
+
+/* Professional Badge Styles */
+.status-badge-modern {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.status-badge-modern:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Quick Action Buttons */
+.action-btn-modern {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.action-btn-modern svg {
+  width: 16px;
+  height: 16px;
+}
+
+.action-btn-modern:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Availability Status */
+.availability-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.availability-status.available {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+.availability-status.unavailable {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.availability-status.low-stock {
+  background: #fffbeb;
+  color: #d97706;
+  border: 1px solid #fed7aa;
+}
+
+.availability-status.conflict {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Loading and Error States */
+.loading-spinner-modern {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.loading-spinner-modern svg {
+  width: 32px;
+  height: 32px;
+  color: #3b82f6;
+}
+
+.error-state-modern {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+}
+
+.error-state-modern .error-icon {
+  margin-bottom: 16px;
+}
+
+.error-state-modern .error-icon svg {
+  width: 48px;
+  height: 48px;
+  color: #ef4444;
+}
+
+/* Checkout-specific Icon Styles */
+.document-icon,
+.user-icon,
+.security-icon,
+.privacy-icon,
+.legal-icon,
+.notice-icon,
+.document-upload-icon,
+.secure-icon,
+.fast-icon,
+.clipboard-icon,
+.cart-icon,
+.location-icon,
+.truck-icon,
+.return-icon,
+.money-icon,
+.calendar-icon,
+.contract-icon,
+.id-icon {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+/* Larger icons for headers */
+.step-header .document-icon,
+.step-header .user-icon,
+.step-header .fast-icon {
+  width: 28px;
+  height: 28px;
+  margin-right: 12px;
+}
+
+/* Privacy and security icons */
+.privacy-icon,
+.security-icon,
+.legal-icon {
+  color: #059669;
+}
+
+/* Upload area icons */
+.document-upload-icon {
+  width: 48px;
+  height: 48px;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Notice and alert icons */
+.notice-icon {
+  color: #f59e0b;
+  width: 24px;
+  height: 24px;
+}
+
+/* Fast checkout specific icons */
+.fast-icon {
+  color: #3b82f6;
+}
+
+/* Field icons in forms */
+.field-icon {
+  width: 18px;
+  height: 18px;
+  opacity: 0.7;
+  margin-right: 6px;
+}
+
+/* Status icons for completed items */
+.status-item.success .status-icon {
+  color: #059669;
+}
+
+.status-item.pending .status-icon {
+  color: #f59e0b;
+}
+
+/* Checkout validation icons */
+.checkout-validation-status .validation-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+
+/* Connection status indicators */
+.connection-status .status-icon,
+.validation-status .validation-indicator {
+  width: 12px;
+  height: 12px;
+}
+
+/* Real-time indicators */
+.live-indicator .pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+} 

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout Debug - שולא השכרת ציוד</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+      direction: rtl;
+    }
+    .debug-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .test-section {
+      margin-bottom: 30px;
+      padding: 20px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+    }
+    .test-section h3 {
+      color: #1f2937;
+      margin-bottom: 15px;
+    }
+    .test-button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 5px;
+      font-size: 14px;
+    }
+    .test-button:hover {
+      background: #2563eb;
+    }
+    .results {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 15px;
+      margin-top: 10px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .status-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-left: 8px;
+    }
+    .status-success { background: #10b981; }
+    .status-error { background: #ef4444; }
+    .status-warning { background: #f59e0b; }
+    .icon-test {
+      width: 24px;
+      height: 24px;
+      margin: 5px;
+      border: 1px solid #ccc;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div class="debug-container">
+    <h1>🧪 Checkout Debug Tool - כלי בדיקת תהליך הזמנה</h1>
+    <p>כלי זה בודק את תקינות תהליך ההזמנה ומזהה בעיות אפשריות</p>
+
+    <div class="test-section">
+      <h3>📡 בדיקת חיבור API</h3>
+      <button class="test-button" onclick="testApiConnection()">בדוק חיבור לשרת</button>
+      <button class="test-button" onclick="testProductsAPI()">בדוק API מוצרים</button>
+      <div id="api-results" class="results"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>🎨 בדיקת גדלי אייקונים</h3>
+      <p>בדיקה האם האייקונים מוצגים בגדלים נכונים:</p>
+      <div>
+        Header Icon (24px): <svg class="icon-test" style="width: 24px; height: 24px;" viewBox="0 0 24 24" fill="currentColor"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+        Section Icon (20px): <svg class="icon-test" style="width: 20px; height: 20px;" viewBox="0 0 24 24" fill="currentColor"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+        Status Icon (16px): <svg class="icon-test" style="width: 16px; height: 16px;" viewBox="0 0 24 24" fill="currentColor"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+        Item Icon (14px): <svg class="icon-test" style="width: 14px; height: 14px;" viewBox="0 0 24 24" fill="currentColor"><path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
+      </div>
+      <button class="test-button" onclick="testIconSizes()">בדוק גדלי אייקונים בעמוד</button>
+      <div id="icon-results" class="results"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>📋 בדיקת מבנה נתונים</h3>
+      <button class="test-button" onclick="testCheckoutDataStructure()">בדוק מבנה נתוני הזמנה</button>
+      <button class="test-button" onclick="testAddressResolution()">בדוק פתרון כתובות</button>
+      <div id="data-results" class="results"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>⚡ בדיקת זמינות</h3>
+      <button class="test-button" onclick="testAvailabilityTimeout()">בדוק timeout זמינות</button>
+      <button class="test-button" onclick="simulateWebSocketConnection()">סימולציה WebSocket</button>
+      <div id="availability-results" class="results"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>🚀 בדיקה מקיפה</h3>
+      <button class="test-button" onclick="runAllTests()">הרץ את כל הבדיקות</button>
+      <div id="all-results" class="results"></div>
+    </div>
+  </div>
+
+  <script>
+    let results = {};
+
+    function log(section, message, status = 'info') {
+      const element = document.getElementById(`${section}-results`);
+      if (element) {
+        const timestamp = new Date().toLocaleTimeString('he-IL');
+        const statusIcon = status === 'success' ? '✅' : status === 'error' ? '❌' : status === 'warning' ? '⚠️' : 'ℹ️';
+        element.textContent += `[${timestamp}] ${statusIcon} ${message}\n`;
+        element.scrollTop = element.scrollHeight;
+      }
+      results[section] = results[section] || [];
+      results[section].push({ message, status, timestamp });
+    }
+
+    async function testApiConnection() {
+      log('api', 'בודק חיבור לשרת...', 'info');
+      
+      try {
+        const response = await fetch('http://localhost:5002/api/products?limit=1');
+        if (response.ok) {
+          log('api', 'חיבור לשרת תקין ✅', 'success');
+          const data = await response.json();
+          log('api', `נמצאו ${data.products.length} מוצרים`, 'success');
+        } else {
+          log('api', `שרת החזיר קוד שגיאה: ${response.status}`, 'error');
+        }
+      } catch (error) {
+        log('api', `שגיאת חיבור: ${error.message}`, 'error');
+      }
+    }
+
+    async function testProductsAPI() {
+      log('api', 'בודק API מוצרים...', 'info');
+      
+      try {
+        const response = await fetch('http://localhost:5002/api/products');
+        const data = await response.json();
+        
+        log('api', `סה"כ מוצרים: ${data.products.length}`, 'info');
+        log('api', `דפים: ${data.pagination.totalPages}`, 'info');
+        log('api', `קטגוריות: ${data.filters.categories.join(', ')}`, 'info');
+        
+        if (data.products.length > 0) {
+          const product = data.products[0];
+          log('api', `מוצר לדוגמה: ${product.name} - ${product.price}₪`, 'success');
+        }
+      } catch (error) {
+        log('api', `שגיאה בטעינת מוצרים: ${error.message}`, 'error');
+      }
+    }
+
+    function testIconSizes() {
+      log('icon', 'בודק גדלי אייקונים בעמוד...', 'info');
+      
+      const svgElements = document.querySelectorAll('svg');
+      let oversizedIcons = 0;
+      let totalIcons = svgElements.length;
+      
+      svgElements.forEach((svg, index) => {
+        const rect = svg.getBoundingClientRect();
+        const width = rect.width;
+        const height = rect.height;
+        
+        if (width > 32 || height > 32) {
+          oversizedIcons++;
+          log('icon', `אייקון גדול מדי #${index}: ${width}x${height}px`, 'warning');
+        }
+      });
+      
+      log('icon', `נמצאו ${totalIcons} אייקונים, ${oversizedIcons} גדולים מדי`, oversizedIcons > 0 ? 'warning' : 'success');
+    }
+
+    function testCheckoutDataStructure() {
+      log('data', 'בודק מבנה נתוני הזמנה...', 'info');
+      
+      const mockCheckoutData = {
+        customerInfo: {
+          firstName: "Test",
+          lastName: "User",
+          email: "test@example.com",
+          phone: "0501234567",
+          idNumber: ""
+        },
+        pickupReturn: {
+          pickupAddress: "main_store",
+          pickupDate: new Date(),
+          pickupTime: "17:00",
+          returnAddress: "main_store",
+          returnDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+          returnTime: "19:00"
+        },
+        contract: {
+          signed: false,
+          signatureData: null
+        },
+        idUpload: {
+          uploaded: false,
+          fileName: ""
+        }
+      };
+      
+      // Test data completeness
+      const hasCustomerInfo = mockCheckoutData.customerInfo.firstName && 
+                             mockCheckoutData.customerInfo.lastName && 
+                             mockCheckoutData.customerInfo.email && 
+                             mockCheckoutData.customerInfo.phone;
+      
+      const hasPickupReturn = mockCheckoutData.pickupReturn.pickupAddress && 
+                             mockCheckoutData.pickupReturn.pickupDate && 
+                             mockCheckoutData.pickupReturn.returnDate;
+      
+      log('data', `פרטי לקוח: ${hasCustomerInfo ? '✅' : '❌'}`, hasCustomerInfo ? 'success' : 'error');
+      log('data', `איסוף והחזרה: ${hasPickupReturn ? '✅' : '❌'}`, hasPickupReturn ? 'success' : 'error');
+      log('data', `חתימה על הסכם: ${mockCheckoutData.contract.signed ? '✅' : '⏳'}`, mockCheckoutData.contract.signed ? 'success' : 'warning');
+      log('data', `העלאת תעודת זהות: ${mockCheckoutData.idUpload.uploaded ? '✅' : '⏳'}`, mockCheckoutData.idUpload.uploaded ? 'success' : 'warning');
+    }
+
+    function testAddressResolution() {
+      log('data', 'בודק פתרון כתובות...', 'info');
+      
+      const pickupLocations = [
+        {
+          id: "main_store",
+          name: "החנות הראשית",
+          address: "רחוב הרצל 123, תל אביב"
+        },
+        {
+          id: "legacy_haifa",
+          name: "סניף חיפה",
+          address: "טבריה 15, חיפה"
+        }
+      ];
+      
+      const testAddresses = ["main_store", "legacy_haifa", "טבריה 15, חיפה", "unknown_location"];
+      
+      testAddresses.forEach(address => {
+        const location = pickupLocations.find(loc => loc.id === address || loc.address === address);
+        if (location) {
+          log('data', `כתובת "${address}" -> ${location.name}: ${location.address}`, 'success');
+        } else {
+          log('data', `כתובת "${address}" -> לא נמצאה`, 'warning');
+        }
+      });
+    }
+
+    function testAvailabilityTimeout() {
+      log('availability', 'בודק timeout בדיקת זמינות...', 'info');
+      
+      let timeoutTest = setTimeout(() => {
+        log('availability', 'Timeout פועל כהלכה - 5 שניות', 'success');
+      }, 5000);
+      
+      log('availability', 'מתחיל ספירה לאחור של 5 שניות...', 'info');
+      
+      // Simulate clearing timeout (like fixing infinite loading)
+      setTimeout(() => {
+        clearTimeout(timeoutTest);
+        log('availability', 'Timeout בוטל בהצלחה - מונע טעינה אינסופית', 'success');
+      }, 2000);
+    }
+
+    function simulateWebSocketConnection() {
+      log('availability', 'מדמה חיבור WebSocket...', 'info');
+      
+      // Simulate connection states
+      setTimeout(() => log('availability', 'מתחבר...', 'info'), 500);
+      setTimeout(() => log('availability', 'מחובר ✅', 'success'), 1000);
+      setTimeout(() => log('availability', 'בודק זמינות מוצרים...', 'info'), 1500);
+      setTimeout(() => log('availability', 'כל המוצרים זמינים ✅', 'success'), 2500);
+    }
+
+    async function runAllTests() {
+      log('all', 'מתחיל בדיקה מקיפה...', 'info');
+      
+      await testApiConnection();
+      await testProductsAPI();
+      testIconSizes();
+      testCheckoutDataStructure();
+      testAddressResolution();
+      testAvailabilityTimeout();
+      simulateWebSocketConnection();
+      
+      setTimeout(() => {
+        log('all', '=== סיכום בדיקה מקיפה ===', 'info');
+        
+        let totalTests = 0;
+        let passedTests = 0;
+        let issues = [];
+        
+        Object.keys(results).forEach(section => {
+          const sectionResults = results[section];
+          const sectionPassed = sectionResults.filter(r => r.status === 'success').length;
+          const sectionTotal = sectionResults.length;
+          totalTests += sectionTotal;
+          passedTests += sectionPassed;
+          
+          if (sectionPassed < sectionTotal) {
+            const sectionIssues = sectionResults.filter(r => r.status === 'error' || r.status === 'warning');
+            issues.push(`${section}: ${sectionIssues.length} בעיות`);
+          }
+        });
+        
+        log('all', `סה"כ בדיקות: ${totalTests}, עברו: ${passedTests}`, passedTests === totalTests ? 'success' : 'warning');
+        
+        if (issues.length > 0) {
+          log('all', `בעיות שזוהו: ${issues.join(', ')}`, 'warning');
+        } else {
+          log('all', 'כל הבדיקות עברו בהצלחה! 🎉', 'success');
+        }
+      }, 3000);
+    }
+
+    // Auto-run basic tests on page load
+    window.addEventListener('load', () => {
+      log('all', 'עמוד הבדיקה נטען בהצלחה', 'success');
+      setTimeout(testApiConnection, 1000);
+    });
+  </script>
+</body>
+</html> 

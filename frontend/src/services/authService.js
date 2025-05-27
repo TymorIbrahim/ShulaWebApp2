@@ -22,3 +22,21 @@ export const login = async (credentials) => {
   const response = await axios.post(`${API_URL}/login`, credentials);
   return response.data;
 };
+
+/**
+ * Returns auth headers for API requests
+ * @param {string} token - JWT token
+ * @returns {Object} - Headers object with Authorization
+ */
+export const getAuthHeaders = (token) => {
+  if (!token) {
+    return {};
+  }
+  
+  return {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  };
+};

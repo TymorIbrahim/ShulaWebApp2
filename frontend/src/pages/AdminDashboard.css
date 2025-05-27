@@ -231,7 +231,7 @@
 
 .loading-spinner,
 .error-icon {
-    font-size: 3rem;
+    font-size: 1.5rem;
     margin-bottom: var(--spacing-lg);
     animation: float 2s ease-in-out infinite;
 }
@@ -642,7 +642,7 @@
 }
 
 .quick-action-icon {
-    font-size: 2rem;
+    font-size: 1.2rem;
     transition: var(--transition-smooth);
 }
 
@@ -784,7 +784,7 @@
 }
 
 .no-activity-icon {
-    font-size: 3rem;
+    font-size: 1.5rem;
     margin-bottom: var(--spacing-lg);
     opacity: 0.5;
 }
@@ -1010,7 +1010,7 @@
     }
     
     .quick-action-icon {
-        font-size: 1.5rem;
+        font-size: 1.2rem;
     }
     
     .activity-item {
@@ -1093,4 +1093,76 @@
 
 .recent-activity-section {
     animation: fadeInUp 0.8s ease-out;
+}
+
+/* Rate Limit Warning Banner */
+.rate-limit-warning {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.1);
+  animation: slideInDown 0.3s ease-out;
+}
+
+.rate-limit-warning .warning-icon {
+  width: 24px;
+  height: 24px;
+  color: #856404;
+  flex-shrink: 0;
+}
+
+.rate-limit-warning .warning-content {
+  flex: 1;
+}
+
+.rate-limit-warning .warning-content strong {
+  color: #856404;
+  font-weight: 600;
+  font-size: 14px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.rate-limit-warning .warning-content p {
+  color: #856404;
+  font-size: 13px;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.rate-limit-warning .warning-close {
+  background: none;
+  border: none;
+  width: 20px;
+  height: 20px;
+  color: #856404;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+.rate-limit-warning .warning-close:hover {
+  opacity: 1;
+  background: rgba(133, 100, 4, 0.1);
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

@@ -37,6 +37,7 @@ import AnalyticsDashboard from './pages/AnalyticsDashboard';
 import AdminSettings from "./pages/AdminSettings";
 
 import "./App.css"; // Main App CSS
+import "./components/icons.css";
 
 // --- DEBUGGING: Log the type of each imported component ---
 console.log("Type of Navbar:", typeof Navbar);

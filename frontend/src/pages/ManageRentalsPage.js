@@ -3,6 +3,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getOrdersAsAdmin, updateOrderStatusAsAdmin } from '../services/orderService';
 import MembershipModal from '../components/admin/MembershipModal';
+import PickupConfirmationModal from '../components/admin/PickupConfirmationModal';
+import ReturnConfirmationModal from '../components/admin/ReturnConfirmationModal';
 import './ManageRentalsPage.css'; 
 
 // --- SVG Icons ---
@@ -76,6 +78,18 @@ const ChevronRightIcon = () => (
     <path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
   </svg>
 );
+// NEW: Pickup Icon
+const PickupIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+    <path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M11,16.5L6.5,12L7.91,10.59L11,13.67L16.59,8.09L18,9.5L11,16.5Z"/>
+  </svg>
+);
+// NEW: Return Icon
+const ReturnIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+    <path d="M2,12A10,10 0 0,1 12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12M18,11H10L13.5,7.5L12.08,6.08L6.16,12L12.08,17.92L13.5,16.5L10,13H18V11Z"/>
+  </svg>
+);
 // --- End SVG Icons ---
 
 // Helper to normalize orders - handle both old and new structures
@@ -105,25 +119,7 @@ const normalizeOrder = (order) => {
 
 // Helper to check if order is currently ongoing
 const isOrderOngoing = (order) => {
-    if (order.status !== 'Accepted' || !order.items?.length) {
-        return false;
-    }
-    
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set to start of day for comparison
-    
-    return order.items.some(item => {
-        if (!item.rentalPeriod?.startDate || !item.rentalPeriod?.endDate) {
-            return false;
-        }
-        
-        const startDate = new Date(item.rentalPeriod.startDate);
-        const endDate = new Date(item.rentalPeriod.endDate);
-        startDate.setHours(0, 0, 0, 0);
-        endDate.setHours(23, 59, 59, 999);
-        
-        return today >= startDate && today <= endDate;
-    });
+    return order.status === 'PickedUp';
 };
 
 // Helper to format dates - DD/MM/YYYY
@@ -194,7 +190,8 @@ const OrderStatistics = ({ statistics }) => {
     // Use global statistics from the API for the main dashboard stats
     const stats = statistics?.global || {
         pending: 0, accepted: 0, rejected: 0, ongoing: 0,
-        total: 0, totalItems: 0, revenue: 0, avgItemsPerOrder: 0
+        total: 0, totalItems: 0, revenue: 0, avgItemsPerOrder: 0,
+        pickedUp: 0, completed: 0
     };
 
     return (
@@ -210,7 +207,6 @@ const OrderStatistics = ({ statistics }) => {
             </div>
             <div className="stats-grid premium">
                 <div className="stat-card total">
-                    <div className="stat-icon">📋</div>
                     <div className="stat-content">
                         <div className="stat-number">{stats.total}</div>
                         <div className="stat-label">סה"כ הזמנות</div>
@@ -218,41 +214,38 @@ const OrderStatistics = ({ statistics }) => {
                     </div>
                 </div>
                 <div className="stat-card pending">
-                    <div className="stat-icon">⏳</div>
                     <div className="stat-content">
                         <div className="stat-number">{stats.pending}</div>
                         <div className="stat-label">ממתינות לטיפול</div>
                         <div className="stat-trend">דורש פעולה</div>
                     </div>
                 </div>
+                <div className="stat-card accepted">
+                    <div className="stat-content">
+                        <div className="stat-number">{stats.accepted}</div>
+                        <div className="stat-label">מאושרות לאיסוף</div>
+                        <div className="stat-trend">מוכנות</div>
+                    </div>
+                </div>
                 <div className="stat-card ongoing">
-                    <div className="stat-icon">🔄</div>
                     <div className="stat-content">
                         <div className="stat-number">{stats.ongoing}</div>
                         <div className="stat-label">השכרות פעילות</div>
                         <div className="stat-trend">כרגע מושכרות</div>
                     </div>
                 </div>
+                <div className="stat-card completed">
+                    <div className="stat-content">
+                        <div className="stat-number">{stats.completed}</div>
+                        <div className="stat-label">הושלמו</div>
+                        <div className="stat-trend">בארכיון</div>
+                    </div>
+                </div>
                 <div className="stat-card revenue">
-                    <div className="stat-icon">💰</div>
                     <div className="stat-content">
                         <div className="stat-number">₪{stats.revenue.toLocaleString()}</div>
                         <div className="stat-label">הכנסות מאושרות</div>
                         <div className="stat-trend">מכל ההזמנות</div>
-                    </div>
-                </div>
-                <div className="stat-card accepted">
-                    <div className="stat-content">
-                        <div className="stat-number">{stats.accepted}</div>
-                        <div className="stat-label">מאושרות</div>
-                        <div className="stat-trend">הושלמו</div>
-                    </div>
-                </div>
-                <div className="stat-card items">
-                    <div className="stat-content">
-                        <div className="stat-number">{stats.totalItems}</div>
-                        <div className="stat-label">פריטים בסך הכל</div>
-                        <div className="stat-trend">{stats.avgItemsPerOrder} ממוצע</div>
                     </div>
                 </div>
             </div>
@@ -316,36 +309,96 @@ const SearchBar = ({
                         onClick={() => onQuickFilter('today')} 
                         className={`quick-filter-btn premium ${activeQuickFilter === 'today' ? 'active' : ''}`}
                     >
-                        <span className="filter-icon">📅</span>
+                        <span className="filter-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19M5,6V5H19V6H5Z"/>
+                            </svg>
+                        </span>
                         <span className="filter-text">היום</span>
                     </button>
                     <button 
                         onClick={() => onQuickFilter('pending')} 
                         className={`quick-filter-btn premium ${activeQuickFilter === 'pending' ? 'active' : ''}`}
                     >
-                        <span className="filter-icon">⏳</span>
+                        <span className="filter-icon">
+                            <svg className="spin" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z" />
+                            </svg>
+                        </span>
                         <span className="filter-text">ממתינות</span>
+                    </button>
+                    <button 
+                        onClick={() => onQuickFilter('ready_for_pickup')} 
+                        className={`quick-filter-btn premium ${activeQuickFilter === 'ready_for_pickup' ? 'active' : ''}`}
+                    >
+                        <span className="filter-icon">
+                            <PickupIcon />
+                        </span>
+                        <span className="filter-text">מוכנות לאיסוף</span>
                     </button>
                     <button 
                         onClick={() => onQuickFilter('ongoing')} 
                         className={`quick-filter-btn premium ${activeQuickFilter === 'ongoing' ? 'active' : ''}`}
                     >
-                        <span className="filter-icon">🔄</span>
+                        <span className="filter-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12,4V1L8,5L12,9V6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12H4A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z"/>
+                            </svg>
+                        </span>
                         <span className="filter-text">פעילות</span>
+                    </button>
+                    <button 
+                        onClick={() => onQuickFilter('due_for_return')} 
+                        className={`quick-filter-btn premium ${activeQuickFilter === 'due_for_return' ? 'active' : ''}`}
+                    >
+                        <span className="filter-icon">
+                            <ReturnIcon />
+                        </span>
+                        <span className="filter-text">דורש החזרה</span>
                     </button>
                     <button 
                         onClick={() => onQuickFilter('urgent')} 
                         className={`quick-filter-btn premium ${activeQuickFilter === 'urgent' ? 'active' : ''}`}
                     >
-                        <span className="filter-icon">🚨</span>
+                        <span className="filter-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+                            </svg>
+                        </span>
                         <span className="filter-text">דחוף</span>
                     </button>
                     <button 
                         onClick={() => onQuickFilter('recent')} 
                         className={`quick-filter-btn premium ${activeQuickFilter === 'recent' ? 'active' : ''}`}
                     >
-                        <span className="filter-icon">🕒</span>
+                        <span className="filter-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
+                            </svg>
+                        </span>
                         <span className="filter-text">השבוע</span>
+                    </button>
+                    <button 
+                        onClick={() => onQuickFilter('completed_today')} 
+                        className={`quick-filter-btn premium ${activeQuickFilter === 'completed_today' ? 'active' : ''}`}
+                    >
+                        <span className="filter-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"/>
+                            </svg>
+                        </span>
+                        <span className="filter-text">הושלמו היום</span>
+                    </button>
+                    <button 
+                        onClick={() => onQuickFilter('late_returns')} 
+                        className={`quick-filter-btn premium ${activeQuickFilter === 'late_returns' ? 'active' : ''}`}
+                    >
+                        <span className="filter-icon">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+                            </svg>
+                        </span>
+                        <span className="filter-text">החזרות מאוחרות</span>
                     </button>
                 </div>
                 {hasActiveFilters && (
@@ -458,33 +511,90 @@ const OrderCard = ({
     onReject, 
     onShowCustomerContact,
     onShowOrderId,
-    onShowMembership
+    onShowMembership,
+    onConfirmPickup,
+    onConfirmReturn
 }) => {
     const normalizedOrder = normalizeOrder(order);
     console.log('Normalized order:', normalizedOrder);
     
-    const customerName = normalizedOrder.user ? 
-        `${normalizedOrder.user.firstName || ''} ${normalizedOrder.user.lastName || ''}`.trim() || normalizedOrder.user.email 
-        : 'לקוח לא ידוע';
-
+    // Safely get customer name with defensive programming
+    const getCustomerName = () => {
+        if (!normalizedOrder.user) return 'לקוח לא ידוע';
+        
+        const firstName = typeof normalizedOrder.user.firstName === 'string' ? normalizedOrder.user.firstName : '';
+        const lastName = typeof normalizedOrder.user.lastName === 'string' ? normalizedOrder.user.lastName : '';
+        const email = typeof normalizedOrder.user.email === 'string' ? normalizedOrder.user.email : '';
+        
+        const fullName = `${firstName} ${lastName}`.trim();
+        return fullName || email || 'לקוח לא ידוע';
+    };
+    
+    const customerName = getCustomerName();
+    
     // Get membership status
     const getMembershipStatus = () => {
         const membership = normalizedOrder.user?.membership;
         if (!membership?.isMember) {
-            return { status: 'not-member', label: 'לא חבר', icon: '⚠️', color: '#f39c12' };
+            return { 
+                status: 'not-member', 
+                label: 'לא חבר', 
+                icon: (
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+                    </svg>
+                ), 
+                color: '#f39c12' 
+            };
         }
         
         if (membership.membershipType === 'online') {
             if (membership.idVerification?.verified) {
-                return { status: 'verified', label: 'חבר מאומת', icon: '✅', color: '#27ae60' };
+                return { 
+                    status: 'verified', 
+                    label: 'חבר מאומת', 
+                    icon: (
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
+                        </svg>
+                    ), 
+                    color: '#27ae60' 
+                };
             } else {
-                return { status: 'pending', label: 'ממתין לאימות', icon: '⏳', color: '#f39c12' };
+                return { 
+                    status: 'pending', 
+                    label: 'ממתין לאימות', 
+                    icon: (
+                        <svg className="spin" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z" />
+                        </svg>
+                    ), 
+                    color: '#f39c12' 
+                };
             }
         } else if (membership.membershipType === 'in_person') {
-            return { status: 'in-person', label: 'חבר במקום', icon: '🏢', color: '#8e44ad' };
+            return { 
+                status: 'in-person', 
+                label: 'חבר במקום', 
+                icon: (
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12,7V3H2V21H22V7H12M6,19H4V17H6V19M6,15H4V13H6V15M6,11H4V9H6V11M6,7H4V5H6V7M10,19H8V17H10V19M10,15H8V13H10V15M10,11H8V9H10V11M10,7H8V5H10V7M20,19H12V17H14V15H12V13H14V11H12V9H20V19M18,11H16V13H18V11M18,15H16V17H18V15Z"/>
+                    </svg>
+                ), 
+                color: '#8e44ad' 
+            };
         }
         
-        return { status: 'unknown', label: 'סטטוס לא ידוע', icon: '❓', color: '#95a5a6' };
+        return { 
+            status: 'unknown', 
+            label: 'סטטוס לא ידוע', 
+            icon: (
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M10,19H13V22H10V19M12,2C17.35,2.22 19.68,7.62 16.5,11.67C15.67,12.67 14.33,13.33 13.5,14.17C13,14.67 13,15.33 13,16H10C10,14.33 10,13.92 10.5,13.42C11.25,12.67 12.58,12 13.42,11.17C15.08,9.5 15.08,6.83 13.42,5.17C11.75,3.5 9.08,3.5 7.42,5.17C6.08,6.5 6,8.25 6,10H3C3,7.75 3.25,5.5 5.17,3.58C7.08,1.67 9.75,1.78 12,2Z"/>
+                </svg>
+            ), 
+            color: '#95a5a6' 
+        };
     };
 
     const membershipStatus = getMembershipStatus();
@@ -497,7 +607,11 @@ const OrderCard = ({
                     color: '#ea580c', 
                     border: '#fb923c',
                     label: 'ממתין לאישור',
-                    icon: '⏳',
+                    icon: (
+                        <svg className="spin" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z" />
+                        </svg>
+                    ),
                     shadowColor: 'rgba(251, 146, 60, 0.3)'
                 };
             case 'accepted': 
@@ -505,9 +619,39 @@ const OrderCard = ({
                     bg: 'linear-gradient(135deg, #f0fdf4 0%, #bbf7d0 100%)', 
                     color: '#16a34a', 
                     border: '#22c55e',
-                    label: 'מאושר',
-                    icon: '✅',
+                    label: 'מאושר לאיסוף',
+                    icon: (
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
+                        </svg>
+                    ),
                     shadowColor: 'rgba(34, 197, 94, 0.3)'
+                };
+            case 'pickedup':
+                return { 
+                    bg: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)', 
+                    color: '#2563eb', 
+                    border: '#3b82f6',
+                    label: 'הושכר - פעיל',
+                    icon: (
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12,4V1L8,5L12,9V6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12H4A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z"/>
+                        </svg>
+                    ),
+                    shadowColor: 'rgba(59, 130, 246, 0.3)'
+                };
+            case 'completed':
+                return { 
+                    bg: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)', 
+                    color: '#0891b2', 
+                    border: '#0ea5e9',
+                    label: 'הושלם',
+                    icon: (
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"/>
+                        </svg>
+                    ),
+                    shadowColor: 'rgba(14, 165, 233, 0.3)'
                 };
             case 'rejected': 
                 return { 
@@ -515,8 +659,25 @@ const OrderCard = ({
                     color: '#dc2626', 
                     border: '#f87171',
                     label: 'נדחה',
-                    icon: '❌',
+                    icon: (
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                        </svg>
+                    ),
                     shadowColor: 'rgba(248, 113, 113, 0.3)'
+                };
+            case 'cancelled':
+                return { 
+                    bg: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)', 
+                    color: '#64748b', 
+                    border: '#cbd5e1',
+                    label: 'בוטל',
+                    icon: (
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12,2C17.53,2 22,6.47 22,12C22,17.53 17.53,22 12,22C6.47,22 2,17.53 2,12C2,6.47 6.47,2 12,2M15.59,7L12,10.59L8.41,7L7,8.41L10.59,12L7,15.59L8.41,17L12,13.41L15.59,17L17,15.59L13.41,12L17,8.41L15.59,7Z"/>
+                        </svg>
+                    ),
+                    shadowColor: 'rgba(203, 213, 225, 0.3)'
                 };
             default: 
                 return { 
@@ -524,15 +685,19 @@ const OrderCard = ({
                     color: '#64748b', 
                     border: '#cbd5e1',
                     label: 'לא ידוע',
-                    icon: '❓',
+                    icon: (
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M10,19H13V22H10V19M12,2C17.35,2.22 19.68,7.62 16.5,11.67C15.67,12.67 14.33,13.33 13.5,14.17C13,14.67 13,15.33 13,16H10C10,14.33 10,13.92 10.5,13.42C11.25,12.67 12.58,12 13.42,11.17C15.08,9.5 15.08,6.83 13.42,5.17C11.75,3.5 9.08,3.5 7.42,5.17C6.08,6.5 6,8.25 6,10H3C3,7.75 3.25,5.5 5.17,3.58C7.08,1.67 9.75,1.78 12,2Z"/>
+                        </svg>
+                    ),
                     shadowColor: 'rgba(203, 213, 225, 0.3)'
                 };
         }
     };
 
     const statusConfig = getStatusConfig(normalizedOrder.status);
-    const isOngoing = normalizedOrder.isOngoing;
-    const daysUntilStart = normalizedOrder.daysUntilStart;
+    const isOngoing = isOrderOngoing(normalizedOrder);
+    const daysUntilStart = getDaysUntilStart(normalizedOrder);
 
     const earliestStart = normalizedOrder.items?.length > 0 ? 
         new Date(Math.min(...normalizedOrder.items.map(item => new Date(item.rentalPeriod?.startDate)).filter(d => !isNaN(d)))) 
@@ -541,7 +706,7 @@ const OrderCard = ({
         new Date(Math.max(...normalizedOrder.items.map(item => new Date(item.rentalPeriod?.endDate)).filter(d => !isNaN(d)))) 
         : null;
 
-    const isUrgent = normalizedOrder.isUrgent;
+    const isUrgent = daysUntilStart !== null && daysUntilStart <= 1 && daysUntilStart >= 0;
 
     const handleQuickCall = (e) => {
         e.stopPropagation();
@@ -561,23 +726,54 @@ const OrderCard = ({
         }
     };
 
+    // NEW: Calculate if order is due for return
+    const isDueForReturn = () => {
+        if (normalizedOrder.status !== 'PickedUp' || !latestEnd) return false;
+        const today = new Date();
+        today.setHours(23, 59, 59, 999);
+        return latestEnd <= today;
+    };
+
+    const dueForReturn = isDueForReturn();
+
     return (
-        <div className={`order-card-modern ${normalizedOrder.status?.toLowerCase()} ${isUrgent ? 'urgent' : ''} ${isOngoing ? 'ongoing' : ''}`}
+        <div className={`order-card-modern ${normalizedOrder.status?.toLowerCase()} ${isUrgent ? 'urgent' : ''} ${isOngoing ? 'ongoing' : ''} ${dueForReturn ? 'due-return' : ''}`}
              style={{ boxShadow: `0 8px 32px ${statusConfig.shadowColor}` }}>
             
             {/* Priority Badges */}
-            {(isUrgent || isOngoing) && (
+            {(isUrgent || isOngoing || dueForReturn) && (
                 <div className="priority-alerts">
-                    {isUrgent && (
+                    {isUrgent && normalizedOrder.status === 'Accepted' && (
                         <div className="alert-badge urgent">
-                            <span className="alert-icon">🚨</span>
+                            <span className="alert-icon">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+                                </svg>
+                            </span>
                             <span className="alert-text">דחוף - {daysUntilStart === 0 ? 'מתחיל היום' : `מתחיל בעוד ${daysUntilStart} ימים`}</span>
                         </div>
                     )}
                     {isOngoing && (
                         <div className="alert-badge ongoing">
-                            <span className="alert-icon">🔄</span>
+                            <span className="alert-icon">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12,4V1L8,5L12,9V6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12H4A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4Z"/>
+                                </svg>
+                            </span>
                             <span className="alert-text">השכרה פעילה כעת</span>
+                        </div>
+                    )}
+                    {dueForReturn && (
+                        <div className="alert-badge due-return">
+                            <span className="alert-icon">
+                                <ReturnIcon />
+                            </span>
+                            <span className="alert-text">
+                                {latestEnd && new Date() > latestEnd ? 
+                                    `פגועת זמן - ${Math.floor((new Date() - latestEnd) / (1000 * 60 * 60 * 24))} ימים` : 
+                                    'דורש החזרה היום'
+                                }
+                            </span>
                         </div>
                     )}
                 </div>
@@ -711,28 +907,33 @@ const OrderCard = ({
                             {normalizedOrder.customerInfo && (
                                 <div className="customer-info-detailed">
                                     <h6 className="section-subtitle">
-                                        📋 פרטים אישיים מההזמנה
+                                        <svg className="section-icon" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19M5,6V5H19V6H5Z"/>
+                                        </svg>
+                                        פרטים אישיים מההזמנה
                                     </h6>
                                     <div className="customer-details-grid">
                                         <div className="detail-item-admin">
                                             <span className="label">שם מלא:</span>
-                                            <span className="value">{normalizedOrder.customerInfo.firstName} {normalizedOrder.customerInfo.lastName}</span>
+                                            <span className="value">
+                                                {(typeof normalizedOrder.customerInfo.firstName === 'string' ? normalizedOrder.customerInfo.firstName : '')} {(typeof normalizedOrder.customerInfo.lastName === 'string' ? normalizedOrder.customerInfo.lastName : '')}
+                                            </span>
                                         </div>
                                         <div className="detail-item-admin">
                                             <span className="label">אימייל:</span>
-                                            <span className="value">{normalizedOrder.customerInfo.email}</span>
+                                            <span className="value">{typeof normalizedOrder.customerInfo.email === 'string' ? normalizedOrder.customerInfo.email : 'לא זמין'}</span>
                                         </div>
                                         <div className="detail-item-admin">
                                             <span className="label">טלפון:</span>
-                                            <span className="value">{normalizedOrder.customerInfo.phone}</span>
+                                            <span className="value">{typeof normalizedOrder.customerInfo.phone === 'string' ? normalizedOrder.customerInfo.phone : 'לא זמין'}</span>
                                         </div>
                                         <div className="detail-item-admin id-number">
                                             <span className="label">תעודת זהות:</span>
                                             <span className="value">
                                                 {normalizedOrder.customerInfo.idNumber === "PENDING-IN-PERSON" || 
                                                  normalizedOrder.customerInfo.idNumber === "WILL_VERIFY_IN_PERSON" ? 
-                                                  <span className="pending-verification">יאומת בעת איסוף 🏢</span> : 
-                                                  <span className="id-number-value">{normalizedOrder.customerInfo.idNumber || "לא זמין"}</span>
+                                                  <span className="pending-verification">יאומת בעת איסוף</span> : 
+                                                  <span className="id-number-value">{typeof normalizedOrder.customerInfo.idNumber === 'string' ? normalizedOrder.customerInfo.idNumber : "לא זמין"}</span>
                                                 }
                                             </span>
                                         </div>
@@ -744,12 +945,12 @@ const OrderCard = ({
                             {normalizedOrder.contract && (
                                 <div className="contract-status-admin">
                                     <h6 className="section-subtitle">
-                                        ✍️ סטטוס הסכם השכירות
+                                        סטטוס הסכם השכירות
                                     </h6>
                                     <div className="contract-status-card">
                                         {normalizedOrder.contract.signed ? (
                                             <div className="status-item-admin verified">
-                                                <span className="status-icon">✅</span>
+                                                <span className="status-icon">✓</span>
                                                 <div className="status-details">
                                                     <span className="status-text">הסכם נחתם דיגיטלית</span>
                                                     <span className="status-date">נחתם ב: {formatDate(normalizedOrder.contract.signedAt)}</span>
@@ -762,14 +963,14 @@ const OrderCard = ({
                                                                 newWindow.document.write(`<img src="${normalizedOrder.contract.signatureData}" alt="חתימה דיגיטלית" style="max-width:100%;"/>`);
                                                             }}
                                                         >
-                                                            🖊️ צפה בחתימה
+                                                            צפה בחתימה
                                                         </button>
                                                     )}
                                                 </div>
                                             </div>
                                         ) : normalizedOrder.metadata?.onboardingChoice === "in-person" ? (
                                             <div className="status-item-admin pending">
-                                                <span className="status-icon">🏢</span>
+                                                <span className="status-icon">●</span>
                                                 <div className="status-details">
                                                     <span className="status-text">הסכם יחתם בעת איסוף הציוד</span>
                                                     <span className="status-note">הלקוח בחר בתהליך אישי</span>
@@ -777,7 +978,7 @@ const OrderCard = ({
                                             </div>
                                         ) : (
                                             <div className="status-item-admin missing">
-                                                <span className="status-icon">❌</span>
+                                                <span className="status-icon">✗</span>
                                                 <div className="status-details">
                                                     <span className="status-text">הסכם לא נחתם</span>
                                                     <span className="status-note">דורש טיפול</span>
@@ -792,12 +993,12 @@ const OrderCard = ({
                             {normalizedOrder.idUpload && (
                                 <div className="id-upload-status-admin">
                                     <h6 className="section-subtitle">
-                                        📄 סטטוס תעודת זהות
+                                        סטטוס תעודת זהות
                                     </h6>
                                     <div className="id-upload-status-card">
                                         {normalizedOrder.idUpload.uploaded ? (
                                             <div className="status-item-admin verified">
-                                                <span className="status-icon">✅</span>
+                                                <span className="status-icon">✓</span>
                                                 <div className="status-details">
                                                     <span className="status-text">תעודת זהות הועלתה</span>
                                                     <span className="file-info">קובץ: {normalizedOrder.idUpload.fileName}</span>
@@ -809,14 +1010,14 @@ const OrderCard = ({
                                                                 alert(`פתיחת קובץ: ${normalizedOrder.idUpload.fileName}`);
                                                             }}
                                                         >
-                                                            👁️ צפה בתעודת זהות
+                                                            צפה בתעודת זהות
                                                         </button>
                                                     )}
                                                 </div>
                                             </div>
                                         ) : normalizedOrder.metadata?.onboardingChoice === "in-person" ? (
                                             <div className="status-item-admin pending">
-                                                <span className="status-icon">🏢</span>
+                                                <span className="status-icon">●</span>
                                                 <div className="status-details">
                                                     <span className="status-text">תעודת זהות תאומת בעת איסוף הציוד</span>
                                                     <span className="status-note">הלקוח בחר בתהליך אישי</span>
@@ -824,7 +1025,7 @@ const OrderCard = ({
                                             </div>
                                         ) : (
                                             <div className="status-item-admin missing">
-                                                <span className="status-icon">❌</span>
+                                                <span className="status-icon">✗</span>
                                                 <div className="status-details">
                                                     <span className="status-text">תעודת זהות לא הועלתה</span>
                                                     <span className="status-note">דורש טיפול</span>
@@ -839,11 +1040,11 @@ const OrderCard = ({
                             {normalizedOrder.pickupReturn && (
                                 <div className="pickup-return-admin">
                                     <h6 className="section-subtitle">
-                                        📍 פרטי איסוף והחזרה
+                                        פרטי איסוף והחזרה
                                     </h6>
                                     <div className="pickup-return-grid-admin">
                                         <div className="pickup-details-admin">
-                                            <h7>🚚 איסוף</h7>
+                                            <h7>איסוף</h7>
                                             <div className="pickup-info">
                                                 <p><strong>תאריך:</strong> {formatDate(normalizedOrder.pickupReturn.pickupDate)}</p>
                                                 <p><strong>שעה:</strong> {normalizedOrder.pickupReturn.pickupTime}</p>
@@ -851,7 +1052,7 @@ const OrderCard = ({
                                             </div>
                                         </div>
                                         <div className="return-details-admin">
-                                            <h7>🔄 החזרה</h7>
+                                            <h7>החזרה</h7>
                                             <div className="return-info">
                                                 <p><strong>תאריך:</strong> {formatDate(normalizedOrder.pickupReturn.returnDate)}</p>
                                                 <p><strong>שעה:</strong> {normalizedOrder.pickupReturn.returnTime}</p>
@@ -871,7 +1072,7 @@ const OrderCard = ({
                             {/* Membership Status */}
                             <div className="membership-status-section">
                                 <h6 className="membership-title">
-                                    🏛️ סטטוס חברות
+                                    סטטוס חברות
                                 </h6>
                                 <div className="membership-badge-card" style={{ borderColor: membershipStatus.color }}>
                                     <span className="membership-icon">{membershipStatus.icon}</span>
@@ -884,12 +1085,57 @@ const OrderCard = ({
                                     )}
                                 </div>
                             </div>
+
+                            {/* NEW: Pickup/Return Confirmation Status */}
+                            {(normalizedOrder.pickupConfirmation || normalizedOrder.returnConfirmation) && (
+                                <div className="confirmation-status-section">
+                                    <h6 className="section-subtitle">
+                                        סטטוס איסוף והחזרה
+                                    </h6>
+                                    
+                                    {normalizedOrder.pickupConfirmation && (
+                                        <div className="confirmation-card pickup-confirmed">
+                                            <div className="confirmation-header">
+                                                <PickupIcon />
+                                                <span>איסוף אושר</span>
+                                            </div>
+                                            <div className="confirmation-details">
+                                                <p><strong>תאריך איסוף:</strong> {formatDate(normalizedOrder.pickupConfirmation.confirmedAt)}</p>
+                                                <p><strong>אושר על ידי:</strong> {normalizedOrder.pickupConfirmation.confirmedBy}</p>
+                                                {normalizedOrder.pickupConfirmation.notes && (
+                                                    <p><strong>הערות:</strong> {normalizedOrder.pickupConfirmation.notes}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {normalizedOrder.returnConfirmation && (
+                                        <div className="confirmation-card return-confirmed">
+                                            <div className="confirmation-header">
+                                                <ReturnIcon />
+                                                <span>החזרה אושרה</span>
+                                            </div>
+                                            <div className="confirmation-details">
+                                                <p><strong>תאריך החזרה:</strong> {formatDate(normalizedOrder.returnConfirmation.returnedAt)}</p>
+                                                <p><strong>אושר על ידי:</strong> {normalizedOrder.returnConfirmation.returnedBy}</p>
+                                                <p><strong>חוויה כללית:</strong> {normalizedOrder.returnConfirmation.summaryReport?.overallExperience}</p>
+                                                <button 
+                                                    className="view-report-btn"
+                                                    onClick={() => alert('צפייה בדוח מפורט - לפתח')}
+                                                >
+                                                    צפה בדוח מפורט
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </div>
 
                         {/* Products Section */}
                         <div className="section-modern products-section">
                             <h5 className="section-title-modern">
-                                📦 מוצרים בהזמנה ({normalizedOrder.items?.length || 0})
+                                מוצרים בהזמנה ({normalizedOrder.items?.length || 0})
                             </h5>
                             <div className="products-list-modern">
                                 {normalizedOrder.items && normalizedOrder.items.length > 0 ? normalizedOrder.items.map((item, index) => (
@@ -906,7 +1152,7 @@ const OrderCard = ({
                                                 />
                                             ) : null}
                                             <div className="product-placeholder-modern" style={{ display: item.product?.productImageUrl ? 'none' : 'flex' }}>
-                                                📦
+                                                ●
                                             </div>
                                         </div>
                                         <div className="product-details-modern">
@@ -937,22 +1183,48 @@ const OrderCard = ({
                         </div>
                     </div>
 
-                    {/* Action Buttons for Pending Orders */}
+                    {/* Action Buttons for Different Order Status */}
                     {normalizedOrder.status === 'Pending' && (
                         <div className="decision-actions-modern">
                             <button 
                                 onClick={() => onAccept(normalizedOrder._id)}
                                 className="decision-btn-modern accept-btn"
                             >
-                                <span className="btn-icon">✅</span>
+                                <span className="btn-icon">✓</span>
                                 <span className="btn-text">אשר הזמנה</span>
                             </button>
                             <button 
                                 onClick={() => onReject(normalizedOrder._id)}
                                 className="decision-btn-modern reject-btn"
                             >
-                                <span className="btn-icon">❌</span>
+                                <span className="btn-icon">✗</span>
                                 <span className="btn-text">דחה הזמנה</span>
+                            </button>
+                        </div>
+                    )}
+
+                    {/* NEW: Pickup Confirmation for Accepted Orders */}
+                    {normalizedOrder.status === 'Accepted' && (
+                        <div className="decision-actions-modern">
+                            <button 
+                                onClick={() => onConfirmPickup(normalizedOrder)}
+                                className="decision-btn-modern pickup-btn"
+                            >
+                                <span className="btn-icon"><PickupIcon /></span>
+                                <span className="btn-text">אשר איסוף פריטים</span>
+                            </button>
+                        </div>
+                    )}
+
+                    {/* NEW: Return Confirmation for PickedUp Orders */}
+                    {normalizedOrder.status === 'PickedUp' && (
+                        <div className="decision-actions-modern">
+                            <button 
+                                onClick={() => onConfirmReturn(normalizedOrder)}
+                                className="decision-btn-modern return-btn"
+                            >
+                                <span className="btn-icon"><ReturnIcon /></span>
+                                <span className="btn-text">אשר החזרת פריטים</span>
                             </button>
                         </div>
                     )}
@@ -969,7 +1241,7 @@ const OrderIdModal = ({ orderId, onClose }) => {
     const copyToClipboard = async () => {
         try {
             await navigator.clipboard.writeText(orderId);
-            alert('מזהה הזמנה הועתק בהצלחה! 📋');
+            alert('מזהה הזמנה הועתק בהצלחה!');
         } catch (err) {
             console.error('Failed to copy:', err);
             alert('שגיאה בהעתקה');
@@ -980,14 +1252,14 @@ const OrderIdModal = ({ orderId, onClose }) => {
         <div className="modal-overlay premium" onClick={onClose}>
             <div className="modal-content premium order-id-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h3>🆔 מזהה הזמנה</h3>
+                    <h3>מזהה הזמנה</h3>
                     <p>השתמש במזהה זה לעקיבה ותיאום</p>
                 </div>
                 <div className="order-id-display">
                     <div className="id-container premium">
                         <code className="order-id-code">{orderId}</code>
                         <button onClick={copyToClipboard} className="copy-btn premium">
-                            📋 העתק
+                            העתק
                         </button>
                     </div>
                 </div>
@@ -1001,7 +1273,17 @@ const OrderIdModal = ({ orderId, onClose }) => {
 const CustomerContactModal = ({ customer, onClose }) => {
     if (!customer) return null;
     
-    const customerName = `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || 'לקוח';
+    // Safely get customer name with defensive programming
+    const getCustomerName = () => {
+        const firstName = typeof customer.firstName === 'string' ? customer.firstName : '';
+        const lastName = typeof customer.lastName === 'string' ? customer.lastName : '';
+        const email = typeof customer.email === 'string' ? customer.email : '';
+        
+        const fullName = `${firstName} ${lastName}`.trim();
+        return fullName || email || 'לקוח';
+    };
+    
+    const customerName = getCustomerName();
     
     const handleSendSMS = () => {
         if (customer.phone) {
@@ -1031,7 +1313,7 @@ const CustomerContactModal = ({ customer, onClose }) => {
         <div className="modal-overlay premium" onClick={onClose}>
             <div className="modal-content premium customer-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h3>👤 פרטי יצירת קשר</h3>
+                    <h3>פרטי יצירת קשר</h3>
                     <p>דרכי התקשרות עם הלקוח</p>
                 </div>
                 <div className="customer-profile premium">
@@ -1066,7 +1348,7 @@ const CustomerContactModal = ({ customer, onClose }) => {
                         className="contact-action-btn premium sms-btn" 
                         disabled={!customer.phone}
                     >
-                        💬
+                        SMS
                         <span>שלח SMS</span>
                     </button>
                     <button 
@@ -1090,15 +1372,15 @@ const ConfirmationModal = ({ message, onConfirm, onCancel }) => {
         <div className="modal-overlay premium" onClick={onCancel}>
             <div className="modal-content premium confirmation-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h3>⚠️ אישור פעולה</h3>
+                    <h3>אישור פעולה</h3>
                     <p>אנא אשר את הפעולה שברצונך לבצע</p>
                 </div>
                 <div className="confirmation-content">
                     <p className="confirmation-message">{message}</p>
                 </div>
                 <div className="confirmation-actions">
-                    <button onClick={onConfirm} className="action-btn premium confirm">✅ כן, בצע</button>
-                    <button onClick={onCancel} className="action-btn premium cancel">❌ ביטול</button>
+                    <button onClick={onConfirm} className="action-btn premium confirm">כן, בצע</button>
+                    <button onClick={onCancel} className="action-btn premium cancel">ביטול</button>
                 </div>
             </div>
         </div>
@@ -1131,6 +1413,12 @@ const ManageRentalsPage = () => {
     const [currentOrderIdForModal, setCurrentOrderIdForModal] = useState(null);
     const [showMembershipModal, setShowMembershipModal] = useState(false);
     const [currentCustomerForMembership, setCurrentCustomerForMembership] = useState(null);
+    
+    // NEW: Pickup and Return Modals
+    const [showPickupModal, setShowPickupModal] = useState(false);
+    const [currentOrderForPickup, setCurrentOrderForPickup] = useState(null);
+    const [showReturnModal, setShowReturnModal] = useState(false);
+    const [currentOrderForReturn, setCurrentOrderForReturn] = useState(null);
 
     // Ref for the results section
     const resultsRef = useRef(null);
@@ -1159,7 +1447,52 @@ const ManageRentalsPage = () => {
         };
     }
 
-    // Fetch orders with pagination and filters
+    // OPTIMIZED: Single effect to handle all filter changes
+    useEffect(() => {
+        // Skip if no token available
+        if (!token) {
+            setError("נדרשת התחברות לצפייה בדף זה.");
+            setLoading(false);
+            return;
+        }
+
+        // Use debounced fetch for search, immediate for other filters
+        const params = {
+            page: 1, // Always reset to page 1 when filters change
+            search: searchText,
+            status: activeTab !== 'all' ? activeTab : '',
+            quickFilter: quickFilter
+        };
+
+        // Clear expanded orders when filters change
+        setExpandedOrders(new Set());
+        
+        // Reset current page
+        setCurrentPage(1);
+
+        // Use debouncing for search, immediate for others
+        if (searchText !== undefined && searchText !== '') {
+            debouncedFetch(params);
+        } else {
+            fetchOrders(params);
+        }
+    }, [searchText, activeTab, quickFilter, token, debouncedFetch]);
+
+    // Separate effect for pagination only (no debouncing needed)
+    useEffect(() => {
+        if (currentPage > 1) {
+            fetchOrders({ page: currentPage });
+        }
+    }, [currentPage]);
+
+    // Initial fetch only
+    useEffect(() => {
+        if (token) {
+            fetchOrders();
+        }
+    }, [token]);
+
+    // Fetch orders with pagination and filters - optimized with useCallback
     const fetchOrders = useCallback(async (params = {}) => {
         if (!token) {
             setError("נדרשת התחברות לצפייה בדף זה.");
@@ -1212,31 +1545,6 @@ const ManageRentalsPage = () => {
         }
     }, [token, currentPage, pageSize, searchText, activeTab, quickFilter]);
 
-    // Initial fetch
-    useEffect(() => {
-        fetchOrders();
-    }, []);
-
-    // Handle search text change with debouncing
-    useEffect(() => {
-        if (searchText !== undefined) {
-            debouncedFetch({ page: 1, search: searchText });
-            setCurrentPage(1);
-        }
-    }, [searchText, debouncedFetch]);
-
-    // Handle tab change
-    useEffect(() => {
-        fetchOrders({ page: 1, status: activeTab !== 'all' ? activeTab : '' });
-        setCurrentPage(1);
-    }, [activeTab]);
-
-    // Handle quick filter change
-    useEffect(() => {
-        fetchOrders({ page: 1, quickFilter });
-        setCurrentPage(1);
-    }, [quickFilter]);
-
     // Helper function to scroll to results section smoothly
     const scrollToResults = () => {
         if (resultsRef.current) {
@@ -1247,101 +1555,136 @@ const ManageRentalsPage = () => {
         }
     };
 
-    // Event handlers
-    const handleSearchTextChange = (newSearchText) => {
+    // Event handlers - optimized with useCallback to prevent re-renders
+    const handleSearchTextChange = useCallback((newSearchText) => {
         setSearchText(newSearchText);
-    };
+    }, []);
 
-    const handleSearchEnter = () => {
+    const handleSearchEnter = useCallback(() => {
         scrollToResults(); // Scroll to results when Enter is pressed in search
-    };
+    }, []);
 
-    const handleTabChange = (newTab) => {
+    const handleTabChange = useCallback((newTab) => {
         setActiveTab(newTab);
         // No scroll needed - tabs are at top of screen
-    };
+    }, []);
 
-    const handleQuickFilter = (filterType) => {
+    const handleQuickFilter = useCallback((filterType) => {
         const newFilter = quickFilter === filterType ? '' : filterType;
         setQuickFilter(newFilter);
         // No scroll needed - filters are at top of screen
-    };
+    }, [quickFilter]);
 
-    const handlePageChange = (newPage) => {
-        fetchOrders({ page: newPage });
+    const handlePageChange = useCallback((newPage) => {
+        setCurrentPage(newPage);
         scrollToResults(); // Scroll to results when changing numbered pages
-    };
+    }, []);
 
-    const handleClearAllFilters = () => {
+    const handleClearAllFilters = useCallback(() => {
         setSearchText('');
         setQuickFilter('');
         setActiveTab('all');
         setCurrentPage(1);
-        fetchOrders({ page: 1, search: '', status: '', quickFilter: '' });
+        setExpandedOrders(new Set());
         // No scroll needed - user initiated action from filters at top
-    };
+    }, []);
 
-    const handleToggleExpand = (orderId) => {
-        const newExpanded = new Set(expandedOrders);
-        if (newExpanded.has(orderId)) {
-            newExpanded.delete(orderId);
-        } else {
-            newExpanded.add(orderId);
-        }
-        setExpandedOrders(newExpanded);
-    };
+    const handleToggleExpand = useCallback((orderId) => {
+        setExpandedOrders(prev => {
+            const newExpanded = new Set(prev);
+            if (newExpanded.has(orderId)) {
+                newExpanded.delete(orderId);
+            } else {
+                newExpanded.add(orderId);
+            }
+            return newExpanded;
+        });
+    }, []);
 
-    const handleShowCustomerContact = (customer) => {
+    const handleShowCustomerContact = useCallback((customer) => {
         setCurrentCustomerForModal(customer);
         setShowCustomerContactModal(true);
-    };
+    }, []);
 
-    const handleShowOrderId = (orderId) => {
+    const handleShowOrderId = useCallback((orderId) => {
         setCurrentOrderIdForModal(orderId);
         setShowOrderIdModal(true);
-    };
+    }, []);
 
-    const handleShowMembership = (customer) => {
+    const handleShowMembership = useCallback((customer) => {
         setCurrentCustomerForMembership(customer);
         setShowMembershipModal(true);
-    };
+    }, []);
 
-    const handleMembershipUpdate = () => {
+    const handleMembershipUpdate = useCallback(() => {
         // Refresh orders to get updated membership data
         fetchOrders();
-    };
+    }, [fetchOrders]);
 
-    const handleAccept = (orderId) => {
+    const handleAccept = useCallback((orderId) => {
         setConfirmationAction({
             orderId,
             newStatus: 'Accepted',
             message: 'האם אתה בטוח שברצונך לאשר הזמנה זו? הפעולה תשלח הודעה ללקוח.'
         });
         setShowConfirmationModal(true);
-    };
+    }, []);
 
-    const handleReject = (orderId) => {
+    const handleReject = useCallback((orderId) => {
         setConfirmationAction({
             orderId,
             newStatus: 'Rejected',
             message: 'האם אתה בטוח שברצונך לדחות הזמנה זו? הפעולה תשלח הודעה ללקוח.'
         });
         setShowConfirmationModal(true);
-    };
+    }, []);
 
-    const handleConfirmAction = async () => {
+    // NEW: Pickup Confirmation Handler
+    const handleConfirmPickup = useCallback((order) => {
+        setCurrentOrderForPickup(order);
+        setShowPickupModal(true);
+    }, []);
+
+    // NEW: Return Confirmation Handler
+    const handleConfirmReturn = useCallback((order) => {
+        setCurrentOrderForReturn(order);
+        setShowReturnModal(true);
+    }, []);
+
+    // NEW: Pickup Success Handler
+    const handlePickupSuccess = useCallback(() => {
+        setShowPickupModal(false);
+        setCurrentOrderForPickup(null);
+        // Refresh orders to show updated status
+        fetchOrders();
+    }, [fetchOrders]);
+
+    // NEW: Return Success Handler
+    const handleReturnSuccess = useCallback(() => {
+        setShowReturnModal(false);
+        setCurrentOrderForReturn(null);
+        // Refresh orders to show updated status
+        fetchOrders();
+    }, [fetchOrders]);
+
+    const handleConfirmAction = useCallback(async () => {
         if (!confirmationAction || !token) return;
         
         try {
+            const staffName = user?.firstName && user?.lastName ? 
+                `${user.firstName} ${user.lastName}` : 'Unknown Staff';
+            
             const updatedOrder = await updateOrderStatusAsAdmin(
                 confirmationAction.orderId, 
                 confirmationAction.newStatus, 
-                token
+                token,
+                staffName,
+                'Status updated via admin panel'
             );
 
             // Update the order in the current page
             setOrders(prevOrders => 
-                prevOrders.map(o => o._id === updatedOrder._id ? updatedOrder : o)
+                prevOrders.map(o => o._id === updatedOrder.order?._id ? updatedOrder.order : o)
             );
 
             setShowConfirmationModal(false);
@@ -1355,12 +1698,12 @@ const ManageRentalsPage = () => {
         } catch (err) {
             setError(`שגיאה בעדכון סטטוס הזמנה: ${err.message}`);
         }
-    };
+    }, [confirmationAction, token, user, fetchOrders]);
 
-    const handleCancelAction = () => {
+    const handleCancelAction = useCallback(() => {
         setShowConfirmationModal(false);
         setConfirmationAction(null);
-    };
+    }, []);
 
     const hasActiveFilters = searchText || quickFilter || activeTab !== 'all';
 
@@ -1370,13 +1713,14 @@ const ManageRentalsPage = () => {
         pending: 0,
         ongoing: 0,
         accepted: 0,
+        completed: 0,
         rejected: 0
     };
 
     if (loading && !orders.length) return (
         <div className="loading-screen premium">
             <div className="loading-content">
-                <div className="loading-spinner">⏳</div>
+                <div className="loading-spinner">טוען...</div>
                 <h3>טוען הזמנות...</h3>
                 <p>אנא המתן בזמן שאנו טוענים את המידע</p>
             </div>
@@ -1386,7 +1730,7 @@ const ManageRentalsPage = () => {
     if (error && !loading && !orders.length) return (
         <div className="error-screen premium">
             <div className="error-content">
-                <div className="error-icon">❌</div>
+                <div className="error-icon">✗</div>
                 <h3>שגיאה בטעינת המידע</h3>
                 <p>{error}</p>
                 <button onClick={() => fetchOrders()} className="retry-btn premium">נסה שוב</button>
@@ -1399,7 +1743,7 @@ const ManageRentalsPage = () => {
             <header className="page-header premium">
                 <div className="header-content">
                     <div className="title-section">
-                        <h1>🏢 מערכת ניהול השכרות</h1>
+                        <h1>מערכת ניהול השכרות</h1>
                         <p>ניהול חכם ומתקדם של הזמנות והשכרות</p>
                     </div>
                 </div>
@@ -1419,7 +1763,7 @@ const ManageRentalsPage = () => {
                 
                 <div className="status-tabs premium">
                     <div className="tabs-header">
-                        <h4>📊 סטטוס הזמנות</h4>
+                        <h4>סטטוס הזמנות</h4>
                         <p>סינון מתקדם לפי סטטוס הזמנה</p>
                     </div>
                     <div className="tabs-container">
@@ -1427,7 +1771,7 @@ const ManageRentalsPage = () => {
                             onClick={() => handleTabChange('all')}
                             className={`tab-btn premium ${activeTab === 'all' ? 'active' : ''}`}
                         >
-                            <span className="tab-icon">🎯</span>
+                            <span className="tab-icon">●</span>
                             <span className="tab-text">הכל</span>
                             <span className="tab-count">({tabCounts.all})</span>
                         </button>
@@ -1435,7 +1779,7 @@ const ManageRentalsPage = () => {
                             onClick={() => handleTabChange('Pending')}
                             className={`tab-btn premium ${activeTab === 'Pending' ? 'active' : ''}`}
                         >
-                            <span className="tab-icon">⏳</span>
+                            <span className="tab-icon">●</span>
                             <span className="tab-text">ממתינות</span>
                             <span className="tab-count">({tabCounts.pending})</span>
                         </button>
@@ -1443,7 +1787,7 @@ const ManageRentalsPage = () => {
                             onClick={() => handleTabChange('ongoing')}
                             className={`tab-btn premium ${activeTab === 'ongoing' ? 'active' : ''}`}
                         >
-                            <span className="tab-icon">🔄</span>
+                            <span className="tab-icon">●</span>
                             <span className="tab-text">פעילות</span>
                             <span className="tab-count">({tabCounts.ongoing})</span>
                         </button>
@@ -1451,15 +1795,23 @@ const ManageRentalsPage = () => {
                             onClick={() => handleTabChange('Accepted')}
                             className={`tab-btn premium ${activeTab === 'Accepted' ? 'active' : ''}`}
                         >
-                            <span className="tab-icon">✅</span>
+                            <span className="tab-icon">✓</span>
                             <span className="tab-text">מאושרות</span>
                             <span className="tab-count">({tabCounts.accepted})</span>
+                        </button>
+                        <button 
+                            onClick={() => handleTabChange('Completed')}
+                            className={`tab-btn premium ${activeTab === 'Completed' ? 'active' : ''}`}
+                        >
+                            <span className="tab-icon">📁</span>
+                            <span className="tab-text">ארכיון</span>
+                            <span className="tab-count">({tabCounts.completed})</span>
                         </button>
                         <button 
                             onClick={() => handleTabChange('Rejected')}
                             className={`tab-btn premium ${activeTab === 'Rejected' ? 'active' : ''}`}
                         >
-                            <span className="tab-icon">❌</span>
+                            <span className="tab-icon">✗</span>
                             <span className="tab-text">נדחו</span>
                             <span className="tab-count">({tabCounts.rejected})</span>
                         </button>
@@ -1471,12 +1823,12 @@ const ManageRentalsPage = () => {
                 {!loading && orders.length === 0 ? (
                     <div className="no-orders premium">
                         <div className="no-orders-content">
-                            <div className="no-orders-icon">🔍</div>
+                            <div className="no-orders-icon">?</div>
                             <h3>לא נמצאו הזמנות</h3>
                             <p>נסה לשנות את מסנני החיפוש או לנקות את כל הפילטרים</p>
                             {hasActiveFilters && (
                                 <button onClick={handleClearAllFilters} className="clear-filters-btn premium">
-                                    🧹 נקה פילטרים
+                                    נקה פילטרים
                                 </button>
                             )}
                         </div>
@@ -1484,13 +1836,13 @@ const ManageRentalsPage = () => {
                 ) : (
                     <div className="orders-container premium">
                         <div className="orders-header">
-                            <h3>📋 הזמנות</h3>
+                            <h3>הזמנות</h3>
                             {paginationData && (
                                 <p>הצגת {orders.length} הזמנות מתוך {paginationData.totalOrders} סה"כ</p>
                             )}
                             {loading && (
                                 <div className="loading-indicator">
-                                    <span>⏳ טוען...</span>
+                                    <span>טוען...</span>
                                 </div>
                             )}
                         </div>
@@ -1507,6 +1859,8 @@ const ManageRentalsPage = () => {
                                     onShowCustomerContact={handleShowCustomerContact}
                                     onShowOrderId={handleShowOrderId}
                                     onShowMembership={handleShowMembership}
+                                    onConfirmPickup={handleConfirmPickup}
+                                    onConfirmReturn={handleConfirmReturn}
                                 />
                             ))}
                         </div>
@@ -1556,6 +1910,30 @@ const ManageRentalsPage = () => {
                     message={confirmationAction.message}
                     onConfirm={handleConfirmAction}
                     onCancel={handleCancelAction}
+                />
+            )}
+
+            {/* NEW: Pickup Confirmation Modal */}
+            {showPickupModal && currentOrderForPickup && (
+                <PickupConfirmationModal
+                    order={currentOrderForPickup}
+                    onClose={() => {
+                        setShowPickupModal(false);
+                        setCurrentOrderForPickup(null);
+                    }}
+                    onSuccess={handlePickupSuccess}
+                />
+            )}
+
+            {/* NEW: Return Confirmation Modal */}
+            {showReturnModal && currentOrderForReturn && (
+                <ReturnConfirmationModal
+                    order={currentOrderForReturn}
+                    onClose={() => {
+                        setShowReturnModal(false);
+                        setCurrentOrderForReturn(null);
+                    }}
+                    onSuccess={handleReturnSuccess}
                 />
             )}
         </div>

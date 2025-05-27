@@ -191,7 +191,7 @@ const ProductForm = () => {
     <div className="product-form-container-modern">
       <div className="form-header-modern">
         <div className="header-content">
-          <h1>{editing ? '✏️ עריכת מוצר' : '➕ הוספת מוצר חדש'}</h1>
+          <h1>{editing ? 'עריכת מוצר' : 'הוספת מוצר חדש'}</h1>
           <p>{editing ? 'עדכן את פרטי המוצר והמלאי' : 'הוסף מוצר חדש עם ניהול מלאי מתקדם'}</p>
         </div>
       </div>
@@ -200,7 +200,7 @@ const ProductForm = () => {
         {/* Basic Information Section */}
         <div className="form-section-modern">
           <div className="section-header">
-            <h3>📋 מידע בסיסי</h3>
+            <h3>מידע בסיסי</h3>
             <p>פרטי המוצר הבסיסיים</p>
           </div>
           
@@ -305,7 +305,7 @@ const ProductForm = () => {
           <div className="section-header">
             <InventoryIcon />
             <div>
-              <h3>📦 ניהול מלאי</h3>
+              <h3>ניהול מלאי</h3>
               <p>הגדרות מלאי ויחידות זמינות</p>
             </div>
           </div>
@@ -341,7 +341,7 @@ const ProductForm = () => {
         {/* Additional Details Section */}
         <div className="form-section-modern">
           <div className="section-header">
-            <h3>📝 פרטים נוספים</h3>
+            <h3>פרטים נוספים</h3>
             <p>מפרטים וקטגוריות לחיפוש</p>
           </div>
           
@@ -374,7 +374,7 @@ const ProductForm = () => {
           <div className="section-header">
             <ImageIcon />
             <div>
-              <h3>🖼️ תמונת המוצר</h3>
+              <h3>תמונת המוצר</h3>
               <p>העלה תמונה איכותית של המוצר</p>
             </div>
           </div>
@@ -412,7 +412,7 @@ const ProductForm = () => {
         {/* Error Display */}
         {error && (
           <div className="error-message-modern">
-            <span className="error-icon">⚠️</span>
+            <span className="error-icon">!</span>
             <span>{error}</span>
           </div>
         )}

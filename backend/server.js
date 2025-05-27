@@ -5,8 +5,12 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require('path');
+const http = require('http');
 require("./config/db"); // Auto-connects to database
 const rateLimit = require('express-rate-limit');
+
+// Import WebSocket service
+const websocketService = require('./services/websocketService');
 
 const productRoutes = require('./routes/productRoutes');
 const authRoutes = require("./routes/auth");
@@ -15,24 +19,34 @@ const cartRoutes = require("./routes/cartRoutes");
 const userRoutes = require('./routes/userRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const adminOrderRoutes = require('./routes/adminOrders');
+const reservationRoutes = require('./routes/reservationRoutes');
 
 const app = express();
+const server = http.createServer(app);
 
 // Rate limiting middleware
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: process.env.NODE_ENV === 'production' ? 100 : 1000, // 1000 requests for development, 100 for production
   message: {
     error: 'Too many requests from this IP, please try again later.',
     retryAfter: '15 minutes'
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => {
+    // Skip rate limiting for localhost in development
+    if (process.env.NODE_ENV !== 'production' && 
+        (req.ip === '127.0.0.1' || req.ip === '::1' || req.ip?.includes('localhost'))) {
+      return true;
+    }
+    return false;
+  }
 });
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // limit each IP to 10 auth requests per windowMs
+  max: process.env.NODE_ENV === 'production' ? 10 : 100, // 100 requests for development, 10 for production
   message: {
     error: 'Too many authentication attempts, please try again later.',
     retryAfter: '15 minutes'
@@ -43,7 +57,7 @@ const authLimiter = rateLimit({
 
 const checkoutLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
-  max: 5, // limit each IP to 5 checkout requests per minute
+  max: process.env.NODE_ENV === 'production' ? 5 : 50, // 50 requests for development, 5 for production
   message: {
     error: 'Too many checkout attempts, please try again later.',
     retryAfter: '1 minute'
@@ -119,6 +133,7 @@ app.use("/api/carts", cartRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/admin/orders', adminOrderRoutes);
+app.use('/api/reservations', reservationRoutes);
 
 // Static folder for images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -155,10 +170,18 @@ app.get("/api/test-rate-limit", (req, res) => {
 
 // Start the server
 const PORT = process.env.PORT || 5002;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   if (process.env.NODE_ENV === 'production') {
     console.log('🚀 Production mode: Serving React build files');
+  }
+  
+  // Initialize WebSocket service
+  try {
+    websocketService.initialize(server);
+    console.log('🔄 WebSocket service initialized successfully');
+  } catch (error) {
+    console.error('❌ Failed to initialize WebSocket service:', error);
   }
 });

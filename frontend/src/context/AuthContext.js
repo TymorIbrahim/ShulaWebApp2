@@ -1,5 +1,6 @@
 // src/context/AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from "react";
+import websocketService from "../services/websocketService"; // Import WebSocket service
 
 const AuthContext = createContext(undefined);
 
@@ -24,6 +25,28 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  // Effect to handle WebSocket connection based on user authentication
+  useEffect(() => {
+    if (authReady) {
+      if (user && user.token) {
+        // User is authenticated, initialize WebSocket with token
+        console.log("Initializing WebSocket for authenticated user");
+        websocketService.initialize(user.token);
+      } else {
+        // User is not authenticated, disconnect WebSocket if connected
+        console.log("Disconnecting WebSocket - user not authenticated");
+        websocketService.disconnect();
+      }
+    }
+
+    // Cleanup function to disconnect when component unmounts
+    return () => {
+      if (!user) {
+        websocketService.disconnect();
+      }
+    };
+  }, [user, authReady]);
+
   const loginUser = (userData) => {
     if (!userData || typeof userData !== 'object') {
       console.error("Invalid userData provided to loginUser");
@@ -34,6 +57,12 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("user", JSON.stringify(userData));
       setUser(userData);
       if (!authReady) setAuthReady(true);
+      
+      // Initialize WebSocket with the new user's token
+      if (userData.token) {
+        console.log("Initializing WebSocket for logged in user");
+        websocketService.initialize(userData.token);
+      }
     } catch (error) {
       console.error("Could not save user to localStorage:", error);
     }
@@ -42,6 +71,10 @@ export const AuthProvider = ({ children }) => {
   const logoutUser = () => {
     localStorage.removeItem("user");
     setUser(null);
+    
+    // Disconnect WebSocket when user logs out
+    console.log("🔌 Disconnecting WebSocket (user logged out)");
+    websocketService.disconnect();
   };
 
   // Effect to listen for storage changes (for multi-tab sync)
@@ -52,9 +85,17 @@ export const AuthProvider = ({ children }) => {
           const storedUser = localStorage.getItem("user");
           const parsedUser = storedUser ? JSON.parse(storedUser) : null;
           setUser(parsedUser);
+          
+          // Handle WebSocket connection for multi-tab sync
+          if (parsedUser && parsedUser.token) {
+            websocketService.initialize(parsedUser.token);
+          } else {
+            websocketService.disconnect();
+          }
         } catch (error) {
           console.error("Error parsing user from storage event:", error);
           setUser(null);
+          websocketService.disconnect();
         }
       }
     };
@@ -93,5 +134,6 @@ export const useAuth = () => {
     isAuthenticated: !!user,
     isAdmin: calculatedIsAdmin,
     authReady,
+    token: user?.token, // Add token to the returned object for easy access
   };
 };

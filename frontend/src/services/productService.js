@@ -8,7 +8,9 @@ const API_URL = `${API_BASE_URL}/api/products`;
 const getAuthHeaders = () => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const token = user.token || user.accessToken;
-    return token ? { Authorization: `Bearer ${token}` } : {};
+    return {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+    };
 };
 
 // Function to get all products with optional query filters
@@ -176,3 +178,17 @@ export const getConditionBadge = (condition) => {
 
 // Alias for backward compatibility
 export const getProduct = getProductById;
+
+export const getPopularProducts = async (limit = 8) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/products/popular/featured?limit=${limit}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching popular products:', error);
+    throw error;
+  }
+};

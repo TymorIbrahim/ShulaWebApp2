@@ -2,6 +2,7 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext'; // Adjust path if AuthContext.js is elsewhere
 import HeroSection from '../components/HeroSection'; // Adjust path to your HeroSection component
+import PopularProducts from '../components/PopularProducts'; // New component for popular products
 
 const HomePage = () => {
   // Get authReady and isAuthenticated to manage loading state if needed
@@ -25,7 +26,12 @@ const HomePage = () => {
   // This page (at path '/') will now always show the HeroSection or equivalent customer view.
   // Admins should have been redirected to /admin by LoginPage.js.
   // console.log("[HOME_PAGE_V7] Auth ready or user authenticated. Rendering HeroSection.");
-  return <HeroSection />;
+  return (
+    <div>
+      <HeroSection />
+      <PopularProducts />
+    </div>
+  );
 };
 
 export default HomePage; // Ensure this default export is present and correct

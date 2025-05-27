@@ -84,7 +84,7 @@
 }
 
 .loading-spinner {
-    font-size: 3rem;
+    font-size: 1.5rem;
     margin-bottom: var(--spacing-lg);
     animation: float 2s ease-in-out infinite;
 }
@@ -108,7 +108,7 @@
 }
 
 .settings-header-content h1.settings-title {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 700;
     color: var(--gray-900);
     margin: 0 0 var(--spacing-sm) 0;

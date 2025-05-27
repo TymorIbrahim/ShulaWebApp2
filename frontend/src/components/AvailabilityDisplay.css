@@ -1,0 +1,352 @@
+.availability-display {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 16px;
+  padding: 24px;
+  margin: 20px 0;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  direction: rtl;
+}
+
+/* Main Availability Status */
+.availability-status {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+.availability-status.available {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border: 2px solid #28a745;
+}
+
+.availability-status.unavailable {
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  border: 2px solid #dc3545;
+}
+
+.status-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.status-text h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.availability-status.available .status-text h3 {
+  color: #155724;
+}
+
+.availability-status.unavailable .status-text h3 {
+  color: #721c24;
+}
+
+.status-text p {
+  margin: 0;
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+/* Next Available Date */
+.next-available {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+  border: 2px solid #ffc107;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.next-available-icon {
+  font-size: 2rem;
+}
+
+.next-available-text h4 {
+  margin: 0 0 4px 0;
+  color: #856404;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.next-available-text p {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #856404;
+}
+
+.units-info {
+  font-size: 0.9rem;
+  color: #6c757d;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+/* Quick Availability Timeline */
+.quick-availability {
+  margin-bottom: 20px;
+}
+
+.quick-availability h4 {
+  margin: 0 0 12px 0;
+  color: #495057;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.availability-timeline {
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.day-indicator {
+  flex: 1;
+  text-align: center;
+  padding: 8px 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 40px;
+}
+
+.day-indicator.available {
+  background: #d4edda;
+  border: 1px solid #28a745;
+}
+
+.day-indicator.busy {
+  background: #f8d7da;
+  border: 1px solid #dc3545;
+}
+
+.day-indicator:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.day-name {
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.day-indicator.available .day-name {
+  color: #155724;
+}
+
+.day-indicator.busy .day-name {
+  color: #721c24;
+}
+
+.day-status {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.day-indicator.available .day-status {
+  color: #28a745;
+}
+
+.day-indicator.busy .day-status {
+  color: #dc3545;
+}
+
+/* Upcoming Rentals Section */
+.upcoming-rentals {
+  margin-bottom: 20px;
+}
+
+.toggle-calendar-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border: 2px solid #2196f3;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1565c0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.toggle-calendar-btn:hover {
+  background: linear-gradient(135deg, #bbdefb 0%, #90caf9 100%);
+  transform: translateY(-1px);
+}
+
+.arrow {
+  transition: transform 0.3s ease;
+  font-size: 0.8rem;
+}
+
+.arrow.up {
+  transform: rotate(180deg);
+}
+
+.detailed-calendar {
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 8px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.detailed-calendar h4 {
+  margin: 0 0 12px 0;
+  color: #495057;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.rental-periods {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rental-period {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-right: 4px solid #6c757d;
+}
+
+.rental-period .date {
+  font-weight: 500;
+  color: #495057;
+}
+
+.rental-info {
+  display: flex;
+  gap: 12px;
+}
+
+.rented {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.available {
+  background: #d4edda;
+  color: #155724;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Action Call-to-Action */
+.availability-action {
+  text-align: center;
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 20px;
+}
+
+.action-available {
+  background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+  border: 2px solid #17a2b8;
+}
+
+.action-busy {
+  background: linear-gradient(135deg, #e2e3e5 0%, #d6d8db 100%);
+  border: 2px solid #6c757d;
+}
+
+.action-text {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.action-available .action-text {
+  color: #0c5460;
+}
+
+.action-busy .action-text {
+  color: #495057;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .availability-display {
+    padding: 16px;
+    margin: 16px 0;
+  }
+  
+  .availability-status {
+    padding: 16px;
+    gap: 12px;
+  }
+  
+  .status-icon {
+    font-size: 2rem;
+  }
+  
+  .status-text h3 {
+    font-size: 1.2rem;
+  }
+  
+  .availability-timeline {
+    gap: 4px;
+    padding: 8px;
+  }
+  
+  .day-indicator {
+    padding: 6px 2px;
+    min-width: 35px;
+  }
+  
+  .day-name {
+    font-size: 0.7rem;
+  }
+  
+  .day-status {
+    font-size: 1rem;
+  }
+  
+  .next-available {
+    padding: 12px;
+    gap: 12px;
+  }
+  
+  .next-available-icon {
+    font-size: 1.5rem;
+  }
+} 

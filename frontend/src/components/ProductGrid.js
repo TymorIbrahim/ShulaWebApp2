@@ -2,11 +2,15 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { getProducts } from "../services/productService";
+import { useAuth } from "../context/AuthContext";
+import websocketService from "../services/websocketService";
 import "./ProductGrid.css";
 
 const ProductGrid = () => {
+  const { token } = useAuth();
   // State for products and API response
   const [products, setProducts] = useState([]);
+  const [realTimeInventory, setRealTimeInventory] = useState(new Map());
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -45,6 +49,33 @@ const ProductGrid = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  // WebSocket real-time inventory updates
+  useEffect(() => {
+    const handleInventoryUpdate = (data) => {
+      console.log('Product grid inventory update:', data);
+      setRealTimeInventory(prev => new Map(prev.set(data.productId, data.availability)));
+    };
+
+    const handleProductAvailabilityUpdate = (data) => {
+      console.log('🔄 Product grid availability update:', data);
+      setRealTimeInventory(prev => new Map(prev.set(data.productId, data.availability)));
+    };
+
+    // Listen for real-time updates
+    websocketService.on('inventory-update', handleInventoryUpdate);
+    websocketService.on('product-availability-update', handleProductAvailabilityUpdate);
+
+    // Initialize WebSocket if not connected and we have a token
+    if (!websocketService.isConnected() && token) {
+      websocketService.initialize(token);
+    }
+
+    return () => {
+      websocketService.off('inventory-update', handleInventoryUpdate);
+      websocketService.off('product-availability-update', handleProductAvailabilityUpdate);
+    };
+  }, [token]);
+
   // Fetch products function
   const fetchProducts = useCallback(async (page = 1) => {
     try {
@@ -73,7 +104,7 @@ const ProductGrid = () => {
       setAvailableFilters(response.filters || { categories: [], conditions: [] });
       
     } catch (err) {
-      console.error("❌ Error fetching products:", err);
+      console.error("Error fetching products:", err);
       setError("שגיאה בטעינת מוצרים. אנא נסה שנית.");
       setProducts([]);
     } finally {
@@ -234,8 +265,12 @@ const ProductGrid = () => {
               <option value="name-desc">שם (ת-א)</option>
               <option value="price-asc">מחיר (נמוך לגבוה)</option>
               <option value="price-desc">מחיר (גבוה לנמוך)</option>
+              <option value="rentalStats.popularityScore-desc">פופולריות (גבוה לנמוך)</option>
+              <option value="rentalStats.totalRentals-desc">הכי מושכר</option>
+              <option value="rentalStats.lastRented-desc">אחרון שהושכר</option>
               <option value="createdAt-desc">חדשים ביותר</option>
               <option value="createdAt-asc">ישנים ביותר</option>
+              <option value="featured-desc">מומלץ קודם</option>
             </select>
           </div>
 
@@ -343,12 +378,42 @@ const ProductGrid = () => {
                           e.target.style.opacity = '0';
                         }}
                       />
-                      {/* Stock Status Badge */}
-                      {product.inventory && (
-                        <div className={`stock-badge ${product.inventory.totalUnits > 0 ? 'in-stock' : 'out-of-stock'}`}>
-                          {product.inventory.totalUnits > 0 ? 'במלאי' : 'אזל'}
-                        </div>
-                      )}
+                      {/* Stock Status Badge - Real-time inventory integration */}
+                      {(() => {
+                        // Get real-time inventory data if available
+                        const realtimeData = realTimeInventory.get(product._id || product.id);
+                        const availableUnits = realtimeData ? realtimeData.availableNow : product.inventory?.totalUnits || 0;
+                        const hasReservations = realtimeData ? realtimeData.currentlyReserved > 0 : false;
+                        
+                        let stockStatus, stockClass, stockText;
+                        
+                        if (availableUnits > 5) {
+                          stockStatus = 'in-stock';
+                          stockClass = 'in-stock';
+                          stockText = 'זמין';
+                        } else if (availableUnits > 0) {
+                          stockStatus = 'low-stock';
+                          stockClass = 'low-stock';
+                          stockText = hasReservations ? `${availableUnits} זמין (${realtimeData.currentlyReserved} שמור)` : `${availableUnits} זמין`;
+                        } else {
+                          stockStatus = 'out-of-stock';
+                          stockClass = 'out-of-stock';
+                          stockText = hasReservations ? 'שמור זמנית' : 'אזל';
+                        }
+                        
+                        return (
+                          <div className={`stock-badge ${stockClass}`} title={realtimeData ? 'מעודכן בזמן אמת' : 'נתונים סטטיים'}>
+                            {realtimeData && (
+                              <span className="live-indicator">
+                                <svg className="live-icon" viewBox="0 0 12 12" fill="currentColor">
+                                  <circle cx="6" cy="6" r="6"/>
+                                </svg>
+                              </span>
+                            )}
+                            {stockText}
+                          </div>
+                        );
+                      })()}
                     </div>
                     <div className="product-info">
                       <h3 className="product-name">{product.name || "שם מוצר"}</h3>
