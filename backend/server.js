@@ -66,6 +66,7 @@ const corsOptions = {
           'https://shula-webapp-plis3hw1h-tymoribrahims-projects.vercel.app',
           'https://shula-webapp-3bd67pbsd-tymoribrahims-projects.vercel.app',
           'https://shula-webapp-gmzc8acmn-tymoribrahims-projects.vercel.app',
+          'https://shula-webapp-j4vlf4751-tymoribrahims-projects.vercel.app',
           'https://shula-rent-project-production.up.railway.app',
           'https://shula-webapp-production.vercel.app',
           'https://shula-webapp.vercel.app'

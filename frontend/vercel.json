@@ -19,6 +19,5 @@
   "env": {
     "REACT_APP_API_URL": "https://shula-rent-project-production.up.railway.app"
   },
-  "alias": ["shula-webapp.vercel.app"],
-  "name": "shula-webapp"
+  "alias": ["shula-webapp.vercel.app"]
 } 
