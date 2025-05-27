@@ -91,13 +91,22 @@ const CheckoutPage = () => {
     // Check if ID was previously uploaded OR if they chose in-person (ID verified at pickup)
     const hasValidIdUpload = idUpload.uploaded && idUpload.fileName;
     
-    // For customers who previously chose in-person and have basic info, they qualify for fast checkout
-    // because their contract and ID were verified in person
-    const isInPersonVerified = customerInfo.idNumber === "TBD-IN-PERSON" || 
-                              (customerInfo.idNumber && customerInfo.idNumber.includes("IN-PERSON"));
+    // For customers who previously chose in-person, they qualify for fast checkout
+    // because they've already gone through the onboarding process
+    const isInPersonCustomer = customerInfo.idNumber && (
+      customerInfo.idNumber === "TBD-IN-PERSON" || 
+      customerInfo.idNumber === "WILL_VERIFY_IN_PERSON" ||
+      customerInfo.idNumber === "PENDING-IN-PERSON" ||
+      customerInfo.idNumber.includes("IN-PERSON") ||
+      customerInfo.idNumber.includes("PENDING") ||
+      customerInfo.idNumber.includes("WILL_VERIFY")
+    );
     
+    // Customer qualifies for fast checkout if:
+    // 1. They have complete online verification (signed contract + uploaded ID), OR
+    // 2. They previously chose in-person process (regardless of document status)
     return (hasCompleteCustomerInfo && hasValidContract && hasValidIdUpload) || 
-           (isInPersonVerified && customerInfo.firstName && customerInfo.lastName && customerInfo.email && customerInfo.phone);
+           (isInPersonCustomer && customerInfo.firstName && customerInfo.lastName && customerInfo.email && customerInfo.phone);
   }, []);
 
   // Get streamlined steps for returning customers with complete info
