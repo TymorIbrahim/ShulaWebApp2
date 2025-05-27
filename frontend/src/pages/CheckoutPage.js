@@ -356,14 +356,16 @@ const CheckoutPage = () => {
   };
 
   const nextStep = () => {
-    const maxStep = steps.length - 1;
+    // Get the maximum step ID from the steps array
+    const maxStep = Math.max(...steps.map(step => step.id));
     if (currentStep < maxStep) {
       setCurrentStep(currentStep + 1);
     }
   };
 
   const prevStep = () => {
-    const minStep = isFirstTimeCustomer ? 0 : 1;
+    // Get the minimum step ID from the steps array  
+    const minStep = Math.min(...steps.map(step => step.id));
     if (currentStep > minStep) {
       setCurrentStep(currentStep - 1);
     }
