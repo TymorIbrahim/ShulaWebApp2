@@ -32,10 +32,8 @@ const FastCheckoutConfirmation = ({
     // This step should only confirm details and move to the final step
     // The actual order processing should happen in the final step
     
-    // Scroll to top of page
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    
     // Move to next step (final order processing step)
+    // Auto-scroll will be handled by the step transition
     onNext();
   };
 

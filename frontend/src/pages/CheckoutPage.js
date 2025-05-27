@@ -369,6 +369,19 @@ const CheckoutPage = () => {
     }
   };
 
+  // Auto-scroll to top when step changes
+  useEffect(() => {
+    if (currentStep >= 0) {
+      // Use setTimeout to ensure the new step content is rendered before scrolling
+      setTimeout(() => {
+        window.scrollTo({ 
+          top: 0, 
+          behavior: 'smooth' 
+        });
+      }, 100);
+    }
+  }, [currentStep]);
+
   const handleOnboardingChoice = async (choice) => {
     setOnboardingChoice(choice);
     if (choice === "in-person") {
