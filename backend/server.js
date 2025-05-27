@@ -63,10 +63,11 @@ const corsOptions = {
           'https://shula-webapp-dppi61gn7-tymoribrahims-projects.vercel.app',
           'https://shula-webapp-p5wxumce3-tymoribrahims-projects.vercel.app',
           'https://shula-webapp-axj1uf7jy-tymoribrahims-projects.vercel.app',
+          'https://shula-webapp-plis3hw1h-tymoribrahims-projects.vercel.app',
           'https://shula-rent-project-production.up.railway.app',
           'https://shula-webapp-production.vercel.app',
           'https://shula-webapp.vercel.app'
-        ].filter(Boolean) // Remove any undefined values
+        ].filter(Boolean)
       : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'];
     
     // Allow requests with no origin (like mobile apps or Postman)
