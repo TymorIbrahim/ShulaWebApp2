@@ -2,7 +2,20 @@ const express = require('express');
 const multer = require('multer');
 const authorize = require('../middleware/auth');
 const User = require('../models/user.model');
-const gcsService = require('../services/gcsService');
+
+// Determine which storage service to use based on environment configuration
+let storageService;
+
+if (process.env.STORAGE_SERVICE === 's3' && process.env.AWS_ACCESS_KEY_ID) {
+  console.log('Using S3 storage service');
+  storageService = require('../services/s3Service');
+} else if (process.env.STORAGE_SERVICE === 'gcs' && process.env.GCS_BUCKET_NAME) {
+  console.log('Using Google Cloud Storage service');
+  storageService = require('../services/gcsService');
+} else {
+  console.log('Using local storage service (default)');
+  storageService = require('../services/localStorageService');
+}
 
 const router = express.Router();
 
@@ -37,14 +50,14 @@ router.post('/profile-picture', authorize(['customer', 'staff']), upload.single(
     // If there's an old picture, delete it from GCS
     if (user.profilePic && !user.profilePic.includes('default-avatar.png')) {
       try {
-        await gcsService.deleteFile(user.profilePic);
+        await storageService.deleteFile(user.profilePic);
       } catch (deleteError) {
         console.error("Failed to delete old profile picture from GCS, continuing with upload...", deleteError);
       }
     }
 
     // Upload the new picture to GCS
-    const profilePicUrl = await gcsService.uploadFile(
+    const profilePicUrl = await storageService.uploadFile(
       req.file.buffer,
       req.file.originalname,
       req.file.mimetype,
@@ -81,7 +94,7 @@ router.post('/id-document', authorize(['customer', 'staff']), upload.single('ima
       return res.status(400).json({ message: 'No file uploaded.' });
     }
 
-    const idFileUrl = await gcsService.uploadFile(
+    const idFileUrl = await storageService.uploadFile(
       req.file.buffer,
       req.file.originalname,
       req.file.mimetype,
@@ -105,7 +118,7 @@ router.post('/signature', authorize(['customer', 'staff']), upload.single('signa
       return res.status(400).json({ message: 'No file uploaded.' });
     }
 
-    const signatureUrl = await gcsService.uploadFile(
+    const signatureUrl = await storageService.uploadFile(
       req.file.buffer,
       req.file.originalname,
       req.file.mimetype,
@@ -129,7 +142,7 @@ router.post('/product-image', authorize('staff'), upload.single('image'), async 
       return res.status(400).json({ message: 'No file uploaded.' });
     }
 
-    const imageUrl = await gcsService.uploadFile(
+    const imageUrl = await storageService.uploadFile(
       req.file.buffer,
       req.file.originalname,
       req.file.mimetype,

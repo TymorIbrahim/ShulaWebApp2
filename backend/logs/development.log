@@ -2243,3 +2243,881 @@ Has Role: true
 ✅ CORS allowed origin: http://localhost:3000
 ✅ CORS allowed origin: http://localhost:3000
 ✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:09:59.367Z
+Route: /api/admin/orders?page=1&limit=12&sortBy=createdAt&sortOrder=desc
+Decoded Token User: { id: '68825a1bd28f75825ce6c8e7', role: 'staff' }
+User from DB: {
+  _id: '68825a1bd28f75825ce6c8e7',
+  email: 'einat@shula.com',
+  role: 'staff'
+}
+Required Roles: [ 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:09:59.371Z
+Route: /api/admin/orders?page=1&limit=12&sortBy=createdAt&sortOrder=desc
+Decoded Token User: { id: '68825a1bd28f75825ce6c8e7', role: 'staff' }
+User from DB: {
+  _id: '68825a1bd28f75825ce6c8e7',
+  email: 'einat@shula.com',
+  role: 'staff'
+}
+Required Roles: [ 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:09:59.372Z
+Route: /api/admin/orders?page=1&limit=12&sortBy=createdAt&sortOrder=desc
+Decoded Token User: { id: '68825a1bd28f75825ce6c8e7', role: 'staff' }
+User from DB: {
+  _id: '68825a1bd28f75825ce6c8e7',
+  email: 'einat@shula.com',
+  role: 'staff'
+}
+Required Roles: [ 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:10:11.605Z
+Route: /api/users/membership/68825a27d28f75825ce6c907
+Decoded Token User: { id: '68825a1bd28f75825ce6c8e7', role: 'staff' }
+User from DB: {
+  _id: '68825a1bd28f75825ce6c8e7',
+  email: 'einat@shula.com',
+  role: 'staff'
+}
+Required Roles: [ 'customer', 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:10:13.173Z
+Route: /api/users/membership/68825a27d28f75825ce6c907
+Decoded Token User: { id: '68825a1bd28f75825ce6c8e7', role: 'staff' }
+User from DB: {
+  _id: '68825a1bd28f75825ce6c8e7',
+  email: 'einat@shula.com',
+  role: 'staff'
+}
+Required Roles: [ 'customer', 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:10:28.925Z
+Route: /api/users?page=1&limit=12&sortBy=createdAt&sortOrder=desc
+Decoded Token User: { id: '68825a1bd28f75825ce6c8e7', role: 'staff' }
+User from DB: {
+  _id: '68825a1bd28f75825ce6c8e7',
+  email: 'einat@shula.com',
+  role: 'staff'
+}
+Required Roles: [ 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:10:29.534Z
+Route: /api/users?page=1&limit=12&sortBy=createdAt&sortOrder=desc
+Decoded Token User: { id: '68825a1bd28f75825ce6c8e7', role: 'staff' }
+User from DB: {
+  _id: '68825a1bd28f75825ce6c8e7',
+  email: 'einat@shula.com',
+  role: 'staff'
+}
+Required Roles: [ 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:10:30.232Z
+Route: /api/users?page=1&limit=12&sortBy=createdAt&sortOrder=desc
+Decoded Token User: { id: '68825a1bd28f75825ce6c8e7', role: 'staff' }
+User from DB: {
+  _id: '68825a1bd28f75825ce6c8e7',
+  email: 'einat@shula.com',
+  role: 'staff'
+}
+Required Roles: [ 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:10:30.815Z
+Route: /api/users?page=1&limit=12&sortBy=createdAt&sortOrder=desc
+Decoded Token User: { id: '68825a1bd28f75825ce6c8e7', role: 'staff' }
+User from DB: {
+  _id: '68825a1bd28f75825ce6c8e7',
+  email: 'einat@shula.com',
+  role: 'staff'
+}
+Required Roles: [ 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:10:39.497Z
+Route: /api/users/membership/68825a4fd28f75825ce6c96e
+Decoded Token User: { id: '68825a1bd28f75825ce6c8e7', role: 'staff' }
+User from DB: {
+  _id: '68825a1bd28f75825ce6c8e7',
+  email: 'einat@shula.com',
+  role: 'staff'
+}
+Required Roles: [ 'customer', 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:10:41.245Z
+Route: /api/users/membership/68825a4fd28f75825ce6c96e
+Decoded Token User: { id: '68825a1bd28f75825ce6c8e7', role: 'staff' }
+User from DB: {
+  _id: '68825a1bd28f75825ce6c8e7',
+  email: 'einat@shula.com',
+  role: 'staff'
+}
+Required Roles: [ 'customer', 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+Client connected
+User authenticated via WebSocket
+Client disconnected
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:11:16.641Z
+Route: /api/users?limit=1
+Decoded Token User: { id: '68825a1bd28f75825ce6c8e7', role: 'staff' }
+User from DB: {
+  _id: '68825a1bd28f75825ce6c8e7',
+  email: 'einat@shula.com',
+  role: 'staff'
+}
+Required Roles: [ 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:11:17.256Z
+Route: /api/users?limit=1
+Decoded Token User: { id: '68825a1bd28f75825ce6c8e7', role: 'staff' }
+User from DB: {
+  _id: '68825a1bd28f75825ce6c8e7',
+  email: 'einat@shula.com',
+  role: 'staff'
+}
+Required Roles: [ 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+Client disconnected
+Client disconnected
+Client disconnected
+Client connected
+Authentication error: invalid signature
+Client disconnected
+Client disconnected
+Client connected
+Authentication error: invalid signature
+Client connected
+Client connected
+Authentication error: invalid signature
+Authentication error: invalid signature
+Client disconnected
+Client disconnected
+Client disconnected
+Client disconnected
+Client disconnected
+Client connected
+Authentication error: invalid signature
+Client disconnected
+Client connected
+Authentication error: invalid signature
+❌ CORS blocked origin: https://shula-webapp.vercel.app
+✅ Allowed origins: http://localhost:3000, http://localhost:3001, http://localhost:5173
+Error: Not allowed by CORS
+    at origin (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/server.js:111:14)
+    at /Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/cors/lib/index.js:219:13
+    at optionsCallback (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/cors/lib/index.js:199:9)
+    at corsMiddleware (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/cors/lib/index.js:204:7)
+    at Layer.handle [as handle_request] (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/express/lib/router/index.js:328:13)
+    at /Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/express/lib/router/index.js:346:12)
+    at next (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/express/lib/router/index.js:280:10)
+    at jsonParser (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/body-parser/lib/types/json.js:113:7)
+Error in reservation cleanup job: PoolClearedOnNetworkError: Connection to shulacluster-shard-00-01.ged8w.mongodb.net:27017 interrupted due to server monitor timeout
+    at ConnectionPool.interruptInUseConnections (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cmap/connection_pool.js:253:36)
+    at /Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cmap/connection_pool.js:241:41
+    at process.processTicksAndRejections (node:internal/process/task_queues:85:11) {
+  errorLabelSet: Set(1) { 'PoolRequstedRetry' },
+  beforeHandshake: false,
+  address: 'shulacluster-shard-00-01.ged8w.mongodb.net:27017',
+  [cause]: MongoNetworkTimeoutError: connection <monitor> to 159.41.66.146:27017 timed out
+      at Timeout._onTimeout (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cmap/connection.js:125:26)
+      at listOnTimeout (node:internal/timers:608:17)
+      at process.processTimers (node:internal/timers:543:7) {
+    errorLabelSet: Set(2) { 'ResetPool', 'InterruptInUseConnections' },
+    beforeHandshake: false,
+    [cause]: undefined
+  }
+}
+Error checking expiring reservations: MongoServerSelectionError: connection <monitor> to 159.41.66.146:27017 timed out
+    at Topology.selectServer (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/sdam/topology.js:326:38)
+    at async tryOperation (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/operations/execute_operation.js:192:22)
+    at async executeOperation (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/operations/execute_operation.js:75:16)
+    at async FindCursor._initialize (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/find_cursor.js:61:26)
+    at async FindCursor.cursorInit (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:633:27)
+    at async FindCursor.fetchBatch (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:667:13)
+    at async FindCursor.next (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:347:17)
+    at async [Symbol.asyncIterator] (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:255:34)
+    at async FindCursor.toArray (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:427:26)
+    at async model.Query._find (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/lib/query.js:2407:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'shulacluster-shard-00-01.ged8w.mongodb.net:27017' => [ServerDescription],
+      'shulacluster-shard-00-02.ged8w.mongodb.net:27017' => [ServerDescription],
+      'shulacluster-shard-00-00.ged8w.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-po8yiz-shard-0',
+    maxElectionId: new ObjectId('7fffffff0000000000000021'),
+    maxSetVersion: 19,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkTimeoutError: connection <monitor> to 159.41.66.146:27017 timed out
+      at Timeout._onTimeout (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cmap/connection.js:125:26)
+      at listOnTimeout (node:internal/timers:608:17)
+      at process.processTimers (node:internal/timers:543:7) {
+    errorLabelSet: Set(2) { 'ResetPool', 'InterruptInUseConnections' },
+    beforeHandshake: false,
+    [cause]: undefined
+  }
+}
+Error checking expiring reservations: MongoServerSelectionError: Socket 'secureConnect' timed out after 30316ms (connectTimeoutMS: 30000)
+    at Topology.selectServer (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/sdam/topology.js:326:38)
+    at async tryOperation (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/operations/execute_operation.js:145:18)
+    at async executeOperation (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/operations/execute_operation.js:75:16)
+    at async FindCursor._initialize (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/find_cursor.js:61:26)
+    at async FindCursor.cursorInit (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:633:27)
+    at async FindCursor.fetchBatch (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:667:13)
+    at async FindCursor.next (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:347:17)
+    at async [Symbol.asyncIterator] (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:255:34)
+    at async FindCursor.toArray (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:427:26)
+    at async model.Query._find (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/lib/query.js:2407:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'shulacluster-shard-00-01.ged8w.mongodb.net:27017' => [ServerDescription],
+      'shulacluster-shard-00-02.ged8w.mongodb.net:27017' => [ServerDescription],
+      'shulacluster-shard-00-00.ged8w.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-po8yiz-shard-0',
+    maxElectionId: new ObjectId('7fffffff0000000000000021'),
+    maxSetVersion: 19,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkTimeoutError: Socket 'secureConnect' timed out after 30316ms (connectTimeoutMS: 30000)
+      at TLSSocket.<anonymous> (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cmap/connect.js:288:20)
+      at Object.onceWrapper (node:events:621:28)
+      at TLSSocket.emit (node:events:507:28)
+      at Socket._onTimeout (node:net:609:8)
+      at listOnTimeout (node:internal/timers:608:17)
+      at process.processTimers (node:internal/timers:543:7) {
+    errorLabelSet: Set(2) { 'ResetPool', 'InterruptInUseConnections' },
+    beforeHandshake: false,
+    [cause]: undefined
+  }
+}
+Error checking expiring reservations: MongoServerSelectionError: Socket 'secureConnect' timed out after 30002ms (connectTimeoutMS: 30000)
+    at Topology.selectServer (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/sdam/topology.js:326:38)
+    at async tryOperation (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/operations/execute_operation.js:145:18)
+    at async executeOperation (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/operations/execute_operation.js:75:16)
+    at async FindCursor._initialize (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/find_cursor.js:61:26)
+    at async FindCursor.cursorInit (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:633:27)
+    at async FindCursor.fetchBatch (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:667:13)
+    at async FindCursor.next (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:347:17)
+    at async [Symbol.asyncIterator] (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:255:34)
+    at async FindCursor.toArray (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:427:26)
+    at async model.Query._find (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/lib/query.js:2407:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'shulacluster-shard-00-01.ged8w.mongodb.net:27017' => [ServerDescription],
+      'shulacluster-shard-00-02.ged8w.mongodb.net:27017' => [ServerDescription],
+      'shulacluster-shard-00-00.ged8w.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-po8yiz-shard-0',
+    maxElectionId: new ObjectId('7fffffff0000000000000021'),
+    maxSetVersion: 19,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkTimeoutError: Socket 'secureConnect' timed out after 30002ms (connectTimeoutMS: 30000)
+      at TLSSocket.<anonymous> (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cmap/connect.js:288:20)
+      at Object.onceWrapper (node:events:621:28)
+      at TLSSocket.emit (node:events:507:28)
+      at Socket._onTimeout (node:net:609:8)
+      at listOnTimeout (node:internal/timers:608:17)
+      at process.processTimers (node:internal/timers:543:7) {
+    errorLabelSet: Set(2) { 'ResetPool', 'InterruptInUseConnections' },
+    beforeHandshake: false,
+    [cause]: undefined
+  }
+}
+Error checking expiring reservations: MongoServerSelectionError: Socket 'secureConnect' timed out after 30002ms (connectTimeoutMS: 30000)
+    at Topology.selectServer (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/sdam/topology.js:326:38)
+    at async tryOperation (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/operations/execute_operation.js:145:18)
+    at async executeOperation (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/operations/execute_operation.js:75:16)
+    at async FindCursor._initialize (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/find_cursor.js:61:26)
+    at async FindCursor.cursorInit (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:633:27)
+    at async FindCursor.fetchBatch (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:667:13)
+    at async FindCursor.next (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:347:17)
+    at async [Symbol.asyncIterator] (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:255:34)
+    at async FindCursor.toArray (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:427:26)
+    at async model.Query._find (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/lib/query.js:2407:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'shulacluster-shard-00-01.ged8w.mongodb.net:27017' => [ServerDescription],
+      'shulacluster-shard-00-02.ged8w.mongodb.net:27017' => [ServerDescription],
+      'shulacluster-shard-00-00.ged8w.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-po8yiz-shard-0',
+    maxElectionId: new ObjectId('7fffffff0000000000000021'),
+    maxSetVersion: 19,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkTimeoutError: Socket 'secureConnect' timed out after 30002ms (connectTimeoutMS: 30000)
+      at TLSSocket.<anonymous> (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cmap/connect.js:288:20)
+      at Object.onceWrapper (node:events:621:28)
+      at TLSSocket.emit (node:events:507:28)
+      at Socket._onTimeout (node:net:609:8)
+      at listOnTimeout (node:internal/timers:608:17)
+      at process.processTimers (node:internal/timers:543:7) {
+    errorLabelSet: Set(2) { 'ResetPool', 'InterruptInUseConnections' },
+    beforeHandshake: false,
+    [cause]: undefined
+  }
+}
+Error checking expiring reservations: MongoServerSelectionError: Socket 'secureConnect' timed out after 30002ms (connectTimeoutMS: 30000)
+    at Topology.selectServer (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/sdam/topology.js:326:38)
+    at async tryOperation (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/operations/execute_operation.js:145:18)
+    at async executeOperation (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/operations/execute_operation.js:75:16)
+    at async FindCursor._initialize (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/find_cursor.js:61:26)
+    at async FindCursor.cursorInit (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:633:27)
+    at async FindCursor.fetchBatch (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:667:13)
+    at async FindCursor.next (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:347:17)
+    at async [Symbol.asyncIterator] (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:255:34)
+    at async FindCursor.toArray (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:427:26)
+    at async model.Query._find (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/lib/query.js:2407:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'shulacluster-shard-00-01.ged8w.mongodb.net:27017' => [ServerDescription],
+      'shulacluster-shard-00-02.ged8w.mongodb.net:27017' => [ServerDescription],
+      'shulacluster-shard-00-00.ged8w.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-po8yiz-shard-0',
+    maxElectionId: new ObjectId('7fffffff0000000000000021'),
+    maxSetVersion: 19,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkTimeoutError: Socket 'secureConnect' timed out after 30002ms (connectTimeoutMS: 30000)
+      at TLSSocket.<anonymous> (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cmap/connect.js:288:20)
+      at Object.onceWrapper (node:events:621:28)
+      at TLSSocket.emit (node:events:507:28)
+      at Socket._onTimeout (node:net:609:8)
+      at listOnTimeout (node:internal/timers:608:17)
+      at process.processTimers (node:internal/timers:543:7) {
+    errorLabelSet: Set(2) { 'ResetPool', 'InterruptInUseConnections' },
+    beforeHandshake: false,
+    [cause]: undefined
+  }
+}
+Error in reservation cleanup job: MongoServerSelectionError: Socket 'secureConnect' timed out after 30002ms (connectTimeoutMS: 30000)
+    at Topology.selectServer (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/sdam/topology.js:326:38)
+    at async tryOperation (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/operations/execute_operation.js:145:18)
+    at async executeOperation (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/operations/execute_operation.js:75:16)
+    at async Collection.updateMany (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/collection.js:231:16)
+    at async model.Query.exec (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/lib/query.js:4604:63)
+    at async ReservationSchema.statics.cleanupExpired (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/models/Reservation.js:93:18)
+    at async Timeout._onTimeout (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/services/websocketService.js:275:30) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'shulacluster-shard-00-01.ged8w.mongodb.net:27017' => [ServerDescription],
+      'shulacluster-shard-00-02.ged8w.mongodb.net:27017' => [ServerDescription],
+      'shulacluster-shard-00-00.ged8w.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-po8yiz-shard-0',
+    maxElectionId: new ObjectId('7fffffff0000000000000021'),
+    maxSetVersion: 19,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkTimeoutError: Socket 'secureConnect' timed out after 30002ms (connectTimeoutMS: 30000)
+      at TLSSocket.<anonymous> (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cmap/connect.js:288:20)
+      at Object.onceWrapper (node:events:621:28)
+      at TLSSocket.emit (node:events:507:28)
+      at Socket._onTimeout (node:net:609:8)
+      at listOnTimeout (node:internal/timers:608:17)
+      at process.processTimers (node:internal/timers:543:7) {
+    errorLabelSet: Set(2) { 'ResetPool', 'InterruptInUseConnections' },
+    beforeHandshake: false,
+    [cause]: undefined
+  }
+}
+Error checking expiring reservations: MongoServerSelectionError: Socket 'secureConnect' timed out after 30002ms (connectTimeoutMS: 30000)
+    at Topology.selectServer (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/sdam/topology.js:326:38)
+    at async tryOperation (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/operations/execute_operation.js:145:18)
+    at async executeOperation (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/operations/execute_operation.js:75:16)
+    at async FindCursor._initialize (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/find_cursor.js:61:26)
+    at async FindCursor.cursorInit (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:633:27)
+    at async FindCursor.fetchBatch (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:667:13)
+    at async FindCursor.next (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:347:17)
+    at async [Symbol.asyncIterator] (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:255:34)
+    at async FindCursor.toArray (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:427:26)
+    at async model.Query._find (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/lib/query.js:2407:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'shulacluster-shard-00-01.ged8w.mongodb.net:27017' => [ServerDescription],
+      'shulacluster-shard-00-02.ged8w.mongodb.net:27017' => [ServerDescription],
+      'shulacluster-shard-00-00.ged8w.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-po8yiz-shard-0',
+    maxElectionId: new ObjectId('7fffffff0000000000000021'),
+    maxSetVersion: 19,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkTimeoutError: Socket 'secureConnect' timed out after 30002ms (connectTimeoutMS: 30000)
+      at TLSSocket.<anonymous> (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cmap/connect.js:288:20)
+      at Object.onceWrapper (node:events:621:28)
+      at TLSSocket.emit (node:events:507:28)
+      at Socket._onTimeout (node:net:609:8)
+      at listOnTimeout (node:internal/timers:608:17)
+      at process.processTimers (node:internal/timers:543:7) {
+    errorLabelSet: Set(2) { 'ResetPool', 'InterruptInUseConnections' },
+    beforeHandshake: false,
+    [cause]: undefined
+  }
+}
+Error checking expiring reservations: MongoServerSelectionError: Socket 'secureConnect' timed out after 30245ms (connectTimeoutMS: 30000)
+    at Topology.selectServer (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/sdam/topology.js:326:38)
+    at async tryOperation (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/operations/execute_operation.js:145:18)
+    at async executeOperation (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/operations/execute_operation.js:75:16)
+    at async FindCursor._initialize (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/find_cursor.js:61:26)
+    at async FindCursor.cursorInit (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:633:27)
+    at async FindCursor.fetchBatch (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:667:13)
+    at async FindCursor.next (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:347:17)
+    at async [Symbol.asyncIterator] (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:255:34)
+    at async FindCursor.toArray (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cursor/abstract_cursor.js:427:26)
+    at async model.Query._find (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/lib/query.js:2407:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'shulacluster-shard-00-01.ged8w.mongodb.net:27017' => [ServerDescription],
+      'shulacluster-shard-00-02.ged8w.mongodb.net:27017' => [ServerDescription],
+      'shulacluster-shard-00-00.ged8w.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-po8yiz-shard-0',
+    maxElectionId: new ObjectId('7fffffff0000000000000021'),
+    maxSetVersion: 19,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkTimeoutError: Socket 'secureConnect' timed out after 30245ms (connectTimeoutMS: 30000)
+      at TLSSocket.<anonymous> (/Users/tymoribrahim/Desktop/ShulaWebApp2/backend/node_modules/mongoose/node_modules/mongodb/lib/cmap/connect.js:288:20)
+      at Object.onceWrapper (node:events:621:28)
+      at TLSSocket.emit (node:events:507:28)
+      at Socket._onTimeout (node:net:609:8)
+      at listOnTimeout (node:internal/timers:608:17)
+      at process.processTimers (node:internal/timers:543:7) {
+    errorLabelSet: Set(2) { 'ResetPool', 'InterruptInUseConnections' },
+    beforeHandshake: false,
+    [cause]: undefined
+  }
+}
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+Client disconnected
+Client disconnected
+Signup error: Socket 'secureConnect' timed out after 30001ms (connectTimeoutMS: 30000)
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+Client connected
+User authenticated via WebSocket
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:26:48.573Z
+Route: /api/carts/add
+Decoded Token User: { id: '68825eb2ea7c7b6d510707ce', role: 'customer' }
+User from DB: {
+  _id: '68825eb2ea7c7b6d510707ce',
+  email: 'monya@shula.com',
+  role: 'customer'
+}
+Required Roles: [ 'customer', 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:26:51.079Z
+Route: /api/carts/68825eb2ea7c7b6d510707ce
+Decoded Token User: { id: '68825eb2ea7c7b6d510707ce', role: 'customer' }
+User from DB: {
+  _id: '68825eb2ea7c7b6d510707ce',
+  email: 'monya@shula.com',
+  role: 'customer'
+}
+Required Roles: [ 'customer', 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:26:51.632Z
+Route: /api/carts/68825eb2ea7c7b6d510707ce
+Decoded Token User: { id: '68825eb2ea7c7b6d510707ce', role: 'customer' }
+User from DB: {
+  _id: '68825eb2ea7c7b6d510707ce',
+  email: 'monya@shula.com',
+  role: 'customer'
+}
+Required Roles: [ 'customer', 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:26:53.817Z
+Route: /api/orders/user/68825eb2ea7c7b6d510707ce?limit=1
+Decoded Token User: { id: '68825eb2ea7c7b6d510707ce', role: 'customer' }
+User from DB: {
+  _id: '68825eb2ea7c7b6d510707ce',
+  email: 'monya@shula.com',
+  role: 'customer'
+}
+Required Roles: [ 'customer', 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:26:54.376Z
+Route: /api/carts/68825eb2ea7c7b6d510707ce
+Decoded Token User: { id: '68825eb2ea7c7b6d510707ce', role: 'customer' }
+User from DB: {
+  _id: '68825eb2ea7c7b6d510707ce',
+  email: 'monya@shula.com',
+  role: 'customer'
+}
+Required Roles: [ 'customer', 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:26:54.382Z
+Route: /api/orders/user/68825eb2ea7c7b6d510707ce?limit=1
+Decoded Token User: { id: '68825eb2ea7c7b6d510707ce', role: 'customer' }
+User from DB: {
+  _id: '68825eb2ea7c7b6d510707ce',
+  email: 'monya@shula.com',
+  role: 'customer'
+}
+Required Roles: [ 'customer', 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:26:54.909Z
+Route: /api/orders/user/68825eb2ea7c7b6d510707ce?limit=10&sortBy=createdAt&sortOrder=desc
+Decoded Token User: { id: '68825eb2ea7c7b6d510707ce', role: 'customer' }
+User from DB: {
+  _id: '68825eb2ea7c7b6d510707ce',
+  email: 'monya@shula.com',
+  role: 'customer'
+}
+Required Roles: [ 'customer', 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:26:54.921Z
+Route: /api/carts/68825eb2ea7c7b6d510707ce
+Decoded Token User: { id: '68825eb2ea7c7b6d510707ce', role: 'customer' }
+User from DB: {
+  _id: '68825eb2ea7c7b6d510707ce',
+  email: 'monya@shula.com',
+  role: 'customer'
+}
+Required Roles: [ 'customer', 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:26:55.483Z
+Route: /api/orders/user/68825eb2ea7c7b6d510707ce?limit=10&sortBy=createdAt&sortOrder=desc
+Decoded Token User: { id: '68825eb2ea7c7b6d510707ce', role: 'customer' }
+User from DB: {
+  _id: '68825eb2ea7c7b6d510707ce',
+  email: 'monya@shula.com',
+  role: 'customer'
+}
+Required Roles: [ 'customer', 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:27:52.994Z
+Route: /api/uploads/signature
+Decoded Token User: { id: '68825eb2ea7c7b6d510707ce', role: 'customer' }
+User from DB: {
+  _id: '68825eb2ea7c7b6d510707ce',
+  email: 'monya@shula.com',
+  role: 'customer'
+}
+Required Roles: [ 'customer', 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+Successfully uploaded to GCS: https://storage.googleapis.com/shula_admin/signatures/1753374472995_signature.png
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:28:02.788Z
+Route: /api/uploads/id-document
+Decoded Token User: { id: '68825eb2ea7c7b6d510707ce', role: 'customer' }
+User from DB: {
+  _id: '68825eb2ea7c7b6d510707ce',
+  email: 'monya@shula.com',
+  role: 'customer'
+}
+Required Roles: [ 'customer', 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+Successfully uploaded to GCS: https://storage.googleapis.com/shula_admin/id-documents/1753374482791_Screenshot 2025-07-23 at 20.28.47.png
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:28:27.428Z
+Route: /api/orders
+Decoded Token User: { id: '68825eb2ea7c7b6d510707ce', role: 'customer' }
+User from DB: {
+  _id: '68825eb2ea7c7b6d510707ce',
+  email: 'monya@shula.com',
+  role: 'customer'
+}
+Required Roles: [ 'customer', 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+Order creation request: {
+  userId: new ObjectId('68825eb2ea7c7b6d510707ce'),
+  itemsCount: 1,
+  hasCustomerInfo: true
+}
+Creating comprehensive order with full checkout data
+Comprehensive order created successfully: new ObjectId('68825f2bea7c7b6d51070823')
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:28:28.193Z
+Route: /api/users/68825eb2ea7c7b6d510707ce/process-membership
+Decoded Token User: { id: '68825eb2ea7c7b6d510707ce', role: 'customer' }
+User from DB: {
+  _id: '68825eb2ea7c7b6d510707ce',
+  email: 'monya@shula.com',
+  role: 'customer'
+}
+Required Roles: [ 'customer', 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:28:28.747Z
+Route: /api/carts/clear/68825eb2ea7c7b6d510707ce
+Decoded Token User: { id: '68825eb2ea7c7b6d510707ce', role: 'customer' }
+User from DB: {
+  _id: '68825eb2ea7c7b6d510707ce',
+  email: 'monya@shula.com',
+  role: 'customer'
+}
+Required Roles: [ 'customer', 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ Cleared 1 cart items for user 68825eb2ea7c7b6d510707ce
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:28:43.901Z
+Route: /api/users/profile?page=1&limit=5
+Decoded Token User: { id: '68825eb2ea7c7b6d510707ce', role: 'customer' }
+User from DB: {
+  _id: '68825eb2ea7c7b6d510707ce',
+  email: 'monya@shula.com',
+  role: 'customer'
+}
+Required Roles: [ 'customer', 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:28:44.822Z
+Route: /api/users/profile?page=1&limit=5
+Decoded Token User: { id: '68825eb2ea7c7b6d510707ce', role: 'customer' }
+User from DB: {
+  _id: '68825eb2ea7c7b6d510707ce',
+  email: 'monya@shula.com',
+  role: 'customer'
+}
+Required Roles: [ 'customer', 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+Client disconnected
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+Client connected
+User authenticated via WebSocket
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:29:48.232Z
+Route: /api/users?limit=1
+Decoded Token User: { id: '68825a1bd28f75825ce6c8e7', role: 'staff' }
+User from DB: {
+  _id: '68825a1bd28f75825ce6c8e7',
+  email: 'einat@shula.com',
+  role: 'staff'
+}
+Required Roles: [ 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+--- AUTHORIZE MIDDLEWARE DEBUG ---
+Timestamp: 2025-07-24T16:29:48.811Z
+Route: /api/users?limit=1
+Decoded Token User: { id: '68825a1bd28f75825ce6c8e7', role: 'staff' }
+User from DB: {
+  _id: '68825a1bd28f75825ce6c8e7',
+  email: 'einat@shula.com',
+  role: 'staff'
+}
+Required Roles: [ 'staff' ]
+Has Role: true
+--- END DEBUG LOG ---
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000
+✅ CORS allowed origin: http://localhost:3000

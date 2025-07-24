@@ -66,6 +66,13 @@ const checkoutLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// Body parser middlewares
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // CORS configuration for production
 const corsOptions = {
   origin: function (origin, callback) {
@@ -117,7 +124,6 @@ const corsOptions = {
 };
 
 // Middleware
-app.use(express.json({ limit: '10mb' })); // Limit request size
 app.use(cors(corsOptions));
 
 // Apply rate limiting
