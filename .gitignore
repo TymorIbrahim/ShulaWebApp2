@@ -1,31 +1,14 @@
-# Node.js dependencies
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Logs
-logs/
-*.log
-*.log.*
-
-# Environment variables
+# Sensitive files
+backend/digital-rhythm-466815-m2-4f7de534dd0b.json
 .env
-.env.*
 
-# Build output
-dist/
-build/
+# Uploads
+backend/uploads/
 
-# IDE files
-.vscode/
-.idea/
-*.swp
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
 
-# OS files
+# macOS
 .DS_Store
-Thumbs.db
-
-# Temporary files
-*.tmp
-*.temp
