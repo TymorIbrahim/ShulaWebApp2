@@ -239,6 +239,17 @@ ProductSchema.methods.emitInventoryUpdate = async function() {
   }
 };
 
+ProductSchema.pre('remove', async function(next) {
+  const Order = mongoose.model('Order');
+  const orderCount = await Order.countDocuments({ 'items.product': this._id });
+  if (orderCount > 0) {
+    const error = new Error('This product cannot be deleted because it is associated with existing orders.');
+    error.code = 'PRODUCT_IN_USE';
+    return next(error);
+  }
+  next();
+});
+
 // Method to update inventory
 ProductSchema.methods.updateInventory = function(totalUnits) {
   this.inventory.totalUnits = Math.max(0, totalUnits);

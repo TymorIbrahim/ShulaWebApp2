@@ -122,6 +122,12 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
+    // Self-healing: If user has no role, assign 'customer' and save.
+    if (!user.role) {
+      user.role = 'customer';
+      await user.save();
+    }
+
     // Verify password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {

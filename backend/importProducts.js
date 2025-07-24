@@ -2,7 +2,8 @@ const mongoose = require("mongoose");
 const Product = require("./models/Product"); // Import the Product model
 const fs = require("fs");
 const csv = require("csv-parser");
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, './.env') });
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
@@ -14,7 +15,7 @@ const importProducts = async () => {
     const products = [];
 
     // Read the CSV file
-    fs.createReadStream("./catalog_products.csv") // Ensure correct file path
+    fs.createReadStream(path.join(__dirname, "catalog_products.csv")) // Ensure correct file path
         .pipe(csv())
         .on("data", (row) => {
             //console.log("🔍 Raw row data:", row); // Debugging output

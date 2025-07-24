@@ -840,6 +840,51 @@
   width: fit-content;
 }
 
+/* Quantity display */
+.cart-item .item-quantity {
+  font-size: 15px;
+  color: #374151;
+  margin: 8px 0;
+  font-weight: 500;
+  background: #f0f9ff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  width: fit-content;
+  border: 1px solid #bae6fd;
+}
+
+.cart-item .item-quantity strong {
+  color: #0369a1;
+}
+
+/* Price per unit */
+.cart-item .price-per-unit {
+  font-size: 14px;
+  color: #6b7280;
+  margin-top: 8px;
+  font-style: italic;
+}
+
+/* Item conflict alert */
+.cart-item .item-conflict-alert {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 8px;
+  border: 1px solid #fecaca;
+}
+
+.cart-item .item-conflict-alert .status-icon {
+  width: 16px;
+  height: 16px;
+}
+
 /* Animation keyframes for real-time features */
 @keyframes blink {
   0%, 50% { opacity: 1; }

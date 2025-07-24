@@ -33,16 +33,21 @@ fi
 echo "✅ Railway CLI is ready!"
 echo ""
 
-# Login to Railway
-echo "🔑 Please login to Railway..."
-echo "If you don't have an account, create one at: https://railway.app"
-echo ""
+# Check if user is already logged in
+if railway status &> /dev/null; then
+    echo "✅ Already logged in to Railway."
+else
+    # Login to Railway
+    echo "🔑 Please login to Railway..."
+    echo "If you don't have an account, create one at: https://railway.app"
+    echo ""
 
-railway login
+    railway login
 
-if [ $? -ne 0 ]; then
-    echo "❌ Railway login failed. Please try again."
-    exit 1
+    if [ $? -ne 0 ]; then
+        echo "❌ Railway login failed. Please try again."
+        exit 1
+    fi
 fi
 
 echo "✅ Successfully logged in to Railway!"
@@ -79,10 +84,10 @@ fi
 # Set environment variables
 echo "Setting up environment variables..."
 
-railway variables set MONGO_URI="mongodb+srv://Tymor:Tymor123@shulacluster.ged8w.mongodb.net/ShulaDB?retryWrites=true&w=majority&appName=ShulaCluster"
-railway variables set JWT_SECRET="yourRandomStrongSecretKeyHere123!@#$"
-railway variables set NODE_ENV="production"
-railway variables set PORT="$PORT"
+railway variables --set "MONGO_URI=mongodb+srv://Tymor:Tymor123@shulacluster.ged8w.mongodb.net/ShulaDB?retryWrites=true&w=majority&appName=ShulaCluster"
+railway variables --set "JWT_SECRET=yourRandomStrongSecretKeyHere123!@#$"
+railway variables --set "NODE_ENV=production"
+railway variables --set "PORT=$PORT"
 
 echo "✅ Environment variables set!"
 

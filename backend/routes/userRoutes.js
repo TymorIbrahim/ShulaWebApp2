@@ -5,6 +5,7 @@ const User = require('../models/user.model');
 const Order = require('../models/order.model');
 const bcrypt = require('bcryptjs');
 const authorize = require('../middleware/auth');
+const jwt = require('jsonwebtoken');
 
 // GET /api/users - Enhanced with pagination, search, filtering, and statistics
 router.get('/', authorize(['staff']), async (req, res) => {
@@ -221,6 +222,43 @@ async function getFilterOptions() {
     };
   }
 }
+
+// GET /api/users/profile - Get user profile with order history (Customer)
+router.get('/profile', authorize(['customer', 'staff']), async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const user = await User.findById(userId).select('-password');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const ordersQuery = Order.find({ user: userId })
+            .populate('items.product', 'name productImageUrl')
+            .sort({ createdAt: -1 });
+
+        const totalOrders = await Order.countDocuments({ user: userId });
+        const orders = await ordersQuery.skip(skip).limit(limit);
+
+        res.json({ 
+            user, 
+            orders,
+            pagination: {
+                totalOrders,
+                totalPages: Math.ceil(totalOrders / limit),
+                currentPage: page,
+                limit
+            }
+        });
+    } catch (err) {
+        console.error('Error fetching user profile:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 
 // PUT /api/users/profile - Update user profile (Customer) - MOVED BEFORE /:id route
 router.put('/profile', authorize(['customer', 'staff']), async (req, res) => {
@@ -653,7 +691,7 @@ router.post('/:userId/process-membership', authorize(['customer', 'staff']), asy
     // Create basic membership after first order
     const membershipData = {
       isMember: true,
-      membershipType: 'basic_customer',
+      membershipType: 'online',
       membershipDate: new Date(),
       source: 'first_order',
       contract: {
@@ -696,5 +734,6 @@ router.post('/:userId/process-membership', authorize(['customer', 'staff']), asy
     res.status(500).json({ message: 'Server error' });
   }
 });
+
 
 module.exports = router;

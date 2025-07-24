@@ -72,7 +72,7 @@ const ProductDetails = () => {
   };
 
   // Confirm rental (add to cart) with the selected dates
-  const handleConfirmRental = async ({ startDate, endDate }) => {
+  const handleConfirmRental = async ({ startDate, endDate, quantity = 1 }) => {
     if (!user) {
       alert("נא להתחבר כדי להוסיף לעגלה.");
       navigate("/login");
@@ -82,7 +82,7 @@ const ProductDetails = () => {
     try {
       // First, validate that the booking is still available
       console.log("Validating booking before adding to cart...");
-      const validation = await validateBooking(product._id, startDate, endDate, user.token);
+      const validation = await validateBooking(product._id, startDate, endDate, user.token, quantity);
       
       if (!validation.isAvailable) {
         alert(`לא ניתן להוסיף לעגלה: ${validation.message}`);
@@ -94,6 +94,7 @@ const ProductDetails = () => {
         user: user._id,
         product: product._id,
         rentalPeriod: { startDate, endDate },
+        quantity: quantity,
       };
       
       console.log("Sending cart item data:", cartItemData);
@@ -168,7 +169,8 @@ const ProductDetails = () => {
         onConfirm={handleConfirmRental}
         bookedDates={bookedDates}
         availabilityData={availabilityData}
-        productPrice = {product.price}
+        productPrice={product.price}
+        availableUnits={availabilityData?.availableUnits || product.inventory?.totalUnits || 1}
       />
 
       {/* Choice Modal after adding item to cart */}

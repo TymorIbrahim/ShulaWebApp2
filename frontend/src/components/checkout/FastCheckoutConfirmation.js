@@ -494,6 +494,9 @@ const FastCheckoutConfirmation = ({
                 </div>
                 <div className="item-details">
                   <h4>{item.product.name}</h4>
+                  {item.quantity > 1 && (
+                    <p className="item-quantity">כמות: {item.quantity} יחידות</p>
+                  )}
                   <div className="rental-period">
                     <svg className="calendar-icon" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M19,3H18V1H16V3H8V1H6V3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19Z"/>

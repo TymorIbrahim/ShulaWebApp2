@@ -517,7 +517,7 @@ const CheckoutPage = () => {
         periods = Math.max(1, periods - 1);
       }
       
-      return sum + (periods * item.product.price);
+      return sum + (periods * item.product.price * (item.quantity || 1));
     }, 0);
   };
 
@@ -532,7 +532,7 @@ const CheckoutPage = () => {
       periods = Math.max(1, periods - 1);
     }
     
-    return periods * item.product.price;
+    return periods * item.product.price * (item.quantity || 1);
   };
 
   const updateCheckoutData = (section, data) => {
@@ -661,7 +661,7 @@ const CheckoutPage = () => {
       const validationPromises = cartItems.map(async (item) => {
         const response = await axios.post(`${API_URL}/api/products/${item.product._id}/validate-availability`, {
           rentalPeriod: item.rentalPeriod,
-          quantity: 1
+          quantity: item.quantity || 1
         }, config);
         
         if (!response.data.isAvailable) {
@@ -707,6 +707,7 @@ const CheckoutPage = () => {
       const orderData = {
         items: cartItems.map(item => ({
           product: item.product._id,
+          quantity: item.quantity || 1,
           rentalPeriod: item.rentalPeriod,
           price: calculateItemPrice(item)
         })),
@@ -821,6 +822,7 @@ const CheckoutPage = () => {
       const inPersonOrderData = {
         items: cartItems.map(item => ({
           product: item.product._id,
+          quantity: item.quantity || 1,
           rentalPeriod: item.rentalPeriod,
           price: calculateItemPrice(item)
         })),
@@ -984,13 +986,14 @@ const CheckoutPage = () => {
     const conflictingItems = cartItems.filter(item => {
       if (item.product._id === updateData.productId) {
         const availableUnits = updateData.availability.availableNow || 0;
+        const requiredQuantity = item.quantity || 1;
         
         // Check if rental period conflicts with current bookings
         // const startDate = new Date(item.rentalPeriod.startDate);
         // const endDate = new Date(item.rentalPeriod.endDate);
         
-        // For checkout, we need at least 1 unit available during the rental period
-        return availableUnits < 1;
+        // For checkout, we need at least the requested quantity available during the rental period
+        return availableUnits < requiredQuantity;
       }
       return false;
     });

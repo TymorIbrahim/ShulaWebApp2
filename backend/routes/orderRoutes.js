@@ -655,36 +655,51 @@ router.post('/', authorize(['customer', 'staff']), async (req, res) => {
   }
 });
 
-// PUT /api/orders/:id/cancel - Cancel order (Customer can cancel own pending orders)
-router.put('/:id/cancel', authorize(['customer', 'staff']), async (req, res) => {
+// PUT /api/orders/:orderId/cancel - Cancel a pending order (Customer)
+router.put('/:orderId/cancel', authorize(['customer']), async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
-    
+    const order = await Order.findById(req.params.orderId);
+
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // Check if user can cancel this order
-    if (req.user.role !== 'staff' && order.user.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'Access denied. Cannot cancel this order.' });
+    if (order.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'User not authorized to cancel this order' });
     }
 
-    // Only pending orders can be cancelled by customers
-    if (req.user.role !== 'staff' && order.status !== 'Pending') {
+    if (order.status !== 'Pending') {
       return res.status(400).json({ message: 'Only pending orders can be cancelled' });
     }
 
-    // Update order status
     order.status = 'Cancelled';
     await order.save();
 
-    res.json({
-      message: 'Order cancelled successfully',
-      order
-    });
-
+    res.json({ message: 'Order cancelled successfully', order });
   } catch (err) {
     console.error('Error cancelling order:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// DELETE /api/orders/:id - Delete an order
+router.delete("/:id", authorize(['admin', 'staff']), async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    // Only admins or staff can delete orders
+    if (req.user.role !== 'admin' && req.user.role !== 'staff') {
+      return res.status(403).json({ message: 'Access denied. Only admins and staff can delete orders.' });
+    }
+
+    await order.deleteOne();
+    res.json({ message: 'Order deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting order:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });

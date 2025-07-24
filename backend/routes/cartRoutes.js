@@ -49,12 +49,17 @@ router.get("/:userId", authorize(['customer', 'staff']), async (req, res) => {
 // POST /api/carts/add - Add a new item to the cart (Protected)
 router.post("/add", authorize(['customer', 'staff']), async (req, res) => {
   try {
-    const { product, rentalPeriod } = req.body;
+    const { product, rentalPeriod, quantity = 1 } = req.body;
     const userId = req.user._id; // Get user ID from authenticated token
     
     // Input validation
     if (!product || !rentalPeriod) {
       return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    // Validate quantity
+    if (quantity < 1 || !Number.isInteger(quantity)) {
+      return res.status(400).json({ message: "Quantity must be a positive integer" });
     }
 
     // Validate rental period
@@ -74,6 +79,25 @@ router.post("/add", authorize(['customer', 'staff']), async (req, res) => {
       return res.status(400).json({ message: "Start date cannot be in the past" });
     }
 
+    // Check product availability for the requested quantity
+    const Product = require("../models/Product");
+    const productData = await Product.findById(product);
+    
+    if (!productData) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Check availability for the requested dates and quantity
+    const availability = await productData.getAvailabilityForDates(startDate, endDate);
+    
+    if (availability.availableUnits < quantity) {
+      return res.status(400).json({ 
+        message: `Only ${availability.availableUnits} units available for the requested period. You requested ${quantity} units.`,
+        availableUnits: availability.availableUnits,
+        requestedQuantity: quantity
+      });
+    }
+
     // Check if user already has this product in cart for overlapping dates
     const existingCartItem = await Cart.findOne({
       user: userId,
@@ -88,7 +112,7 @@ router.post("/add", authorize(['customer', 'staff']), async (req, res) => {
 
     if (existingCartItem) {
       return res.status(400).json({ 
-        message: "Product already in cart for overlapping dates" 
+        message: "Product already in cart for overlapping dates. Please update the existing cart item instead." 
       });
     }
 
@@ -96,10 +120,15 @@ router.post("/add", authorize(['customer', 'staff']), async (req, res) => {
       user: userId,
       product,
       rentalPeriod,
+      quantity,
       status: "Pending",
     });
 
     const savedItem = await newCartItem.save();
+    
+    // Populate product details before sending response
+    await savedItem.populate('product');
+    
     res.status(201).json({ 
       message: "Item added to cart", 
       cartItem: savedItem 
@@ -128,6 +157,12 @@ router.put("/:cartItemId", authorize(['customer', 'staff']), validateCartOwnersh
     const { cartItemId } = req.params;
     const updateData = req.body;
     
+    // Get the existing cart item
+    const existingCartItem = await Cart.findById(cartItemId).populate('product');
+    if (!existingCartItem) {
+      return res.status(404).json({ message: "Cart item not found" });
+    }
+    
     // Validate rental period if being updated
     if (updateData.rentalPeriod) {
       const { startDate, endDate } = updateData.rentalPeriod;
@@ -145,8 +180,35 @@ router.put("/:cartItemId", authorize(['customer', 'staff']), validateCartOwnersh
         }
       }
     }
+    
+    // Validate quantity if being updated
+    if (updateData.quantity !== undefined) {
+      if (updateData.quantity < 1 || !Number.isInteger(updateData.quantity)) {
+        return res.status(400).json({ message: "Quantity must be a positive integer" });
+      }
+      
+      // Check availability for the new quantity
+      const Product = require("../models/Product");
+      const productData = await Product.findById(existingCartItem.product._id);
+      
+      const startDate = updateData.rentalPeriod?.startDate || existingCartItem.rentalPeriod.startDate;
+      const endDate = updateData.rentalPeriod?.endDate || existingCartItem.rentalPeriod.endDate;
+      
+      const availability = await productData.getAvailabilityForDates(
+        new Date(startDate),
+        new Date(endDate)
+      );
+      
+      if (availability.availableUnits < updateData.quantity) {
+        return res.status(400).json({ 
+          message: `Only ${availability.availableUnits} units available for the requested period. You requested ${updateData.quantity} units.`,
+          availableUnits: availability.availableUnits,
+          requestedQuantity: updateData.quantity
+        });
+      }
+    }
 
-    const updatedItem = await Cart.findByIdAndUpdate(cartItemId, updateData, { new: true });
+    const updatedItem = await Cart.findByIdAndUpdate(cartItemId, updateData, { new: true }).populate('product');
     res.status(200).json({ 
       message: "Cart item updated", 
       cartItem: updatedItem 
@@ -183,11 +245,12 @@ router.post("/checkout", authorize(['customer', 'staff']), async (req, res) => {
         periods = Math.max(1, periods - 1);
       }
       
-      const itemValue = periods * item.product.price;
+      const itemValue = periods * item.product.price * item.quantity;
       totalValue += itemValue;
       
       return {
         product: item.product._id,
+        quantity: item.quantity,
         rentalPeriod: {
           startDate: item.rentalPeriod.startDate,
           endDate: item.rentalPeriod.endDate

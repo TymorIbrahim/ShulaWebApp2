@@ -1,10 +1,15 @@
 import React, { useState, useRef } from "react";
+import axios from "axios";
 import "./ContractSigning.css";
+
+const API_URL = process.env.REACT_APP_API_URL || "https://shula-rent-project-production.up.railway.app";
+
 
 const ContractSigning = ({ data, customerInfo, onUpdate, onNext, onPrev, canProceed }) => {
   const [agreed, setAgreed] = useState(data.signed);
   const [signature, setSignature] = useState(data.signatureData);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [error, setError] = useState(null);
   const canvasRef = useRef(null);
 
   const contractText = `
@@ -96,22 +101,59 @@ const ContractSigning = ({ data, customerInfo, onUpdate, onNext, onPrev, canProc
     });
   };
 
-  const handleAgreementChange = (checked) => {
-    setAgreed(checked);
-    const hasValidSignature = signature && signature !== null;
-    onUpdate({ 
-      signed: checked && hasValidSignature,
-      signatureData: signature,
+  const handleAgreementChange = (e) => {
+    const isChecked = e.target.checked;
+    setAgreed(isChecked);
+
+    onUpdate({
+      signed: isChecked && !!signature,
       agreementVersion: "1.0",
-      signedAt: checked && hasValidSignature ? new Date().toISOString() : null
+      signedAt: isChecked && !!signature ? new Date().toISOString() : null
     });
   };
 
-  const handleNext = () => {
-    if (canProceed && agreed && signature) {
-      onNext();
+  const handleNext = async () => {
+    if (!canProceed || !agreed || !signature) {
+      return;
     }
+
+    setError(null);
+    const canvas = canvasRef.current;
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) {
+        setError("שגיאה ביצירת חתימה דיגיטלית. נסה שוב.");
+        return;
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append('signature', blob, 'signature.png');
+
+        const config = {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${JSON.parse(localStorage.getItem('user')).token}`
+          }
+        };
+
+        const response = await axios.post(`${API_URL}/api/uploads/signature`, formData, config);
+        
+        onUpdate({ 
+          signatureData: response.data.filePath,
+          signed: true,
+          agreementVersion: "1.0",
+          signedAt: new Date().toISOString()
+        });
+
+        onNext();
+      } catch (err) {
+        console.error("Signature upload failed inside blob callback:", err);
+        setError(err.response?.data?.message || "העלאת החתימה נכשלה. בדוק את חיבור האינטרנט שלך ונסה שוב.");
+      }
+    }, 'image/png');
   };
+
 
   return (
     <div className="contract-signing-step">
@@ -164,7 +206,7 @@ const ContractSigning = ({ data, customerInfo, onUpdate, onNext, onPrev, canProc
               <input
                 type="checkbox"
                 checked={agreed}
-                onChange={(e) => handleAgreementChange(e.target.checked)}
+                onChange={handleAgreementChange}
               />
               <span className="checkmark"></span>
               <span className="checkbox-text">
@@ -194,6 +236,17 @@ const ContractSigning = ({ data, customerInfo, onUpdate, onNext, onPrev, canProc
               <span>החתימה נקלטה בהצלחה</span>
             </div>
           )}
+
+          {error && (
+            <div className="error-message">
+              <span className="error-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+                </svg>
+              </span>
+              <span>{error}</span>
+            </div>
+          )}
         </div>
 
         <div className="legal-notice">
@@ -215,7 +268,7 @@ const ContractSigning = ({ data, customerInfo, onUpdate, onNext, onPrev, canProc
           type="button"
           className="btn-primary"
           onClick={handleNext}
-          disabled={!canProceed}
+          disabled={!agreed || !signature}
         >
           המשך להעלאת תעודת זהות ←
         </button>

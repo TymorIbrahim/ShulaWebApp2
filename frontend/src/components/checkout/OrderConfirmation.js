@@ -73,15 +73,12 @@ const OrderConfirmation = ({
   cartItems, 
   total, 
   onFinish, 
-  onPrev,
   onboardingChoice, 
   isFirstTimeCustomer,
   isFastCheckout,
-  processOrder,
   calculateItemPrice
 }) => {
   const [orderProcessed, setOrderProcessed] = useState(false);
-  const [processing, setProcessing] = useState(false);
   const [processingError, setProcessingError] = useState("");
 
   const formatDate = (date) => {
@@ -130,157 +127,12 @@ const OrderConfirmation = ({
 
   const successInfo = getSuccessMessage();
 
-  // Modified: Remove automatic order processing for fast checkout - user should manually confirm
   useEffect(() => {
-    // Only auto-process for regular checkout (non-fast checkout)
-    // Fast checkout should require manual confirmation in Step 3
-    if (!isFastCheckout) {
-      const processOrderAutomatically = async () => {
-        if (orderProcessed || processing) return;
-        
-        try {
-          setProcessing(true);
-          console.log('Processing order...');
-          
-          // Use the existing processOrder function from parent if available
-          if (processOrder && typeof processOrder === 'function') {
-            console.log('Using parent processOrder function');
-            await processOrder(checkoutData, onboardingChoice);
-          } else {
-            console.log('Using local order processing');
-            await processOrderDirectly();
-          }
-          
-          setOrderProcessed(true);
-          setProcessing(false);
-          
-        } catch (error) {
-          console.error("Error in automatic order processing:", error.message);
-          setProcessingError(
-            error.response?.data?.message || 
-            error.message ||
-            "שגיאה ביצירת ההזמנה. אנא נסה שוב."
-          );
-          setProcessing(false);
-        }
-      };
-
-      // Auto-process only for regular checkout
-      if (checkoutData && cartItems.length > 0) {
-        processOrderAutomatically();
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFastCheckout, checkoutData, cartItems, orderProcessed, processing, onboardingChoice, processOrder, total]);
-
-  // Handle fast checkout order processing
-  const handleFastCheckoutOrderProcessing = async () => {
-    try {
-      setProcessing(true);
-      
-      // Use the existing processOrder function from parent if available
-      if (processOrder && typeof processOrder === 'function') {
-        console.log('Processing final order completion');
-        // For fast checkout, we need to prevent the parent from changing steps
-        await processOrder(checkoutData, onboardingChoice, true); // Pass true to indicate this is fast checkout completion
-      } else {
-        console.log('Using local order processing for completion');
-        await processOrderDirectly();
-      }
-      
+    if (!orderProcessed) {
+      // Simulate a successful processing step since the order is already created
       setOrderProcessed(true);
-      setProcessing(false);
-      
-    } catch (error) {
-      console.error("Error in final order processing:", error.message);
-      setProcessingError(
-        error.response?.data?.message || 
-        error.message ||
-        "שגיאה ביצירת ההזמנה. אנא נסה שוב."
-      );
-      setProcessing(false);
     }
-  };
-
-  // Direct order processing with corrected payload structure
-  const processOrderDirectly = async () => {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    
-    const orderData = {
-      items: cartItems.map(item => ({
-        product: item.product._id, // Corrected from item.productId
-        rentalPeriod: item.rentalPeriod,
-        price: calculateItemPrice ? calculateItemPrice(item) : item.price // Use calculateItemPrice if available
-      })),
-      totalValue: total,
-      customerInfo: checkoutData?.customerInfo || {
-        firstName: user.firstName || "",
-        lastName: user.lastName || "",
-        email: user.email || "",
-        phone: user.phone || "",
-        idNumber: ""
-      },
-      pickupReturn: checkoutData?.pickupReturn || {
-        pickupDate: new Date().toISOString(),
-        pickupTime: "17:00",
-        pickupAddress: "main_store",
-        returnDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-        returnTime: "19:00",
-        returnAddress: "main_store"
-      },
-      contract: checkoutData?.contract || {
-        signed: false,
-        signatureData: null,
-        agreementVersion: "1.0",
-        signedAt: null
-      },
-      idUpload: checkoutData?.idUpload || {
-        uploaded: false,
-        fileName: "",
-        fileUrl: ""
-      },
-      payment: {
-        method: "cash",
-        cardData: null,
-        paymentStatus: "pending"
-      },
-      metadata: {
-        checkoutVersion: "2.0",
-        completedAt: new Date().toISOString(),
-        onboardingChoice: onboardingChoice || "online",
-        isFirstTimeCustomer: isFirstTimeCustomer,
-        isFastCheckout: isFastCheckout
-      }
-    };
-
-    // console.log('Creating order...');
-
-    const config = getAuthHeaders();
-    const response = await axios.post(`${API_URL}/api/orders`, orderData, config);
-    
-    console.log('Order created successfully');
-    return response.data;
-  };
-
-  // Show loading while processing
-  if (processing) {
-    return (
-      <div className="order-confirmation-step">
-        <div className="processing-container">
-          <div className="processing-animation">
-            <div className="spinner"></div>
-          </div>
-          <h2>
-            <svg className="processing-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/>
-            </svg>
-            מעבד הזמנה...
-          </h2>
-          <p>אנא המתן, אנו מעבדים את ההזמנה שלך</p>
-        </div>
-      </div>
-    );
-  }
+  }, [orderProcessed]);
 
   // Show error if processing failed
   if (processingError) {
@@ -342,6 +194,9 @@ const OrderConfirmation = ({
                   </div>
                   <div className="item-details-final">
                     <h4>{item.product.name}</h4>
+                    {item.quantity > 1 && (
+                      <p className="item-quantity">כמות: {item.quantity} יחידות</p>
+                    )}
                     <p className="rental-dates">
                       {formatDate(item.rentalPeriod.startDate)} - {formatDate(item.rentalPeriod.endDate)}
                     </p>
@@ -399,8 +254,8 @@ const OrderConfirmation = ({
           <div className="final-actions">
             <button 
               className="btn-primary complete-order-btn"
-              onClick={handleFastCheckoutOrderProcessing}
-              disabled={processing}
+              onClick={() => setOrderProcessed(true)}
+              disabled={orderProcessed}
             >
               <svg viewBox="0 0 24 24" fill="currentColor">
                 <path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"/>
@@ -410,13 +265,13 @@ const OrderConfirmation = ({
             
             <button 
               className="btn-secondary"
-              onClick={onPrev || (() => window.history.back())}
-              disabled={processing}
+              onClick={onFinish}
+              disabled={orderProcessed}
             >
               <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+                <path d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"/>
               </svg>
-              חזור לעריכה
+              לפרופיל שלי
             </button>
           </div>
         </div>
@@ -484,7 +339,10 @@ const OrderConfirmation = ({
               <div className="items-list">
                 {cartItems.map((item, index) => (
                   <div key={index} className="item-row">
-                    <span className="item-name">{item.product.name}</span>
+                    <span className="item-name">
+                      {item.product.name}
+                      {item.quantity > 1 && ` (${item.quantity} יחידות)`}
+                    </span>
                     <span className="item-period">
                       {formatDate(item.rentalPeriod.startDate)} - 
                       {formatDate(item.rentalPeriod.endDate)}

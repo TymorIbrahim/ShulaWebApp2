@@ -290,33 +290,37 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST /api/products - Create new product (Admin only)
-router.post('/', authorize(['staff']), async (req, res) => {
+router.post('/', authorize(['admin', 'staff']), async (req, res) => {
   try {
-    const { name, description, price, category, productImageUrl, isAvailable = true } = req.body;
+    const { 
+        name, description, price, category, brand, condition, 
+        specifications, tags, featured, totalUnits, minStockAlert, productImageUrl 
+    } = req.body;
 
     // Input validation
     if (!name || !price || !category) {
       return res.status(400).json({ message: 'Name, price, and category are required' });
     }
 
-    if (price <= 0) {
-      return res.status(400).json({ message: 'Price must be greater than 0' });
-    }
-
     const newProduct = new Product({
-      name: name.trim(),
-      description: description ? description.trim() : '',
-      price: parseFloat(price),
-      category: category.trim(),
+      name,
+      description,
+      price,
+      category,
+      brand,
+      condition,
+      specifications,
+      tags: Array.isArray(tags) ? tags : (tags || '').split(',').map(tag => tag.trim()),
+      featured,
+      inventory: {
+        totalUnits: totalUnits || 0,
+        minStockAlert: minStockAlert || 1
+      },
       productImageUrl,
-      isAvailable
     });
 
     const savedProduct = await newProduct.save();
-    res.status(201).json({
-      message: 'Product created successfully',
-      product: savedProduct
-    });
+    res.status(201).json(savedProduct);
   } catch (err) {
     console.error('Error creating product:', err);
     res.status(500).json({ message: 'Server error' });
@@ -369,7 +373,17 @@ router.put('/:id', authorize(['staff']), async (req, res) => {
 // DELETE /api/products/:id - Delete product (Admin only)
 router.delete('/:id', authorize(['staff']), async (req, res) => {
   try {
-    const deletedProduct = await Product.findByIdAndDelete(req.params.id);
+    const productId = req.params.id;
+
+    const orderCount = await Order.countDocuments({ 'items.product': productId });
+
+    if (orderCount > 0) {
+      return res.status(400).json({ 
+        message: 'This product cannot be deleted because it is associated with existing orders. Please remove it from all orders before deleting.' 
+      });
+    }
+
+    const deletedProduct = await Product.findByIdAndDelete(productId);
     if (!deletedProduct) {
       return res.status(404).json({ message: 'Product not found' });
     }

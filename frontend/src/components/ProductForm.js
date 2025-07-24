@@ -1,8 +1,11 @@
 // src/components/ProductForm.js
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { createProduct, updateProduct, getProduct } from "../services/productService";
 import './ProductForm.css';
+
+const API_URL = process.env.REACT_APP_API_URL || "https://shula-rent-project-production.up.railway.app";
 
 // --- SVG Icons ---
 const SaveIcon = () => (
@@ -136,28 +139,24 @@ const ProductForm = () => {
     setLoading(true);
 
     try {
-      const submitData = new FormData();
-      
-      // Basic product info
-      submitData.append('name', formData.name);
-      submitData.append('description', formData.description);
-      submitData.append('price', formData.price);
-      submitData.append('category', formData.category);
-      submitData.append('brand', formData.brand);
-      submitData.append('condition', formData.condition);
-      submitData.append('specifications', formData.specifications);
-      submitData.append('tags', formData.tags);
-      submitData.append('featured', formData.featured);
-      
-      // Inventory data
-      submitData.append('totalUnits', formData.totalUnits);
-      submitData.append('minStockAlert', formData.minStockAlert);
+        let imageUrl = formData.productImageUrl || '';
+        if (imageFile) {
+            const uploadData = new FormData();
+            uploadData.append('image', imageFile);
+            
+            const config = {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${JSON.parse(localStorage.getItem('user')).token}`
+                }
+            };
 
-      // Image
-      if (imageFile) {
-        submitData.append('image', imageFile);
-      }
-
+            const response = await axios.post(`${API_URL}/api/uploads/product-image`, uploadData, config);
+            imageUrl = response.data.filePath;
+        }
+        
+      const submitData = { ...formData, productImageUrl: imageUrl };
+      
       let result;
       if (editing) {
         result = await updateProduct(productId, submitData);

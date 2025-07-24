@@ -1,3 +1,0 @@
-MONGO_URI=mongodb+srv://Tymor:Tymor123@shulacluster.ged8w.mongodb.net/ShulaDB?retryWrites=true&w=majority&appName=ShulaCluster
-PORT=5002
-JWT_SECRET=yourRandomStrongSecretKeyHere123!@#$

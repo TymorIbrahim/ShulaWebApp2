@@ -1,123 +1,172 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import './CustomerProfile.css';
+import { useCustomerProfile } from '../hooks/useCustomerProfile';
+import ConfirmDeleteModal from '../components/ConfirmDeleteModal'; // Import the modal
 
 const API_URL = process.env.REACT_APP_API_URL || "https://shula-rent-project-production.up.railway.app";
 
 const CustomerProfile = () => {
-  const { user, loginUser, isAuthenticated } = useAuth();
+  const { user, loginUser, isAuthenticated, authReady, token } = useAuth();
   const navigate = useNavigate();
+  const {
+    profileData,
+    orders,
+    pagination,
+    loading,
+    error,
+    success,
+    fetchProfile,
+    updateProfile,
+    setProfileData,
+    setOrders,
+    setSuccess,
+    setError
+  } = useCustomerProfile();
   
   const [activeTab, setActiveTab] = useState('profile');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [passwordUpdating, setPasswordUpdating] = useState(false);
+  const [orderCancelling, setOrderCancelling] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [orderToCancel, setOrderToCancel] = useState(null);
+  const [expandedOrders, setExpandedOrders] = useState(new Set());
   
-  // Profile form state
-  const [profileData, setProfileData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    profilePic: ''
-  });
-  
-  // Password change state
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
-  
-  // Order history state
-  const [orders, setOrders] = useState([]);
-  const [ordersLoading, setOrdersLoading] = useState(false);
 
-  // Redirect if not authenticated
+  const [orderSort, setOrderSort] = useState({ field: 'createdAt', order: 'desc' });
+  
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (authReady && !isAuthenticated) {
       navigate('/login');
     }
-  }, [isAuthenticated, navigate]);
+  }, [authReady, isAuthenticated, navigate]);
 
-  // Load user data
   useEffect(() => {
-    if (user) {
-      setProfileData({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        profilePic: user.profilePic || ''
-      });
+    if (profileData) {
+      setProfileData(profileData);
     }
-  }, [user]);
+  }, [profileData, setProfileData]);
 
-  const fetchOrderHistory = useCallback(async () => {
-    try {
-      setOrdersLoading(true);
-      const response = await axios.get(`${API_URL}/api/orders/user/${user._id}`, {
-        headers: { Authorization: `Bearer ${user.token}` }
-      });
-      // Extract orders array from response, handle both array and object responses
-      const ordersData = Array.isArray(response.data) ? response.data : (response.data.orders || []);
-      setOrders(ordersData);
-    } catch (err) {
-      console.error('Error fetching order history:', err);
-      // Set empty array as fallback
-      setOrders([]);
-    } finally {
-      setOrdersLoading(false);
-    }
-  }, [user?.token, user?._id]);
+  const toggleOrderExpansion = (orderId) => {
+    setExpandedOrders(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(orderId)) {
+        newSet.delete(orderId);
+      } else {
+        newSet.add(orderId);
+      }
+      return newSet;
+    });
+  };
 
-  // Load order history
-  useEffect(() => {
-    if (activeTab === 'orders' && user) {
-      fetchOrderHistory();
-    }
-  }, [activeTab, user, fetchOrderHistory]);
+  const openCancelModal = (orderId) => {
+    setOrderToCancel(orderId);
+    setIsModalOpen(true);
+  };
 
-  const handleProfileUpdate = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  const closeCancelModal = () => {
+    setOrderToCancel(null);
+    setIsModalOpen(false);
+  };
+
+  const handleCancelOrder = async () => {
+    if (!orderToCancel) return;
+
+    setOrderCancelling(orderToCancel);
     setError('');
     setSuccess('');
 
     try {
-      const response = await axios.put(`${API_URL}/api/users/profile`, profileData, {
-        headers: { Authorization: `Bearer ${user.token}` }
+      await axios.put(`${API_URL}/api/orders/${orderToCancel}/cancel`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
       });
 
-      // Update user in context
-      const updatedUser = { ...user, ...response.data.user };
-      loginUser(updatedUser);
-      
-      setSuccess('פרופיל עודכן בהצלחה!');
+      setOrders(prevOrders =>
+        prevOrders.map(order =>
+          order._id === orderToCancel ? { ...order, status: 'Cancelled' } : order
+        )
+      );
+      setSuccess('Order cancelled successfully!');
     } catch (err) {
-      setError(err.response?.data?.message || 'שגיאה בעדכון הפרופיל');
+      setError(err.response?.data?.message || 'Error cancelling order.');
     } finally {
-      setLoading(false);
+      setOrderCancelling(null);
+      closeCancelModal();
     }
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage > 0 && newPage <= pagination.totalPages) {
+      fetchProfile(newPage);
+    }
+  };
+
+  const handleFileSelect = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+    }
+  };
+
+  const handleProfilePictureUpload = async () => {
+    if (!selectedFile) {
+      setError('Please select a file to upload.');
+      return;
+    }
+    setUploading(true);
+    setError('');
+    setSuccess('');
+    
+    const formData = new FormData();
+    formData.append('profilePic', selectedFile);
+
+    try {
+      const response = await axios.post(`${API_URL}/api/uploads/profile-picture`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const updatedUser = { token, ...response.data.user };
+      loginUser(updatedUser);
+      setProfileData(prev => ({ ...prev, profilePic: response.data.user.profilePic }));
+      setSuccess('Profile picture updated successfully!');
+      setSelectedFile(null);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error uploading profile picture.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleProfileUpdate = async (e) => {
+    e.preventDefault();
+    updateProfile(profileData);
   };
 
   const handlePasswordChange = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setPasswordUpdating(true);
     setError('');
     setSuccess('');
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       setError('הסיסמאות החדשות אינן תואמות');
-      setLoading(false);
+      setPasswordUpdating(false);
       return;
     }
 
     if (passwordData.newPassword.length < 6) {
       setError('הסיסמה החדשה חייבת להכיל לפחות 6 תווים');
-      setLoading(false);
+      setPasswordUpdating(false);
       return;
     }
 
@@ -126,7 +175,7 @@ const CustomerProfile = () => {
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword
       }, {
-        headers: { Authorization: `Bearer ${user.token}` }
+        headers: { Authorization: `Bearer ${token}` }
       });
 
       setSuccess('הסיסמה שונתה בהצלחה!');
@@ -138,7 +187,7 @@ const CustomerProfile = () => {
     } catch (err) {
       setError(err.response?.data?.message || 'שגיאה בשינוי הסיסמה');
     } finally {
-      setLoading(false);
+      setPasswordUpdating(false);
     }
   };
 
@@ -170,25 +219,38 @@ const CustomerProfile = () => {
     }
   };
 
-  if (!isAuthenticated) {
-    return <div className="profile-loading">טוען...</div>;
+  const sortedOrders = [...orders].sort((a, b) => {
+    if (orderSort.field === 'totalValue') {
+      return orderSort.order === 'asc' ? a.totalValue - b.totalValue : b.totalValue - a.totalValue;
+    }
+    return orderSort.order === 'asc' ? new Date(a.createdAt) - new Date(b.createdAt) : new Date(b.createdAt) - new Date(a.createdAt);
+  });
+
+  if (!authReady || loading) {
+    return <div className="profile-loading">Loading Profile...</div>;
   }
 
   return (
     <div className="customer-profile-container">
       <div className="profile-header">
-        <div className="profile-avatar">
-          {profileData.profilePic ? (
-            <img src={profileData.profilePic} alt="Profile" />
-          ) : (
-            <div className="avatar-placeholder">
-              {profileData.firstName?.charAt(0)}{profileData.lastName?.charAt(0)}
-            </div>
-          )}
-        </div>
+        <div className="profile-avatar-container">
+          <div className="profile-avatar">
+            {profileData?.profilePic ? (
+              <img src={profileData.profilePic} alt="Profile" />
+            ) : (
+              <div className="avatar-placeholder">
+                {profileData?.firstName?.charAt(0)}{profileData?.lastName?.charAt(0)}
+              </div>
+            )}
+          </div>
+            <label htmlFor="profile-pic-upload" className="edit-avatar-button">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19.29,4.71,15.29,0.71a1,1,0,0,0-1.42,0L3,11.59V17a1,1,0,0,0,1,1H9.41l10.88-10.88a1,1,0,0,0,0-1.41ZM8,15H5V12l7-7,3,3Z"/></svg>
+            </label>
+            <input id="profile-pic-upload" type="file" accept="image/*" onChange={handleFileSelect} style={{ display: 'none' }} />
+          </div>
         <div className="profile-header-info">
-          <h1>{profileData.firstName} {profileData.lastName}</h1>
-          <p>{profileData.email}</p>
+          <h1>{profileData?.firstName} {profileData?.lastName}</h1>
+          <p>{profileData?.email}</p>
           <span className="member-since">
             חבר מאז {formatDate(user.createdAt)}
           </span>
@@ -196,31 +258,10 @@ const CustomerProfile = () => {
       </div>
 
       <div className="profile-tabs">
-        <button 
-          className={`tab-btn ${activeTab === 'profile' ? 'active' : ''}`}
-          onClick={() => setActiveTab('profile')}
-        >
-          <h4>
-            <svg className="section-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19M5,6V5H19V6H5Z"/>
-            </svg>
-            פרטים אישיים
-          </h4>
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`}
-          onClick={() => setActiveTab('orders')}
-        >
-          <i className="icon-history"></i>
-          היסטוריית הזמנות
-        </button>
-        <button 
-          className={`tab-btn ${activeTab === 'security' ? 'active' : ''}`}
-          onClick={() => setActiveTab('security')}
-        >
-          <i className="icon-lock"></i>
-          אבטחה
-        </button>
+        <button className={`tab-btn ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>Profile</button>
+        <button className={`tab-btn ${activeTab === 'orders' ? 'active' : ''}`} onClick={() => setActiveTab('orders')}>Order History</button>
+        <button className={`tab-btn ${activeTab === 'documents' ? 'active' : ''}`} onClick={() => setActiveTab('documents')}>Documents</button>
+        <button className={`tab-btn ${activeTab === 'security' ? 'active' : ''}`} onClick={() => setActiveTab('security')}>Security</button>
       </div>
 
       <div className="profile-content">
@@ -231,6 +272,16 @@ const CustomerProfile = () => {
           <div className="tab-content">
             <div className="content-card">
               <h2>עדכון פרטים אישיים</h2>
+
+              {selectedFile && (
+                <div className="upload-preview">
+                  <p>New profile picture selected: {selectedFile.name}</p>
+                  <button onClick={handleProfilePictureUpload} className="btn-primary" disabled={uploading}>
+                    {uploading ? 'Uploading...' : 'Upload Picture'}
+                  </button>
+                </div>
+              )}
+              
               <form onSubmit={handleProfileUpdate} className="profile-form">
                 <div className="form-row">
                   <div className="form-group">
@@ -238,7 +289,7 @@ const CustomerProfile = () => {
                     <input
                       type="text"
                       id="firstName"
-                      value={profileData.firstName}
+                      value={profileData?.firstName || ''}
                       onChange={(e) => setProfileData({...profileData, firstName: e.target.value})}
                       required
                     />
@@ -248,7 +299,7 @@ const CustomerProfile = () => {
                     <input
                       type="text"
                       id="lastName"
-                      value={profileData.lastName}
+                      value={profileData?.lastName || ''}
                       onChange={(e) => setProfileData({...profileData, lastName: e.target.value})}
                       required
                     />
@@ -260,7 +311,7 @@ const CustomerProfile = () => {
                   <input
                     type="email"
                     id="email"
-                    value={profileData.email}
+                    value={profileData?.email || ''}
                     onChange={(e) => setProfileData({...profileData, email: e.target.value})}
                     required
                   />
@@ -271,7 +322,7 @@ const CustomerProfile = () => {
                   <input
                     type="tel"
                     id="phone"
-                    value={profileData.phone}
+                    value={profileData?.phone || ''}
                     onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
                     required
                   />
@@ -288,38 +339,40 @@ const CustomerProfile = () => {
         {activeTab === 'orders' && (
           <div className="tab-content">
             <div className="content-card">
-              <h2>היסטוריית הזמנות</h2>
-              {ordersLoading ? (
-                <div className="loading-state">טוען הזמנות...</div>
-              ) : orders.length === 0 ? (
-                <div className="empty-state">
-                  <i className="icon-shopping-bag"></i>
-                  <h3>אין הזמנות עדיין</h3>
-                  <p>כשתבצע הזמנות, הן יופיעו כאן</p>
-                  <button 
-                    className="btn-primary"
-                    onClick={() => navigate('/products')}
-                  >
-                    התחל לקנות
-                  </button>
-                </div>
-              ) : (
-                <div className="orders-list">
-                  {orders.map((order) => (
-                    <div key={order._id} className="order-card">
-                      <div className="order-header">
-                        <div className="order-info">
-                          <h3>הזמנה #{order._id.slice(-6)}</h3>
-                          <p>{formatDate(order.createdAt)}</p>
-                        </div>
+              <h2>Order History</h2>
+              <div className="order-filters">
+                <select onChange={(e) => setOrderSort({ ...orderSort, field: e.target.value })}>
+                  <option value="createdAt">Sort by Date</option>
+                  <option value="totalValue">Sort by Total</option>
+                </select>
+                <select onChange={(e) => setOrderSort({ ...orderSort, order: e.target.value })}>
+                  <option value="desc">Descending</option>
+                  <option value="asc">Ascending</option>
+                </select>
+              </div>
+              <div className="orders-list">
+                {sortedOrders.map((order) => {
+                  const isExpanded = expandedOrders.has(order._id);
+                  return (
+                  <div key={order._id} className="order-card">
+                    <div className="order-header" onClick={() => toggleOrderExpansion(order._id)}>
+                      <div className="order-info">
+                        <h3>Order #{order._id.slice(-6)}</h3>
+                        <p>{formatDate(order.createdAt)}</p>
+                      </div>
+                      <div className="order-summary-short">
                         <div 
                           className="order-status"
                           style={{ backgroundColor: getStatusColor(order.status) }}
                         >
                           {getStatusText(order.status)}
                         </div>
+                        <span className="order-card-total">₪{order.totalValue || 0}</span>
+                        <span className={`expansion-arrow ${isExpanded ? 'expanded' : ''}`}>&#9660;</span>
                       </div>
-
+                    </div>
+                    
+                    <div className={`order-details-wrapper ${isExpanded ? 'expanded' : ''}`}>
                       {/* Enhanced Customer Information Section */}
                       {order.customerInfo && (
                         <div className="customer-info-section">
@@ -499,12 +552,14 @@ const CustomerProfile = () => {
                               alt={item.product?.name}
                             />
                             <div className="item-details">
-                              <h4>{item.product?.name}</h4>
+                              <Link to={`/products/${item.product?._id}`} className="product-link">
+                                <h4>{item.product?.name}</h4>
+                              </Link>
                               <p>
                                 {formatDate(item.rentalPeriod?.startDate)} - {formatDate(item.rentalPeriod?.endDate)}
                               </p>
                             </div>
-                            <div className="item-price">
+                            <div className="item-.price">
                               ₪{item.price || item.product?.price}
                             </div>
                           </div>
@@ -513,12 +568,82 @@ const CustomerProfile = () => {
                       
                       <div className="order-footer">
                         <div className="order-total">
-                          סה"כ: ₪{order.totalValue || 0}
+                          Total: ₪{order.totalValue || 0}
                         </div>
+                        {order.status === 'Pending' && (
+                          <button
+                            className="btn-cancel"
+                            onClick={() => openCancelModal(order._id)}
+                            disabled={orderCancelling === order._id}
+                          >
+                            {orderCancelling === order._id ? 'Cancelling...' : 'Cancel Order'}
+                          </button>
+                        )}
                       </div>
                     </div>
-                  ))}
+                  </div>
+                )})}
+              </div>
+              {pagination && pagination.totalPages > 1 && (
+                <div className="pagination-controls">
+                  <button 
+                    onClick={() => handlePageChange(pagination.currentPage - 1)}
+                    disabled={pagination.currentPage === 1}
+                  >
+                    Previous
+                  </button>
+                  <span>
+                    Page {pagination.currentPage} of {pagination.totalPages}
+                  </span>
+                  <button
+                    onClick={() => handlePageChange(pagination.currentPage + 1)}
+                    disabled={pagination.currentPage === pagination.totalPages}
+                  >
+                    Next
+                  </button>
                 </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'documents' && (
+          <div className="tab-content">
+            <div className="content-card">
+              <h2>My Documents</h2>
+              {orders && orders.length > 0 ? (
+                <div className="documents-list">
+                  {orders.map(order => {
+                    const hasDocuments = order.idUpload?.fileUrl || order.contract?.signatureData;
+                    return (
+                      <div key={order._id} className="document-group">
+                        <h4>Documents for Order #{order._id.slice(-6)}</h4>
+                        {hasDocuments ? (
+                          <ul className="document-links">
+                          {order.idUpload?.fileUrl && (
+                            <li>
+                              <a href={order.idUpload.fileUrl} target="_blank" rel="noopener noreferrer">
+                                View Uploaded ID
+                              </a>
+                            </li>
+                          )}
+                          {order.contract?.signatureData && (
+                            <li>
+                              <a href={order.contract.signatureData} target="_blank" rel="noopener noreferrer">
+                                View Signed Contract
+                              </a>
+                            </li>
+                          )}
+                        </ul>
+                        ) : (
+                          <p>No documents available for this order.</p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p>No orders found, so no documents to display.</p>
               )}
             </div>
           </div>
@@ -564,14 +689,22 @@ const CustomerProfile = () => {
                   />
                 </div>
 
-                <button type="submit" className="btn-primary" disabled={loading}>
-                  {loading ? 'משנה סיסמה...' : 'שנה סיסמה'}
+                <button type="submit" className="btn-primary" disabled={passwordUpdating}>
+                  {passwordUpdating ? 'משנה סיסמה...' : 'שנה סיסמה'}
                 </button>
               </form>
             </div>
           </div>
         )}
       </div>
+      <ConfirmDeleteModal
+        isOpen={isModalOpen}
+        onClose={closeCancelModal}
+        onConfirm={handleCancelOrder}
+        title="Confirm Order Cancellation"
+      >
+        Are you sure you want to cancel this order? This action cannot be undone.
+      </ConfirmDeleteModal>
     </div>
   );
 };

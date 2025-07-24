@@ -2,30 +2,43 @@
 const express = require("express");
 const router = express.Router();
 const Order = require("../models/order.model");
+const authorize = require("../middleware/auth");
 
 // POST /api/orders - Create a new order (updated for new structure)
-router.post("/", async (req, res) => {
+router.post("/", authorize(['customer', 'staff', 'admin']), async (req, res) => {
   try {
-    const { user, items } = req.body;
-    if (!user || !items || !Array.isArray(items) || items.length === 0) {
+    const orderData = req.body;
+    const user = req.user._id; // Get user from token
+    
+    console.log("--- ORDER CREATION DEBUG ---");
+    console.log("Received user ID:", user);
+    console.log("Received order data:", JSON.stringify(orderData, null, 2));
+
+    if (!user || !orderData.items || !Array.isArray(orderData.items) || orderData.items.length === 0) {
       return res.status(400).json({ message: "Missing required fields: user and items array" });
     }
 
     // Validate each item has required fields
-    for (const item of items) {
-      if (!item.product || !item.rentalPeriod || !item.rentalPeriod.startDate || !item.rentalPeriod.endDate) {
-        return res.status(400).json({ message: "Each item must have product and rentalPeriod with startDate and endDate" });
-      }
+    for (let i = 0; i < orderData.items.length; i++) {
+        const item = orderData.items[i];
+        if (!item.product || !item.rentalPeriod || !item.rentalPeriod.startDate || !item.rentalPeriod.endDate) {
+            return res.status(400).json({ message: `Item ${i+1}: Missing product or rental period details` });
+        }
+        if (!item.price || item.price <= 0) {
+            return res.status(400).json({ message: `Item ${i+1}: Valid price is required` });
+        }
     }
 
     const newOrder = new Order({
-      user,
-      items,
-      status: "Pending",
-      totalValue: 0 // TODO: Calculate based on products and rental periods
+      ...orderData,
+      user
     });
 
+    console.log("Mongoose model to be saved:", JSON.stringify(newOrder, null, 2));
+
     const savedOrder = await newOrder.save();
+
+    console.log("--- END ORDER CREATION DEBUG ---");
     
      //  --- LOGGING FOR ANALYTICS ---
      console.log("Order Created:", {

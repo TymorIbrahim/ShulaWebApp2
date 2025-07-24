@@ -1,15 +1,12 @@
-const dotenv = require("dotenv");
-dotenv.config();
-
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const path = require('path');
+const express = require('express');
+const cors = require('cors');
 const http = require('http');
-require("./config/db"); // Auto-connects to database
+const path = require('path');
 const rateLimit = require('express-rate-limit');
+const mongoose = require('mongoose');
 
-// Import WebSocket service
+const connectDB = require('./config/db');
+
 const websocketService = require('./services/websocketService');
 
 const productRoutes = require('./routes/productRoutes');
@@ -20,6 +17,7 @@ const userRoutes = require('./routes/userRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const adminOrderRoutes = require('./routes/adminOrders');
 const reservationRoutes = require('./routes/reservationRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 
 const app = express();
 const server = http.createServer(app);
@@ -131,12 +129,18 @@ app.use('/api/products', productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/carts", cartRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/reservations', reservationRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/admin/orders', adminOrderRoutes);
-app.use('/api/reservations', reservationRoutes);
+app.use('/api/uploads', uploadRoutes);
 
-// Static folder for images
+// Serve static files from the 'uploads' directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Serve frontend
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../frontend/build')));
+}
 
 // Health check endpoint - works in all environments
 app.get("/", (req, res) => {
@@ -168,20 +172,39 @@ app.get("/api/test-rate-limit", (req, res) => {
   });
 });
 
-// Start the server
-const PORT = process.env.PORT || 5002;
-server.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  if (process.env.NODE_ENV === 'production') {
-    console.log('🚀 Production mode: Serving React build files');
-  }
-  
-  // Initialize WebSocket service
-  try {
-    websocketService.initialize(server);
-    console.log('🔄 WebSocket service initialized successfully');
-  } catch (error) {
-    console.error('❌ Failed to initialize WebSocket service:', error);
-  }
-});
+const PORT = parseInt(process.env.PORT, 10) || 5002;
+
+let serverInstance = null;
+
+if (require.main === module) {
+  connectDB().then(() => {
+    serverInstance = server.listen(PORT, () => {
+      console.log(`Backend server started on port ${PORT}`);
+      websocketService.initialize(server);
+    }).on('error', (err) => {
+        console.error('SERVER STARTUP ERROR:', err);
+        process.exit(1);
+    });
+  });
+}
+
+module.exports = { app, server, startServer: (port) => {
+    return new Promise((resolve, reject) => {
+        serverInstance = server.listen(port, () => {
+            console.log(`✅ Server is running on port ${port}`);
+            resolve(serverInstance);
+        }).on('error', (err) => {
+            reject(err);
+        });
+    });
+}};
+
+// Initialize WebSocket service
+/* This block is redundant and causes the handleUpgrade error. The service is already initialized when the server starts.
+try {
+  websocketService.initialize(server);
+  console.log('🔄 WebSocket service initialized successfully');
+} catch (error) {
+  console.error('❌ Failed to initialize WebSocket service:', error);
+}
+*/

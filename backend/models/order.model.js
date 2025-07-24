@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const orderItemSchema = new Schema({
   product: { type: Schema.Types.ObjectId, ref: "Product", required: true },
+  quantity: { type: Number, default: 1, min: 1, required: true },
   rentalPeriod: {
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
@@ -184,11 +185,11 @@ const orderSchema = new Schema(
     totalValue: { type: Number, required: true },
     
     // Comprehensive checkout data - optional for backward compatibility
-    customerInfo: { type: customerInfoSchema, required: false },
-    pickupReturn: { type: pickupReturnSchema, required: false },
-    contract: { type: contractSchema, required: false },
-    idUpload: { type: idUploadSchema, required: false },
-    payment: { type: paymentSchema, required: false },
+    customerInfo: { type: customerInfoSchema, required: true },
+    pickupReturn: { type: pickupReturnSchema, required: true },
+    contract: { type: contractSchema, required: true },
+    idUpload: { type: idUploadSchema, required: true },
+    payment: { type: paymentSchema, required: true },
     
     // NEW: Pickup/Return tracking
     pickupConfirmation: { type: pickupConfirmationSchema, required: false },

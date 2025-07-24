@@ -35,23 +35,17 @@ const LoginPage = () => {
     try {
       const response = await login({ email, password }); 
 
-      if (response && response.user) {
-        let userDataForContext = { ...response.user };
-
-        if (response.token) {
-          userDataForContext.token = response.token; 
-        } 
+      if (response && response.user && response.token) {
+        // Flatten the user object and token into a single object
+        const userToStore = {
+          token: response.token,
+          ...response.user
+        };
         
-        // Check if user is admin/staff
-        const isAdminLogin = userDataForContext.role && 
-                             typeof userDataForContext.role === 'string' && 
-                             userDataForContext.role === "staff";
-        
-        // Update the global auth state
-        loginUser(userDataForContext); 
+        loginUser(userToStore); 
       
         // Navigate based on admin status
-        if (isAdminLogin) {
+        if (response.user.role === "staff") {
           navigate("/admin"); 
         } else {
           navigate("/"); 

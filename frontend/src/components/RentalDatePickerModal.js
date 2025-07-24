@@ -10,7 +10,7 @@ Modal.setAppElement("#root");
 
 // --- Helper Function for Price Calculation ---
 // Moved outside the component for clarity, or can be kept inside if preferred
-const calculatePriceForPeriod = (start, end, basePrice) => {
+const calculatePriceForPeriod = (start, end, basePrice, quantity = 1) => {
     // Return null if dates are invalid, incomplete, or no base price
     if (!start || !end || end <= start || !basePrice) {
         return null;
@@ -29,24 +29,25 @@ const calculatePriceForPeriod = (start, end, basePrice) => {
         periods = Math.max(1, periods - 1); // Ensure price doesn't go below 1 period
     }
 
-    const total = periods * basePrice;
-    // console.log(`Hours: ${hours.toFixed(2)}, Periods: ${periods}, Base: ${basePrice}, Total: ${total.toFixed(2)}`); // For debugging
+    const total = periods * basePrice * quantity;
+    // console.log(`Hours: ${hours.toFixed(2)}, Periods: ${periods}, Base: ${basePrice}, Quantity: ${quantity}, Total: ${total.toFixed(2)}`); // For debugging
     return total;
 };
 // --- End Helper Function ---
 
 
-// Receive productPrice prop
-const RentalDatePickerModal = ({ isOpen, onRequestClose, onConfirm, bookedDates, productPrice }) => {
+// Receive productPrice and availableUnits props
+const RentalDatePickerModal = ({ isOpen, onRequestClose, onConfirm, bookedDates, productPrice, availableUnits = 1 }) => {
   const [dateRange, setDateRange] = useState([null, null]);
   const [startDate, endDate] = dateRange;
+  const [quantity, setQuantity] = useState(1);
   const [calculatedPrice, setCalculatedPrice] = useState(null); // State for calculated price
 
-  // Recalculate price whenever dateRange or productPrice changes
+  // Recalculate price whenever dateRange, productPrice, or quantity changes
   useEffect(() => {
-    const price = calculatePriceForPeriod(startDate, endDate, productPrice);
+    const price = calculatePriceForPeriod(startDate, endDate, productPrice, quantity);
     setCalculatedPrice(price);
-  }, [startDate, endDate, productPrice]); // Dependencies: run when these change
+  }, [startDate, endDate, productPrice, quantity]); // Dependencies: run when these change
 
 
   const filterDates = (date) => {
@@ -62,16 +63,30 @@ const RentalDatePickerModal = ({ isOpen, onRequestClose, onConfirm, bookedDates,
 
   const handleReset = () => {
     setDateRange([null, null]);
+    setQuantity(1);
     // Optionally reset calculated price too: setCalculatedPrice(null);
   };
 
   const handleConfirm = () => {
     if (startDate && endDate && endDate > startDate) {
-      onConfirm({ startDate, endDate }); // Pass dates back
+      onConfirm({ startDate, endDate, quantity }); // Pass dates and quantity back
       onRequestClose();
     } else {
       alert("בחר תאריכים חוקיים (תאריך סיום אחרי תאריך התחלה)!");
     }
+  };
+
+  const handleQuantityChange = (e) => {
+    const value = parseInt(e.target.value) || 1;
+    setQuantity(Math.max(1, Math.min(value, availableUnits)));
+  };
+
+  const incrementQuantity = () => {
+    setQuantity(prev => Math.min(prev + 1, availableUnits));
+  };
+
+  const decrementQuantity = () => {
+    setQuantity(prev => Math.max(prev - 1, 1));
   };
 
   return (
@@ -82,17 +97,56 @@ const RentalDatePickerModal = ({ isOpen, onRequestClose, onConfirm, bookedDates,
       className="CenteredModal"
       overlayClassName="CenteredOverlay"
     >
-      <h2>בחר תאריכי השכרה</h2>
+      <h2>בחר תאריכי השכרה וכמות</h2>
       <p className="calendar-instructions">
         לחץ על תאריך התחלה ובחר/גרור לתאריך סיום. ימים זמינים: ראשון, שלישי, חמישי.
       </p>
       {/* Display the base price */}
       <p align="center">( מחיר ל-48 שעות : ₪{productPrice?.toFixed(2) ?? 'N/A'})</p>
 
+      {/* Quantity selector */}
+      {availableUnits > 1 && (
+        <div className="quantity-selector">
+          <label>כמות יחידות להשכרה:</label>
+          <div className="quantity-controls">
+            <button 
+              type="button" 
+              className="quantity-btn" 
+              onClick={decrementQuantity}
+              disabled={quantity <= 1}
+            >
+              -
+            </button>
+            <input
+              type="number"
+              value={quantity}
+              onChange={handleQuantityChange}
+              min="1"
+              max={availableUnits}
+              className="quantity-input"
+            />
+            <button 
+              type="button" 
+              className="quantity-btn" 
+              onClick={incrementQuantity}
+              disabled={quantity >= availableUnits}
+            >
+              +
+            </button>
+          </div>
+          <span className="available-units-text">
+            (זמין: {availableUnits} יחידות)
+          </span>
+        </div>
+      )}
+
       {/* --- Display Calculated Price --- */}
       {calculatedPrice !== null && ( // Only show if a valid price is calculated
         <div className="calculated-price-display">
-            <p align="center">מחיר לתקופה שנבחרה: <strong>₪{calculatedPrice.toFixed(2)}</strong></p>
+            <p align="center">
+              מחיר לתקופה שנבחרה: <strong>₪{calculatedPrice.toFixed(2)}</strong>
+              {quantity > 1 && <span> ({quantity} יחידות)</span>}
+            </p>
         </div>
       )}
       {/* --- End Display Calculated Price --- */}

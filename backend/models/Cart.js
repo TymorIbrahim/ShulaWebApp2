@@ -9,6 +9,12 @@ const CartSchema = new Schema(
       startDate: { type: Date, required: true },
       endDate: { type: Date, required: true },
     },
+    quantity: { 
+      type: Number, 
+      default: 1, 
+      min: 1, 
+      required: true 
+    },
     status: {
       type: String,
       enum: ["Pending", "Accepted", "Rejected"],

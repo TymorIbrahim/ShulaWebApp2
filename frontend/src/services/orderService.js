@@ -55,7 +55,7 @@ export const getBookedDates = async (productId, token) => {
 };
 
 // --- Function to validate if a booking is possible for specific dates ---
-export const validateBooking = async (productId, startDate, endDate, token) => {
+export const validateBooking = async (productId, startDate, endDate, token, quantity = 1) => {
   try {
     const url = `${API_BASE_URL_ORDERS}/validate-booking`;
     
@@ -69,7 +69,8 @@ export const validateBooking = async (productId, startDate, endDate, token) => {
     const data = {
       productId,
       startDate,
-      endDate
+      endDate,
+      quantity
     };
     
     console.log("Validating booking:", data);

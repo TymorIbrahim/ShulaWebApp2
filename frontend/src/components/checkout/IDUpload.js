@@ -1,5 +1,8 @@
 import React, { useState } from "react";
+import axios from "axios";
 import "./IDUpload.css";
+
+const API_URL = process.env.REACT_APP_API_URL || "https://shula-rent-project-production.up.railway.app";
 
 const IDUpload = ({ data, onUpdate, onNext, onPrev, canProceed, processOrder }) => {
   const [dragActive, setDragActive] = useState(false);
@@ -52,19 +55,25 @@ const IDUpload = ({ data, onUpdate, onNext, onPrev, canProceed, processOrder }) 
     setUploading(true);
 
     try {
-      // Simulate file upload (in real app, upload to server/cloud storage)
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const formData = new FormData();
+      formData.append('image', file);
       
-      // For demo purposes, create a mock file URL
-      const mockFileUrl = `mock-id-upload-${Date.now()}.jpg`;
+      const config = {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${JSON.parse(localStorage.getItem('user')).token}`
+        }
+      };
+
+      const response = await axios.post(`${API_URL}/api/uploads/id-document`, formData, config);
       
       onUpdate({
         uploaded: true,
         fileName: file.name,
-        fileUrl: mockFileUrl
+        fileUrl: response.data.filePath
       });
 
-      console.log('ID uploaded successfully');
+      console.log('ID uploaded successfully:', response.data.filePath);
     } catch (error) {
       console.error('Upload error:', error);
       setErrors(['שגיאה בהעלאת הקובץ. אנא נסה שוב']);

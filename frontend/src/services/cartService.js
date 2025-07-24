@@ -6,7 +6,7 @@ const API_URL = `${API_BASE_URL}/api/carts`;
 
 /**
  * Adds an item to the user's cart.
- * @param {Object} cartItemData - { user, product, rentalPeriod }
+ * @param {Object} cartItemData - { user, product, rentalPeriod, quantity }
  * @param {string} token - User authentication token
  * @returns {Promise<Object>} - The API response.
  */

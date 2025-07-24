@@ -173,3 +173,119 @@
     transform: scale(1);
   }
 }
+
+/* Quantity Selector Styles */
+.quantity-selector {
+  margin: 20px 0;
+  text-align: center;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.quantity-selector label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #333;
+  font-size: 16px;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 8px;
+}
+
+.quantity-btn {
+  width: 36px;
+  height: 36px;
+  border: 2px solid #007bff;
+  background-color: #fff;
+  color: #007bff;
+  font-size: 20px;
+  font-weight: bold;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quantity-btn:hover:not(:disabled) {
+  background-color: #007bff;
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.quantity-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: #ccc;
+  color: #ccc;
+}
+
+.quantity-input {
+  width: 60px;
+  height: 36px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #333;
+}
+
+.quantity-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Remove spinner buttons for better cross-browser consistency */
+.quantity-input::-webkit-inner-spin-button,
+.quantity-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.quantity-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.available-units-text {
+  display: block;
+  font-size: 14px;
+  color: #6c757d;
+  margin-top: 5px;
+}
+
+/* Update calculated price display to accommodate quantity info */
+.calculated-price-display {
+  margin-top: 15px;
+  padding: 12px;
+  background-color: #e8f4fd;
+  border-radius: 8px;
+  border: 1px solid #b8e0ff;
+}
+
+.calculated-price-display p {
+  margin: 0;
+  font-size: 16px;
+  color: #0066cc;
+}
+
+.calculated-price-display strong {
+  font-size: 20px;
+  color: #004799;
+}
+
+.calculated-price-display span {
+  font-size: 14px;
+  color: #5a6c7d;
+  margin-left: 8px;
+}

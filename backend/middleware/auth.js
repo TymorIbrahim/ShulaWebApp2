@@ -35,6 +35,17 @@ const authorize = (requiredRoles = []) => {
       // Set user in request object
       req.user = user;
 
+      // --- START DEBUG LOG ---
+      console.log('--- AUTHORIZE MIDDLEWARE DEBUG ---');
+      console.log('Timestamp:', new Date().toISOString());
+      console.log('Route:', req.originalUrl);
+      console.log('Decoded Token User:', decoded.user);
+      console.log('User from DB:', { _id: user._id.toString(), email: user.email, role: user.role });
+      console.log('Required Roles:', requiredRoles);
+      console.log('Has Role:', user.role && requiredRoles.includes(user.role));
+      console.log('--- END DEBUG LOG ---');
+      // --- END DEBUG LOG ---
+
       // Check roles if required
       if (requiredRoles.length === 0) {
         return next();

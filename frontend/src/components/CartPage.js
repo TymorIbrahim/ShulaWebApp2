@@ -167,12 +167,24 @@ const CartPage = () => {
     }
   };
 
-  const handleUpdate = async (newDates) => {
+  const handleUpdate = async (newData) => {
     try {
       const config = getAuthHeaders();
-      await axios.put(`${API_URL}/api/carts/${selectedCartItem._id}`, {
-        rentalPeriod: newDates,
-      }, config);
+      const updatePayload = {};
+      
+      // Only include changed fields
+      if (newData.startDate && newData.endDate) {
+        updatePayload.rentalPeriod = {
+          startDate: newData.startDate,
+          endDate: newData.endDate
+        };
+      }
+      
+      if (newData.quantity !== undefined) {
+        updatePayload.quantity = newData.quantity;
+      }
+      
+      await axios.put(`${API_URL}/api/carts/${selectedCartItem._id}`, updatePayload, config);
       setEditModalOpen(false);
       setSelectedCartItem(null);
       fetchCartItems();
@@ -250,7 +262,7 @@ const CartPage = () => {
       periods = Math.max(1, periods - 1);
     }
 
-    return periods * item.product.price;
+    return periods * item.product.price * (item.quantity || 1);
   };
 
   const formatDate = (date) => {
@@ -366,8 +378,25 @@ const CartPage = () => {
                   />
                 </div>
                 <div className="item-details">
-                  <h3 className="product-name">{item.product.name}</h3>
+                  <h3>{item.product.name}</h3>
                   <p className="product-category">{item.product.category}</p>
+                  
+                  {/* Display quantity */}
+                  <div className="item-quantity">
+                    <strong>כמות:</strong> {item.quantity || 1} יחידות
+                  </div>
+                  
+                  {/* Inventory conflicts alert - per cart item */}
+                  {inventoryConflicts.has(item._id) && (
+                    <div className="item-conflict-alert">
+                      <span className="status-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M13,13H11V7H13M13,17H11V15H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+                        </svg>
+                      </span>
+                      <span className="status-text">לא זמין</span>
+                    </div>
+                  )}
                   
                   {/* Real-time availability status */}
                   {(() => {
@@ -462,6 +491,9 @@ const CartPage = () => {
                     <br />
                     {formatDate(new Date(item.rentalPeriod.startDate))} - {formatDate(new Date(item.rentalPeriod.endDate))}
                   </div>
+                  <div className="price-per-unit">
+                    מחיר ליחידה: ₪{(calculateRentalPrice(item) / (item.quantity || 1)).toFixed(2)}
+                  </div>
                 </div>
                 <div className="item-actions">
                   <button className="action-btn edit-btn" onClick={() => openEditModal(item)}>
@@ -550,7 +582,9 @@ const CartPage = () => {
           isOpen={editModalOpen}
           onRequestClose={() => setEditModalOpen(false)}
           currentRentalPeriod={selectedCartItem.rentalPeriod}
+          currentQuantity={selectedCartItem.quantity || 1}
           onSave={handleUpdate}
+          availableUnits={selectedCartItem.product.inventory?.totalUnits || 1}
         />
       )}
       {deleteModalOpen && selectedCartItem && (
