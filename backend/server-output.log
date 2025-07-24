@@ -1,0 +1,19 @@
+[dotenv@17.2.0] injecting env (6) from .env (tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] })
+[dotenv@17.2.0] injecting env (0) from .env (tip: 🔐 encrypt with dotenvx: https://dotenvx.com)
+(node:13590) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:13590) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+MongoDB Connected: shulacluster-shard-00-00.ged8w.mongodb.net
+Backend server started on port 5002
+🔄 WebSocket service initialized
+Client connected
+Authentication error: invalid signature
+Client connected
+User authenticated via WebSocket
+Client connected
+Client connected
+Client connected
+Authentication error: invalid signature
+Authentication error: invalid signature
+Authentication error: invalid signature
+Client disconnected

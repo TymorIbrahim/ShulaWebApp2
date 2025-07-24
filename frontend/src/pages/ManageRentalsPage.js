@@ -796,7 +796,7 @@ const OrderCard = ({
                                 </span>
                                 <span className="meta-divider">•</span>
                                 <span className="meta-item">
-                                    <span className="items-count">{normalizedOrder.items?.length || 0} פריטים</span>
+                                    <span className="items-count">{normalizedOrder.items?.reduce((sum, item) => sum + (item.quantity || 1), 0) || 0} פריטים</span>
                                 </span>
                             </div>
                         </div>
@@ -955,12 +955,34 @@ const OrderCard = ({
                                                     <span className="status-text">הסכם נחתם דיגיטלית</span>
                                                     <span className="status-date">נחתם ב: {formatDate(normalizedOrder.contract.signedAt)}</span>
                                                     <span className="contract-version">גרסת הסכם: {normalizedOrder.contract.agreementVersion}</span>
-                                                    {normalizedOrder.contract.signatureData && (
+                                                    {(normalizedOrder.contract.signatureData || normalizedOrder.contract.gcsSignatureUrl) && (
                                                         <button 
                                                             className="view-signature-btn"
-                                                            onClick={() => {
-                                                                const newWindow = window.open();
-                                                                newWindow.document.write(`<img src="${normalizedOrder.contract.signatureData}" alt="חתימה דיגיטלית" style="max-width:100%;"/>`);
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                const signatureUrl = normalizedOrder.contract.gcsSignatureUrl || normalizedOrder.contract.signatureData;
+                                                                const newWindow = window.open('', '_blank');
+                                                                newWindow.document.write(`
+                                                                    <!DOCTYPE html>
+                                                                    <html>
+                                                                    <head>
+                                                                        <title>חתימה דיגיטלית - ${normalizedOrder.customerInfo?.firstName} ${normalizedOrder.customerInfo?.lastName}</title>
+                                                                        <style>
+                                                                            body { margin: 0; padding: 20px; background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+                                                                            img { max-width: 90%; max-height: 90vh; box-shadow: 0 4px 20px rgba(0,0,0,0.1); background: white; padding: 20px; }
+                                                                            .container { text-align: center; }
+                                                                            h2 { font-family: Arial, sans-serif; color: #333; margin-bottom: 20px; }
+                                                                        </style>
+                                                                    </head>
+                                                                    <body>
+                                                                        <div class="container">
+                                                                            <h2>חתימה דיגיטלית - ${normalizedOrder.customerInfo?.firstName || ''} ${normalizedOrder.customerInfo?.lastName || ''}</h2>
+                                                                            <img src="${signatureUrl}" alt="חתימה דיגיטלית" />
+                                                                        </div>
+                                                                    </body>
+                                                                    </html>
+                                                                `);
+                                                                newWindow.document.close();
                                                             }}
                                                         >
                                                             צפה בחתימה
@@ -1002,12 +1024,40 @@ const OrderCard = ({
                                                 <div className="status-details">
                                                     <span className="status-text">תעודת זהות הועלתה</span>
                                                     <span className="file-info">קובץ: {normalizedOrder.idUpload.fileName}</span>
-                                                    {normalizedOrder.idUpload.fileUrl && (
+                                                    {(normalizedOrder.idUpload.fileUrl || normalizedOrder.idUpload.gcsUrl) && (
                                                         <button 
                                                             className="view-id-btn"
-                                                            onClick={() => {
-                                                                // In real implementation, this would open the actual file
-                                                                alert(`פתיחת קובץ: ${normalizedOrder.idUpload.fileName}`);
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                const imageUrl = normalizedOrder.idUpload.gcsUrl || normalizedOrder.idUpload.fileUrl;
+                                                                if (imageUrl.startsWith('data:') || imageUrl.startsWith('http')) {
+                                                                    // Open in new window
+                                                                    const newWindow = window.open('', '_blank');
+                                                                    newWindow.document.write(`
+                                                                        <!DOCTYPE html>
+                                                                        <html>
+                                                                        <head>
+                                                                            <title>תעודת זהות - ${normalizedOrder.customerInfo?.firstName} ${normalizedOrder.customerInfo?.lastName}</title>
+                                                                            <style>
+                                                                                body { margin: 0; padding: 20px; background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+                                                                                img { max-width: 90%; max-height: 90vh; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+                                                                                .container { text-align: center; }
+                                                                                h2 { font-family: Arial, sans-serif; color: #333; margin-bottom: 20px; }
+                                                                            </style>
+                                                                        </head>
+                                                                        <body>
+                                                                            <div class="container">
+                                                                                <h2>תעודת זהות - ${normalizedOrder.customerInfo?.firstName || ''} ${normalizedOrder.customerInfo?.lastName || ''}</h2>
+                                                                                <img src="${imageUrl}" alt="תעודת זהות" />
+                                                                            </div>
+                                                                        </body>
+                                                                        </html>
+                                                                    `);
+                                                                    newWindow.document.close();
+                                                                } else {
+                                                                    // Try to download if it's a relative URL
+                                                                    window.open(imageUrl, '_blank');
+                                                                }
                                                             }}
                                                         >
                                                             צפה בתעודת זהות
@@ -1135,15 +1185,15 @@ const OrderCard = ({
                         {/* Products Section */}
                         <div className="section-modern products-section">
                             <h5 className="section-title-modern">
-                                מוצרים בהזמנה ({normalizedOrder.items?.length || 0})
+                                מוצרים בהזמנה ({normalizedOrder.items?.reduce((sum, item) => sum + (item.quantity || 1), 0) || 0} פריטים)
                             </h5>
                             <div className="products-list-modern">
                                 {normalizedOrder.items && normalizedOrder.items.length > 0 ? normalizedOrder.items.map((item, index) => (
                                     <div key={index} className="product-card-modern">
                                         <div className="product-image-modern">
-                                            {item.product?.productImageUrl ? (
+                                            {item.product?.gcsUrl || item.product?.productImageUrl ? (
                                                 <img 
-                                                    src={item.product.productImageUrl} 
+                                                    src={item.product.gcsUrl || item.product.productImageUrl} 
                                                     alt={item.product.name || 'מוצר'}
                                                     onError={(e) => {
                                                         e.target.style.display = 'none';
@@ -1151,13 +1201,16 @@ const OrderCard = ({
                                                     }}
                                                 />
                                             ) : null}
-                                            <div className="product-placeholder-modern" style={{ display: item.product?.productImageUrl ? 'none' : 'flex' }}>
+                                            <div className="product-placeholder-modern" style={{ display: (item.product?.gcsUrl || item.product?.productImageUrl) ? 'none' : 'flex' }}>
                                                 ●
                                             </div>
                                         </div>
                                         <div className="product-details-modern">
                                             <h6 className="product-name-modern">
                                                 {item.product?.name || 'שם מוצר לא זמין'}
+                                                {item.quantity > 1 && (
+                                                    <span className="product-quantity-badge">×{item.quantity}</span>
+                                                )}
                                             </h6>
                                             <div className="product-meta-modern">
                                                 <div className="rental-dates-modern">
@@ -1169,6 +1222,9 @@ const OrderCard = ({
                                                 {item.product?.price && (
                                                     <div className="product-price-modern">
                                                         <span className="price-amount">₪{item.product.price}</span>
+                                                        {item.quantity > 1 && (
+                                                            <span className="price-quantity"> × {item.quantity} = ₪{item.product.price * item.quantity}</span>
+                                                        )}
                                                     </div>
                                                 )}
                                             </div>
@@ -1361,6 +1417,53 @@ const CustomerContactModal = ({ customer, onClose }) => {
                     </button>
                 </div>
                 <button onClick={onClose} className="modal-close-btn premium">סגור</button>
+            </div>
+        </div>
+    );
+};
+
+// ID Image Modal Component
+const IdImageModal = ({ imageUrl, fileName, customerName, onClose }) => {
+    if (!imageUrl) return null;
+
+    return (
+        <div className="modal-overlay premium" onClick={onClose}>
+            <div className="modal-content premium id-image-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                    <h3>תעודת זהות</h3>
+                    <p>{customerName}</p>
+                </div>
+                
+                <div className="modal-body id-image-body">
+                    <div className="id-image-container">
+                        <img 
+                            src={imageUrl} 
+                            alt="תעודת זהות"
+                            className="id-image-display"
+                            onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'block';
+                            }}
+                        />
+                        <div className="id-image-error" style={{ display: 'none' }}>
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="48" height="48">
+                                <path d="M19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19M5,6V5H19V6H5Z"/>
+                            </svg>
+                            <p>לא ניתן לטעון את התמונה</p>
+                            <p className="file-name">{fileName}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div className="modal-footer">
+                    <button onClick={onClose} className="modal-close-btn premium">סגור</button>
+                    <button 
+                        onClick={() => window.open(imageUrl, '_blank')} 
+                        className="modal-action-btn premium"
+                    >
+                        פתח בחלון חדש
+                    </button>
+                </div>
             </div>
         </div>
     );

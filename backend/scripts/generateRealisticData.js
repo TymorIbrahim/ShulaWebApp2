@@ -296,6 +296,7 @@ const generateOrders = async (customers, products, adminUser) => {
       // Build order items
       const items = selectedProducts.map(product => ({
         product: product._id,
+        quantity: 1,  // Add quantity field
         price: product.price,
         rentalPeriod: {
           startDate,
@@ -306,7 +307,7 @@ const generateOrders = async (customers, products, adminUser) => {
       // Calculate total price
       const totalPrice = items.reduce((sum, item) => {
         const days = Math.ceil((item.rentalPeriod.endDate - item.rentalPeriod.startDate) / (1000 * 60 * 60 * 24));
-        return sum + (item.price * days);
+        return sum + (item.price * days * item.quantity);
       }, 0);
       
       // Create order object
@@ -327,6 +328,40 @@ const generateOrders = async (customers, products, adminUser) => {
             phone: generatePhoneNumber(),
             relationship: ['אח', 'אחות', 'הורה', 'בן/בת זוג', 'חבר'][Math.floor(Math.random() * 5)]
           }
+        },
+        // Add pickupReturn details
+        pickupReturn: {
+          pickupAddress: ['רחוב דיזנגוף 50, תל אביב', 'רחוב אלנבי 100, תל אביב', 'רחוב בן יהודה 20, תל אביב'][Math.floor(Math.random() * 3)],
+          pickupDate: startDate,
+          pickupTime: ['09:00', '10:00', '11:00', '14:00', '15:00'][Math.floor(Math.random() * 5)],
+          returnAddress: ['רחוב דיזנגוף 50, תל אביב', 'רחוב אלנבי 100, תל אביב', 'רחוב בן יהודה 20, תל אביב'][Math.floor(Math.random() * 3)],
+          returnDate: endDate,
+          returnTime: ['17:00', '18:00', '19:00', '20:00'][Math.floor(Math.random() * 4)],
+          specialInstructions: Math.random() > 0.7 ? 'אנא התקשרו לפני הגעה' : ''
+        },
+        // Add contract details
+        contract: {
+          signed: status !== 'Pending',
+          signatureData: status !== 'Pending' ? 'Digital Signature Data' : undefined,
+          agreementVersion: '1.0',
+          signedAt: status !== 'Pending' ? orderDate : undefined
+        },
+        // Add ID upload details
+        idUpload: {
+          uploaded: !!(customer.membership && customer.membership.isMember),
+          fileName: customer.membership && customer.membership.isMember ? `ID_${customer.firstName}_${customer.lastName}.jpg` : undefined,
+          fileUrl: customer.membership && customer.membership.isMember ? `/uploads/ids/${customer._id}.jpg` : undefined
+        },
+        // Add payment details
+        payment: {
+          method: Math.random() > 0.3 ? 'online' : 'cash',
+          paymentStatus: status === 'Completed' ? 'completed' : (status === 'PickedUp' || status === 'Accepted' ? 'processing' : 'pending'),
+          transactionId: status !== 'Pending' && status !== 'Rejected' ? `TRX${Date.now()}${Math.floor(Math.random() * 1000)}` : undefined,
+          paymentDate: status !== 'Pending' && status !== 'Rejected' ? orderDate : undefined,
+          cardData: status !== 'Pending' && status !== 'Rejected' && Math.random() > 0.3 ? {
+            lastFourDigits: String(Math.floor(Math.random() * 9000) + 1000),
+            cardName: `${customer.firstName} ${customer.lastName}`
+          } : undefined
         },
         createdAt: orderDate,
         updatedAt: orderDate,

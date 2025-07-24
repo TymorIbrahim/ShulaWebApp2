@@ -669,8 +669,9 @@ body {
 /* Orders Grid */
 .orders-grid.premium {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
     gap: var(--spacing-xl);
+    width: 100%;
 }
 
 /* Modern Order Card Styles */
@@ -961,6 +962,7 @@ body {
     background: #ffffff;
     animation: expandContent 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
+    width: 100%;
 }
 
 @keyframes expandContent {
@@ -977,19 +979,23 @@ body {
 }
 
 .content-sections {
-    padding: 24px;
+    padding: 32px;
     display: grid;
-    gap: 24px;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    width: 100%;
+    max-width: 100%;
 }
 
 .section-modern {
-    background: #f9fafb;
+    background: #f8fafc;
     border-radius: 16px;
-    padding: 20px;
-    border: 1px solid #f3f4f6;
+    padding: 28px;
+    border: 1px solid #e2e8f0;
     transition: all 0.3s ease;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+    width: 100%;
 }
 
 .section-modern::before {
@@ -1059,7 +1065,9 @@ body {
 /* Products List */
 .products-list-modern {
     display: grid;
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+    width: 100%;
 }
 
 .product-card-modern {
@@ -1116,6 +1124,21 @@ body {
     color: #111827;
     margin: 0;
     line-height: 1.3;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.product-quantity-badge {
+    background: #3b82f6;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .product-meta-modern {
@@ -1145,6 +1168,13 @@ body {
     background: #d1fae5;
     padding: 4px 8px;
     border-radius: 6px;
+}
+
+.price-quantity {
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 8px;
 }
 
 .no-products-modern {
@@ -1432,9 +1462,9 @@ body {
     padding: 32px;
     border-radius: 20px;
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
-    width: auto;
+    width: 90%;
     min-width: 400px;
-    max-width: 500px;
+    max-width: 800px;
     max-height: 90vh;
     overflow-y: auto;
     text-align: right;
@@ -1851,10 +1881,11 @@ body {
 .id-upload-status-admin,
 .pickup-return-admin {
   margin: 1rem 0;
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border-left: 4px solid #0066cc;
+  padding: 1.5rem;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .section-subtitle {
@@ -1869,9 +1900,10 @@ body {
 
 .customer-details-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 0.75rem;
-  margin-bottom: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
 }
 
 .detail-item-admin {
@@ -2087,4 +2119,251 @@ body {
   .status-item-admin .status-icon {
     align-self: flex-start;
   }
+} 
+
+/* Large Desktop Optimizations */
+@media (min-width: 1400px) {
+    .orders-grid.premium {
+        grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+    }
+    
+    .modal-content.premium {
+        max-width: 1000px;
+    }
+    
+    .content-sections {
+        grid-template-columns: 1fr;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .products-list-modern {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1800px) {
+    .orders-grid.premium {
+        grid-template-columns: repeat(auto-fit, minmax(700px, 1fr));
+    }
+    
+    .modal-content.premium {
+        max-width: 1200px;
+    }
+    
+    .order-card-modern {
+        padding: 28px;
+    }
+    
+    .expanded-content-modern {
+        padding: 32px;
+    }
+} 
+
+/* Improved Expanded Order Card Layout */
+.expanded-content-modern .section-modern {
+    min-height: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.expanded-content-modern .section-modern.customer-details {
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+}
+
+.expanded-content-modern .section-modern.products-section {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+}
+
+.section-modern .contact-grid-modern {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.membership-status-section {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 2px solid #e5e7eb;
+}
+
+.membership-badge-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    background: white;
+    border-radius: 12px;
+    border: 2px solid;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.confirmation-status-section {
+    margin-top: 24px;
+    padding: 20px;
+    background: #f0f9ff;
+    border-radius: 12px;
+    border: 1px solid #bae6fd;
+}
+
+.confirmation-card {
+    background: white;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    border: 1px solid #e0f2fe;
+}
+
+.confirmation-card.pickup-confirmed {
+    border-left: 4px solid #10b981;
+}
+
+.confirmation-card.return-confirmed {
+    border-left: 4px solid #3b82f6;
+}
+
+.view-report-btn {
+    margin-top: 12px;
+    padding: 8px 16px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.view-report-btn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Better spacing for pickup-return details */
+.pickup-return-grid-admin {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 16px;
+}
+
+.pickup-details-admin,
+.return-details-admin {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+}
+
+.pickup-details-admin h7,
+.return-details-admin h7 {
+    display: block;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 12px;
+    font-size: 1rem;
+}
+
+.special-instructions {
+    margin-top: 20px;
+    padding: 16px;
+    background: #fef3c7;
+    border-radius: 8px;
+    border: 1px solid #fde68a;
+}
+
+/* Fix product card spacing in expanded view */
+.expanded-content-modern .product-card-modern {
+    background: white;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.expanded-content-modern .product-image-modern {
+    width: 100px;
+    height: 100px;
+}
+
+.expanded-content-modern .product-meta-modern {
+    gap: 12px;
+}
+
+.expanded-content-modern .price-amount {
+    font-size: 18px;
+    padding: 6px 12px;
+} 
+
+/* ID Image Modal */
+.id-image-modal {
+    max-width: 90vw;
+    max-height: 90vh;
+    width: auto;
+}
+
+.id-image-body {
+    padding: 0;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.id-image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    background: #000;
+    position: relative;
+}
+
+.id-image-display {
+    max-width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+    display: block;
+}
+
+.id-image-error {
+    text-align: center;
+    color: #fff;
+    padding: 40px;
+}
+
+.id-image-error svg {
+    opacity: 0.5;
+    margin-bottom: 20px;
+}
+
+.id-image-error p {
+    margin: 10px 0;
+    color: #ccc;
+}
+
+.id-image-error .file-name {
+    font-size: 0.9rem;
+    font-family: monospace;
+    background: rgba(255,255,255,0.1);
+    padding: 8px 16px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.modal-action-btn.premium {
+    padding: 12px 24px;
+    background: #059669;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-action-btn.premium:hover {
+    background: #047857;
+    transform: translateY(-2px);
 } 

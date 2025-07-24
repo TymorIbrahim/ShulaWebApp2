@@ -19,6 +19,8 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
     idNotes: ''
   });
 
+
+
   const getAuthHeaders = () => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     const token = user.token || user.accessToken;
@@ -28,21 +30,28 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
   };
 
   const fetchMembershipData = useCallback(async () => {
+    if (!customer || !customer._id) {
+      setError('נתוני לקוח חסרים');
+      setLoading(false);
+      return;
+    }
+    
     try {
       setLoading(true);
+      setError('');
       const config = getAuthHeaders();
       const response = await axios.get(
         `${API_URL}/api/users/membership/${customer._id}`,
         config
       );
-      setMembershipData(response.data.user);
+      setMembershipData(response.data.user || response.data);
     } catch (err) {
       console.error('Error fetching membership data:', err);
-      setError('שגיאה בטעינת נתוני החברות');
+      setError('שגיאה בטעינת נתוני החברות: ' + (err.response?.data?.message || err.message));
     } finally {
       setLoading(false);
     }
-  }, [customer._id]);
+  }, [customer]);
 
   useEffect(() => {
     fetchMembershipData();
@@ -53,8 +62,12 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
       setSaving(true);
       const config = getAuthHeaders();
       await axios.put(
-        `${API_URL}/api/users/membership/admin-verify-id/${customer._id}`,
-        { verified, idNotes: inPersonForm.idNotes },
+        `${API_URL}/api/users/membership/verify-id`,
+        { 
+          userId: customer._id,
+          verified, 
+          notes: inPersonForm.idNotes 
+        },
         config
       );
       
@@ -62,7 +75,7 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
       await fetchMembershipData();
       onMembershipUpdate && onMembershipUpdate();
     } catch (err) {
-      setError('שגיאה באישור תעודת זהות');
+      setError('שגיאה באישור תעודת זהות: ' + (err.response?.data?.message || err.message));
     } finally {
       setSaving(false);
     }
@@ -111,7 +124,7 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
   };
 
   const getMembershipStatusBadge = () => {
-    if (!membershipData?.membership?.isMember) {
+    if (!membershipData || !membershipData.membership || !membershipData.membership.isMember) {
       return <span className="membership-badge not-member">לא חבר</span>;
     }
 
@@ -152,9 +165,25 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
     return 'לא ידוע';
   };
 
+  if (!customer) {
+    return (
+      <div className="membership-modal-overlay" onClick={onClose}>
+        <div className="membership-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>ניהול חברות</h2>
+            <button className="close-btn" onClick={onClose}>✕</button>
+          </div>
+          <div className="error-content">
+            <p>נתוני לקוח חסרים</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
-      <div className="modal-overlay">
+      <div className="membership-modal-overlay">
         <div className="membership-modal">
           <div className="loading-content">
             <div className="loading-spinner"></div>
@@ -165,11 +194,13 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
     );
   }
 
+  const customerName = `${customer.firstName || ''} ${customer.lastName || ''}`.trim() || customer.email || 'לקוח';
+
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="membership-modal-overlay" onClick={onClose}>
       <div className="membership-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>ניהול חברות - {(typeof customer.firstName === 'string' ? customer.firstName : '')} {(typeof customer.lastName === 'string' ? customer.lastName : '')}</h2>
+          <h2>ניהול חברות - {customerName}</h2>
           <button className="close-btn" onClick={onClose}>✕</button>
         </div>
 
@@ -199,13 +230,19 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
         </div>
 
         <div className="modal-content">
-          {activeTab === 'overview' && (
-            <div className="overview-tab">
-              <div className="membership-status-card">
-                <h3>סטטוס חברות</h3>
-                {getMembershipStatusBadge()}
-                
-                {membershipData?.membership?.isMember && (
+          {!membershipData ? (
+            <div className="no-data-message">
+              <p>לא נמצאו נתוני חברות עבור משתמש זה</p>
+            </div>
+          ) : (
+            <>
+              {activeTab === 'overview' && (
+                <div className="overview-tab">
+                  <div className="membership-status-card">
+                    <h3>סטטוס חברות</h3>
+                    {getMembershipStatusBadge()}
+                    
+                    {membershipData?.membership?.isMember && (
                   <div className="membership-details">
                     <div className="detail-row">
                       <span className="label">תאריך הצטרפות:</span>
@@ -255,10 +292,10 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
                       <span className="date">נחתם: {formatDate(membershipData.membership.contract.signedAt)}</span>
                       <span className="version">גרסה: {membershipData.membership.contract.agreementVersion}</span>
                     </div>
-                    {membershipData.membership.contract.signatureData && (
+                    {(membershipData.membership.contract.gcsSignatureUrl || membershipData.membership.contract.signatureData) && (
                       <div className="signature-preview">
                         <img 
-                          src={membershipData.membership.contract.signatureData} 
+                          src={membershipData.membership.contract.gcsSignatureUrl || membershipData.membership.contract.signatureData} 
                           alt="חתימה" 
                           className="signature-image"
                         />
@@ -272,30 +309,64 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
 
               <div className="documents-section">
                 <h3>תעודת זהות</h3>
-                {membershipData.membership.idVerification ? (
-                  <div className="document-card">
-                    <div className="document-info">
-                      <span>
-                        {membershipData.membership.idVerification.verified ? 'מאומת' : 'ממתין לאימות'}
-                      </span>
-                      <span className="filename">{membershipData.membership.idVerification.fileName}</span>
-                      {membershipData.membership.idVerification.uploadedAt && (
-                        <span className="date">הועלה: {formatDate(membershipData.membership.idVerification.uploadedAt)}</span>
-                      )}
-                    </div>
-                    
-                    {membershipData.membership.idVerification.fileUrl && (
+                {(() => {
+                  const idDoc = membershipData.membership?.idVerification || customer?.idUpload || membershipData?.idUpload;
+                  if (!idDoc) return null;
+                  
+                  return (
+                    <div className="document-card">
+                      <div className="document-info">
+                        <span>
+                          {idDoc.verified || idDoc.uploaded ? 'מאומת' : 'ממתין לאימות'}
+                        </span>
+                        {idDoc.fileName && (
+                          <span className="filename">{idDoc.fileName}</span>
+                        )}
+                        {(idDoc.uploadedAt || idDoc.uploadDate) && (
+                          <span className="date">הועלה: {formatDate(idDoc.uploadedAt || idDoc.uploadDate)}</span>
+                        )}
+                      </div>
+                      
+                      {(idDoc.fileUrl || idDoc.gcsUrl) && (
                       <div className="document-actions">
-                        <button 
-                          className="btn-secondary"
-                          onClick={() => window.open(membershipData.membership.idVerification.fileUrl, '_blank')}
+                                                  <button 
+                            className="btn-secondary"
+                            onClick={() => {
+                              const idUrl = idDoc.gcsUrl || idDoc.fileUrl;
+                            if (idUrl.startsWith('data:') || idUrl.startsWith('http')) {
+                              const newWindow = window.open('', '_blank');
+                              newWindow.document.write(`
+                                <!DOCTYPE html>
+                                <html>
+                                <head>
+                                    <title>תעודת זהות - ${customer.firstName || ''} ${customer.lastName || ''}</title>
+                                    <style>
+                                        body { margin: 0; padding: 20px; background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+                                        img { max-width: 90%; max-height: 90vh; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+                                        .container { text-align: center; }
+                                        h2 { font-family: Arial, sans-serif; color: #333; margin-bottom: 20px; }
+                                    </style>
+                                </head>
+                                <body>
+                                    <div class="container">
+                                        <h2>תעודת זהות - ${customer.firstName || ''} ${customer.lastName || ''}</h2>
+                                        <img src="${idUrl}" alt="תעודת זהות" />
+                                    </div>
+                                </body>
+                                </html>
+                              `);
+                              newWindow.document.close();
+                            } else {
+                              window.open(idUrl, '_blank');
+                            }
+                          }}
                         >
                           הצג תעודת זהות
                         </button>
                       </div>
                     )}
                     
-                    {!membershipData.membership.idVerification.verified && (
+                      {!idDoc.verified && (
                       <div className="verification-actions">
                         <textarea
                           placeholder="הערות אימות (אופציונלי)"
@@ -322,15 +393,14 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
                       </div>
                     )}
                     
-                    {membershipData.membership.idVerification.notes && (
-                      <div className="verification-notes-display">
-                        <strong>הערות:</strong> {membershipData.membership.idVerification.notes}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="no-document">תעודת זהות לא הועלתה</div>
-                )}
+                      {idDoc.notes && (
+                        <div className="verification-notes-display">
+                          <strong>הערות:</strong> {idDoc.notes}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })() || <div className="no-document">תעודת זהות לא הועלתה</div>}
               </div>
             </div>
           )}
@@ -417,8 +487,10 @@ const MembershipModal = ({ customer, onClose, onMembershipUpdate }) => {
                     </button>
                   </div>
                 )}
+                </div>
               </div>
-            </div>
+            )}
+            </>
           )}
         </div>
       </div>

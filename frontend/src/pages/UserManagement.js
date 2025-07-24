@@ -412,9 +412,23 @@ const UserCard = ({ user, onEdit, onDelete, onShowInfo, onShowMembership }) => {
             {/* Header Section */}
             <div className="user-header-enhanced">
                 <div className="user-avatar-container">
+                    {user.profilePic || user.gcsProfilePicUrl ? (
+                        <img 
+                            src={user.gcsProfilePicUrl || user.profilePic}
+                            alt={userName}
+                            className="user-avatar-enhanced user-avatar-image"
+                            onError={(e) => {
+                                e.target.style.display = 'none';
+                                e.target.nextSibling.style.display = 'flex';
+                            }}
+                        />
+                    ) : null}
                     <div 
                         className="user-avatar-enhanced" 
-                        style={{ backgroundColor: roleBadge.color }}
+                        style={{ 
+                            backgroundColor: roleBadge.color,
+                            display: (user.profilePic || user.gcsProfilePicUrl) ? 'none' : 'flex'
+                        }}
                     >
                         {getInitials(userName)}
                     </div>
@@ -702,7 +716,21 @@ const UserInfoModal = ({ user, onClose, onEdit }) => {
                 <div className="modal-body">
                     <div className="user-details-modal">
                         <div className="user-profile-section">
-                            <div className="user-avatar-large" style={{ backgroundColor: roleBadge.color }}>
+                            {user.profilePic || user.gcsProfilePicUrl ? (
+                                <img 
+                                    src={user.gcsProfilePicUrl || user.profilePic}
+                                    alt={userName}
+                                    className="user-avatar-large user-avatar-image"
+                                    onError={(e) => {
+                                        e.target.style.display = 'none';
+                                        e.target.nextSibling.style.display = 'flex';
+                                    }}
+                                />
+                            ) : null}
+                            <div className="user-avatar-large" style={{ 
+                                backgroundColor: roleBadge.color,
+                                display: (user.profilePic || user.gcsProfilePicUrl) ? 'none' : 'flex'
+                            }}>
                                 {userName.charAt(0).toUpperCase()}
                             </div>
                             <div className="user-profile-info">

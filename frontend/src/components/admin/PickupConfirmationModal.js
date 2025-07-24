@@ -22,6 +22,7 @@ const PickupConfirmationModal = ({ order, onClose, onSuccess }) => {
       const initialItems = order.items.map(item => ({
         productId: item.product._id,
         productName: item.product.name,
+        quantity: item.quantity || 1,
         condition: 'good',
         notes: ''
       }));
@@ -212,12 +213,13 @@ const PickupConfirmationModal = ({ order, onClose, onSuccess }) => {
 
           {/* Items Handed Out */}
           <div className="section items-section">
-            <h3>פריטים שנמסרו ({pickupData.itemsHandedOut.length})</h3>
+            <h3>פריטים שנמסרו ({pickupData.itemsHandedOut.reduce((sum, item) => sum + (item.quantity || 1), 0)})</h3>
             
-            {pickupData.itemsHandedOut.map((item, index) => (
-              <div key={index} className="item-card">
+            <div className="items-container">
+              {pickupData.itemsHandedOut.map((item, index) => (
+                <div key={index} className="item-card">
                 <div className="item-header">
-                  <h4>{item.productName}</h4>
+                  <h4>{item.productName} {item.quantity > 1 && <span className="quantity-badge">×{item.quantity}</span>}</h4>
                 </div>
                 
                 <div className="item-details">
@@ -248,6 +250,7 @@ const PickupConfirmationModal = ({ order, onClose, onSuccess }) => {
                 </div>
               </div>
             ))}
+            </div>
           </div>
 
           {/* Staff and Notes */}

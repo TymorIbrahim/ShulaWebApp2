@@ -1720,8 +1720,8 @@ body {
 
 /* Product Info Modal */
 .product-info-modal {
-  width: 100%;
-  max-width: 700px;
+  width: 90%;
+  max-width: 1000px;
 }
 
 .product-details-modal {
@@ -1835,8 +1835,8 @@ body {
 
 /* Quick Inventory Modal */
 .inventory-modal {
-  width: 100%;
-  max-width: 400px;
+  width: 90%;
+  max-width: 600px;
 }
 
 .inventory-form-modal {

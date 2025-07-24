@@ -439,7 +439,7 @@ const ProductCard = ({ product, onEdit, onDelete, onShowInfo, onShowQuickInvento
                     </div>
                 )}
                 <img
-                    src={product.productImageUrl || "/placeholder.jpg"}
+                    src={product.gcsUrl || product.productImageUrl || "/placeholder.jpg"}
                     alt={product.name}
                     className={`product-image-enhanced ${imageLoading ? 'loading' : ''}`}
                     onLoad={handleImageLoad}
@@ -696,7 +696,7 @@ const ProductInfoModal = ({ product, onClose, onEdit }) => {
                     <div className="product-details-modal">
                         <div className="product-image-section">
                             <img
-                                src={product.productImageUrl || "/placeholder.jpg"}
+                                src={product.gcsUrl || product.productImageUrl || "/placeholder.jpg"}
                                 alt={product.name}
                                 className="product-image-large"
                                 onError={(e) => {
@@ -888,7 +888,7 @@ const DeleteConfirmationModal = ({ product, onConfirm, onCancel }) => {
                 <div className="delete-content">
                     <div className="product-preview">
                         <img
-                            src={product.productImageUrl || "/placeholder.jpg"}
+                            src={product.gcsUrl || product.productImageUrl || "/placeholder.jpg"}
                             alt={product.name}
                             className="product-image-small"
                         />
